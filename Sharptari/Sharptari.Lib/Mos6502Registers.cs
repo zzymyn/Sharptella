@@ -2,14 +2,14 @@
 
 public struct Mos6502Registers
 {
-    public const byte FlagNegativeMask = 0b1000_0000;
-    public const byte FlagOverflowMask = 0b0100_0000;
-    public const byte FlagUnusedMask = 0b0010_0000;
-    public const byte FlagBreakMask = 0b0001_0000;
-    public const byte FlagDecimalMask = 0b0000_1000;
-    public const byte FlagInterruptDisableMask = 0b0000_0100;
-    public const byte FlagZeroMask = 0b0000_0010;
-    public const byte FlagCarryMask = 0b0000_0001;
+    public const uint FlagNegativeMask = 0b1000_0000;
+    public const uint FlagOverflowMask = 0b0100_0000;
+    public const uint FlagUnusedMask = 0b0010_0000;
+    public const uint FlagBreakMask = 0b0001_0000;
+    public const uint FlagDecimalMask = 0b0000_1000;
+    public const uint FlagInterruptDisableMask = 0b0000_0100;
+    public const uint FlagZeroMask = 0b0000_0010;
+    public const uint FlagCarryMask = 0b0000_0001;
 
     public byte A;
     public byte P;
@@ -66,13 +66,13 @@ public struct Mos6502Registers
         set => WriteFlag(FlagCarryMask, value);
     }
 
-    private readonly bool ReadFlag(byte mask) => (P & mask) != 0;
+    private readonly bool ReadFlag(uint mask) => (P & mask) != 0;
 
-    private void WriteFlag(byte mask, bool value)
+    private void WriteFlag(uint mask, bool value)
     {
         if (value)
-            P |= mask;
+            P = (byte)(P | mask);
         else
-            P &= (byte)~mask;
+            P = (byte)(P & ~mask);
     }
 }
