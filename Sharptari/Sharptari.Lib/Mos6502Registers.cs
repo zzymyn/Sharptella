@@ -12,67 +12,38 @@ public struct Mos6502Registers
     public const uint FlagCarryMask = 0b0000_0001;
 
     public byte A;
-    public byte P;
+    public bool PNegative;
+    public bool POverflow;
+    public bool PDecimal;
+    public bool PInterruptDisable;
+    public bool PZero;
+    public bool PCarry;
     public ushort PC;
     public byte S;
     public byte X;
     public byte Y;
 
-    public bool FlagNegative
+    public readonly byte ReadP(bool fromBrk)
     {
-        readonly get => ReadFlag(FlagNegativeMask);
-        set => WriteFlag(FlagNegativeMask, value);
+        uint p = 0;
+        if (PNegative) p |= FlagNegativeMask;
+        if (POverflow) p |= FlagOverflowMask;
+        p |= FlagUnusedMask;
+        if (fromBrk) p |= FlagBreakMask;
+        if (PDecimal) p |= FlagDecimalMask;
+        if (PInterruptDisable) p |= FlagInterruptDisableMask;
+        if (PZero) p |= FlagZeroMask;
+        if (PCarry) p |= FlagCarryMask;
+        return (byte)p;
     }
 
-    public bool FlagOverflow
+    public void WriteP(byte value)
     {
-        readonly get => ReadFlag(FlagOverflowMask);
-        set => WriteFlag(FlagOverflowMask, value);
-    }
-
-    public bool FlagUnused
-    {
-        readonly get => ReadFlag(FlagUnusedMask);
-        set => WriteFlag(FlagUnusedMask, value);
-    }
-
-    public bool FlagBreak
-    {
-        readonly get => ReadFlag(FlagBreakMask);
-        set => WriteFlag(FlagBreakMask, value);
-    }
-
-    public bool FlagDecimal
-    {
-        readonly get => ReadFlag(FlagDecimalMask);
-        set => WriteFlag(FlagDecimalMask, value);
-    }
-
-    public bool FlagInterruptDisable
-    {
-        readonly get => ReadFlag(FlagInterruptDisableMask);
-        set => WriteFlag(FlagInterruptDisableMask, value);
-    }
-
-    public bool FlagZero
-    {
-        readonly get => ReadFlag(FlagZeroMask);
-        set => WriteFlag(FlagZeroMask, value);
-    }
-
-    public bool FlagCarry
-    {
-        readonly get => ReadFlag(FlagCarryMask);
-        set => WriteFlag(FlagCarryMask, value);
-    }
-
-    private readonly bool ReadFlag(uint mask) => (P & mask) != 0;
-
-    private void WriteFlag(uint mask, bool value)
-    {
-        if (value)
-            P = (byte)(P | mask);
-        else
-            P = (byte)(P & ~mask);
+        PNegative = (value & FlagNegativeMask) != 0;
+        POverflow = (value & FlagOverflowMask) != 0;
+        PDecimal = (value & FlagDecimalMask) != 0;
+        PInterruptDisable = (value & FlagInterruptDisableMask) != 0;
+        PZero = (value & FlagZeroMask) != 0;
+        PCarry = (value & FlagCarryMask) != 0;
     }
 }

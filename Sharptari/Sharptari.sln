@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.37314.3 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharptari.Lib", "Sharptari.Lib\Sharptari.Lib.csproj", "{2331982D-593E-4C9B-93EB-23AF43E7D7A2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharptari.CpuTest", "Sharptari.CpuTest\Sharptari.CpuTest.csproj", "{FD41B227-1C6E-4309-846F-7180A8450934}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{2331982D-593E-4C9B-93EB-23AF43E7D7A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2331982D-593E-4C9B-93EB-23AF43E7D7A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2331982D-593E-4C9B-93EB-23AF43E7D7A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD41B227-1C6E-4309-846F-7180A8450934}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD41B227-1C6E-4309-846F-7180A8450934}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD41B227-1C6E-4309-846F-7180A8450934}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD41B227-1C6E-4309-846F-7180A8450934}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

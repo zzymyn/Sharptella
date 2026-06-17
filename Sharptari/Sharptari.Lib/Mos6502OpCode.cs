@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Sharptari.Lib;
+﻿namespace Sharptari.Lib;
 
 public struct Mos6502OpCode
 {
@@ -19,8 +13,4 @@ public struct Mos6502OpCode
 
     public readonly uint OpCode => (Data & OpCodeHiMask) >> OpCodeHiShift | (Data & OpCodeLoMask) >> OpCodeLoShift;
     public readonly uint Mode => (Data & OpCodeModeMask) >> OpCodeModeShift;
-}
-
-public sealed class Mos6502
-{
 }
