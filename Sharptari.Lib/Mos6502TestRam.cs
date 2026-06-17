@@ -30,6 +30,16 @@ public sealed class Mos6502TestRam
         m_Log.Add(new LogItem { IsRead = false, Address = address, Value = value });
     }
 
+    public byte ReadDirect(ushort address)
+    {
+        return m_Ram[address];
+    }
+
+    public void WriteDirect(ushort address, byte value)
+    {
+        m_Ram[address] = value;
+    }
+
     public struct LogItem
     {
         public bool IsRead;

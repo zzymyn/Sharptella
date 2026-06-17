@@ -82,7 +82,7 @@ internal class Program
         var ram = new Mos6502TestRam();
         foreach (var tuple in test.Initial.Ram!)
         {
-            ram.TryWrite((ushort)tuple![0], (byte)tuple[1]);
+            ram.WriteDirect((ushort)tuple![0], (byte)tuple[1]);
         }
 
         var bus = new Mos6502Bus();
@@ -110,10 +110,38 @@ internal class Program
         foreach (var tuple in test.Final.Ram!)
         {
             var expectedValue = (byte)tuple![1];
-            var actualValue = ram.TryRead((ushort)tuple[0]);
+            var actualValue = ram.ReadDirect((ushort)tuple[0]);
             if (actualValue != expectedValue)
             {
                 return false;
+            }
+        }
+
+        var log = ram.Log;
+
+        if (log.Count != test.Cycles!.Length)
+        {
+            return false; // Number of cycles does not match
+        }
+
+        for (int i = 0; i < test.Cycles!.Length; i++)
+        {
+            var expectedCycle = test.Cycles[i]!;
+            var actualCycle = log[i];
+
+            if (expectedCycle.Type == CycleType.Read)
+            {
+                if (!actualCycle.IsRead || actualCycle.Address != expectedCycle.Address || actualCycle.Value != expectedCycle.Value)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (actualCycle.IsRead || actualCycle.Address != expectedCycle.Address || actualCycle.Value != expectedCycle.Value)
+                {
+                    return false;
+                }
             }
         }
 
