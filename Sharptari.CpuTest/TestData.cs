@@ -8,43 +8,45 @@ using System.Threading.Tasks;
 
 namespace Sharptari.CpuTest;
 
+#pragma warning disable CS0649
+
 internal sealed class TestData
 {
-    [JsonPropertyName("name")]
+    [JsonInclude, JsonPropertyName("name")]
     public string? Name;
 
-    [JsonPropertyName("initial")]
+    [JsonInclude, JsonPropertyName("initial")]
     public CpuState? Initial;
 
-    [JsonPropertyName("final")]
+    [JsonInclude, JsonPropertyName("final")]
     public CpuState? Final;
 
     // Cycles contain heterogeneous data: [address (int), value (int), type (string)]
     // We use JsonElement[] to read this safely without crashing
-    [JsonPropertyName("cycles")]
+    [JsonInclude, JsonPropertyName("cycles")]
     public JsonElement[]?[]? Cycles;
 }
 
 public sealed class CpuState
 {
-    [JsonPropertyName("pc")]
+    [JsonInclude, JsonPropertyName("pc")]
     public ushort PC;
 
-    [JsonPropertyName("s")]
+    [JsonInclude, JsonPropertyName("s")]
     public byte S;
 
-    [JsonPropertyName("a")]
+    [JsonInclude, JsonPropertyName("a")]
     public byte A;
 
-    [JsonPropertyName("x")]
+    [JsonInclude, JsonPropertyName("x")]
     public byte X;
 
-    [JsonPropertyName("y")]
+    [JsonInclude, JsonPropertyName("y")]
     public byte Y;
 
-    [JsonPropertyName("p")]
+    [JsonInclude, JsonPropertyName("p")]
     public byte P;
 
-    [JsonPropertyName("ram")]
+    [JsonInclude, JsonPropertyName("ram")]
     public int[]?[]? Ram;
 }

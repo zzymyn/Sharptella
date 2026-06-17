@@ -23,6 +23,12 @@ public struct Mos6502Registers
     public byte X;
     public byte Y;
 
+    public byte TestP
+    {
+        readonly get => ReadP(false);
+        set => WriteP(value);
+    }
+
     public readonly byte ReadP(bool fromBrk)
     {
         uint p = 0;
