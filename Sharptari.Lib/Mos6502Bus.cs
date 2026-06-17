@@ -28,9 +28,25 @@ public sealed class Mos6502Bus
     public List<IMos6502BusItem> Items { get; } = new List<IMos6502BusItem>();
 
     private byte m_BusValue;
+    private bool m_HasDoneSomethingThisStep;
+
+    public void Step()
+    {
+        if (!m_HasDoneSomethingThisStep)
+        {
+            throw new InvalidOperationException("The bus must do something each step, but nothing has done anything this step.");
+        }
+        m_HasDoneSomethingThisStep = false;
+    }
 
     public byte Read(ushort address)
     {
+        if (m_HasDoneSomethingThisStep)
+        {
+            throw new InvalidOperationException("The bus can only do one thing per step, but something has already done something this step.");
+        }
+        m_HasDoneSomethingThisStep = true;
+
         // we need to know if multiple bus items respond to the same address:
         int readValue = -1;
 
@@ -62,6 +78,12 @@ public sealed class Mos6502Bus
 
     public void Write(ushort address, byte value)
     {
+        if (m_HasDoneSomethingThisStep)
+        {
+            throw new InvalidOperationException("The bus can only do one thing per step, but something has already done something this step.");
+        }
+        m_HasDoneSomethingThisStep = true;
+
         // writing always updates the bus value:
 
         m_BusValue = value;

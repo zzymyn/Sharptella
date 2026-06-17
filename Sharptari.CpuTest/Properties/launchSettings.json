@@ -2,12 +2,12 @@
   "profiles": {
     "Sharptari.CpuTest ALL": {
       "commandName": "Project",
-      "workingDirectory": "$(SolutionDir)Ext\\SingleStepTests\\65x02\\6502\\v1"
+      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
     "Sharptari.CpuTest NOPs": {
       "commandName": "Project",
-      "commandLineArgs": "EA.json",
-      "workingDirectory": "$(SolutionDir)Ext\\SingleStepTests\\65x02\\6502\\v1"
+      "commandLineArgs": "ea.json 1a.json 3a.json 5a.json 7a.json da.json fa.json 80.json 82.json 89.json c2.json e2.json 04.json 44.json 64.json 14.json 34.json 54.json 74.json d4.json f4.json 0c.json 1c.json 3c.json 5c.json 7c.json dc.json fc.json",
+      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     }
   }
 }

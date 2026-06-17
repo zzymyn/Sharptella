@@ -11,7 +11,10 @@ public sealed class Mos6502Cpu
     private readonly Mos6502Bus m_Bus;
     private Mos6502Registers m_Registers;
 
-    private Mos6502OpCode m_CurrentOpCode;
+    private byte m_CurrentOpCode;
+    private uint m_CurrentOpCodeA;
+    private uint m_CurrentOpCodeB;
+    private uint m_CurrentOpCodeC;
     private int m_CurrentOpCodeCycle;
 
     public Mos6502Bus Bus => m_Bus;
@@ -29,14 +32,20 @@ public sealed class Mos6502Cpu
     {
         if (m_CurrentOpCodeCycle == 0)
         {
-            m_CurrentOpCode.Data = m_Bus.Read(m_Registers.PC);
+            m_CurrentOpCode = m_Bus.Read(m_Registers.PC);
+            m_CurrentOpCodeA = Mos6502OpCode.GetOpCodeA(m_CurrentOpCode);
+            m_CurrentOpCodeB = Mos6502OpCode.GetOpCodeB(m_CurrentOpCode);
+            m_CurrentOpCodeC = Mos6502OpCode.GetOpCodeC(m_CurrentOpCode);
             ++m_Registers.PC;
             m_CurrentOpCodeCycle = 1;
         }
         else
         {
             // TODO: implement the actual op codes:
+            var nextValue = m_Bus.Read(m_Registers.PC);
             m_CurrentOpCodeCycle = 0;
         }
+
+        m_Bus.Step();
     }
 }
