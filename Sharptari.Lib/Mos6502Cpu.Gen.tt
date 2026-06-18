@@ -14,6 +14,15 @@ namespace Sharptari.Lib;
 
 public sealed partial class Mos6502Cpu
 {
+<# GenImmediate("ADC"); #>
+<# GenZeropage("ADC"); #>
+<# GenZeropageXIndexed("ADC"); #>
+<# GenAbsolute("ADC"); #>
+<# GenAbsoluteXIndexed("ADC"); #>
+<# GenAbsoluteYIndexed("ADC"); #>
+<# GenIndirectXIndexed("ADC"); #>
+<# GenIndirectYIndexed("ADC"); #>
+
 <# GenImmediate("AND"); #>
 <# GenZeropage("AND"); #>
 <# GenZeropageXIndexed("AND"); #>

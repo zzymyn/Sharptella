@@ -21,6 +21,7 @@ internal class Program
         {
             Console.Write($"Running {name}: ");
 
+            int totalCount = 0;
             int successCount = 0;
 
             Parallel.ForEach(tests,
@@ -38,13 +39,14 @@ internal class Program
                         success = false;
                     }
 
+                    Interlocked.Increment(ref totalCount);
                     if (success)
                     {
                         Interlocked.Increment(ref successCount);
                     }
                 });
 
-            if (successCount != tests.Length)
+            if (successCount != totalCount)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
             }
@@ -52,7 +54,7 @@ internal class Program
             {
                 Console.ForegroundColor = ConsoleColor.Green;
             }
-            Console.WriteLine($"{successCount}/{tests.Length} tests passed.");
+            Console.WriteLine($"{successCount}/{totalCount} tests passed.");
             Console.ResetColor();
         }
     }

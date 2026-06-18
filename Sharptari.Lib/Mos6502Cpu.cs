@@ -41,6 +41,31 @@ public sealed partial class Mos6502Cpu
         {
             switch (m_CurrentOpCode)
             {
+                case 0x69:
+                    ADC_immediate();
+                    break;
+                case 0x65:
+                    ADC_zeropage();
+                    break;
+                case 0x75:
+                    ADC_zeropage_xindexed();
+                    break;
+                case 0x6d:
+                    ADC_absolute();
+                    break;
+                case 0x7d:
+                    ADC_absolute_xindexed();
+                    break;
+                case 0x79:
+                    ADC_absolute_yindexed();
+                    break;
+                case 0x61:
+                    ADC_indirect_xindexed();
+                    break;
+                case 0x71:
+                    ADC_indirect_yindexed();
+                    break;
+
                 case 0x29:
                     AND_immediate();
                     break;
@@ -173,6 +198,49 @@ public sealed partial class Mos6502Cpu
         m_Bus.Step();
     }
 
+    private void ADC()
+    {
+        if (m_Registers.PDecimal)
+        {
+            int carryIn = m_Registers.PCarry ? 1 : 0;
+
+            int resultForZero = m_Registers.A + m_SavedValue0 + carryIn;
+
+            int resultBcd = (0x0F & m_Registers.A) + (0x0F & m_SavedValue0) + carryIn;
+
+            if (resultBcd >= 10)
+                resultBcd = ((resultBcd + 6) & 0x0F) | 0x10;
+
+            resultBcd = (0xF0 & m_Registers.A) + (0xF0 & m_SavedValue0) + resultBcd;
+
+            bool negative = (resultBcd & 0x80) != 0;
+            bool overflow = ((m_Registers.A ^ m_SavedValue0) & 0x80) == 0 && ((m_Registers.A ^ resultBcd) & 0x80) != 0;
+
+            if (resultBcd >= 0xA0)
+                resultBcd += 0x60;
+
+            bool carryOut = resultBcd > 0xFF;
+
+            m_Registers.A = (byte)(resultBcd & 0xFF);
+            m_Registers.PCarry = carryOut;
+            m_Registers.PZero = (resultForZero & 0xFF) == 0;
+            m_Registers.PNegative = negative;
+            m_Registers.POverflow = overflow;
+        }
+        else
+        {
+            int carryIn = m_Registers.PCarry ? 1 : 0;
+            int result = m_Registers.A + m_SavedValue0 + carryIn;
+            bool carryOut = result > 0xFF;
+            bool overflow = ((m_Registers.A ^ m_SavedValue0) & 0x80) == 0 && ((m_Registers.A ^ result) & 0x80) != 0;
+            m_Registers.A = (byte)(result & 0xFF);
+            m_Registers.PCarry = carryOut;
+            m_Registers.PZero = (result & 0xFF) == 0;
+            m_Registers.PNegative = (result & 0x80) != 0;
+            m_Registers.POverflow = overflow;
+        }
+    }
+
     private void AND()
     {
         int result = m_Registers.A & m_SavedValue0;
@@ -205,6 +273,22 @@ public sealed partial class Mos6502Cpu
     private void NOP()
     {
         // nothing
+    }
+
+    private static byte FromBcd(byte value)
+    {
+        var low = value & 0x0F;
+        var high = (value >> 4) & 0x0F;
+        return (byte)(low + high * 10);
+    }
+
+    private static byte ToBcd(byte value)
+    {
+        if (value > 99)
+            value = 99;
+        var low = value % 10;
+        var high = value / 10;
+        return (byte)(low + (high << 4));
     }
 
     private static ushort GetAdd1NoCarry(byte value)
