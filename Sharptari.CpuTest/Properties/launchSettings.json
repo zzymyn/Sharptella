@@ -4,7 +4,17 @@
       "commandName": "Project",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest NOPs": {
+    "Sharptari.CpuTest AND": {
+      "commandName": "Project",
+      "commandLineArgs": "29.json 25.json 35.json 2D.json 3D.json 39.json 21.json 31.json",
+      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
+    },
+    "Sharptari.CpuTest LDA LDX LDY": {
+      "commandName": "Project",
+      "commandLineArgs": "a9.json a5.json b5.json ad.json bd.json b9.json a1.json b1.json a2.json a6.json b6.json ae.json be.json a0.json a4.json b4.json ac.json bc.json",
+      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
+    },
+    "Sharptari.CpuTest NOP": {
       "commandName": "Project",
       "commandLineArgs": "ea.json 1a.json 3a.json 5a.json 7a.json da.json fa.json 80.json 82.json 89.json c2.json e2.json 04.json 44.json 64.json 14.json 34.json 54.json 74.json d4.json f4.json 0c.json 1c.json 3c.json 5c.json 7c.json dc.json fc.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
