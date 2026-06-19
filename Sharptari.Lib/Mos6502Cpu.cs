@@ -131,6 +131,31 @@ public sealed partial class Mos6502Cpu
                     CLV_impl();
                     break;
 
+                case 0xc9:
+                    CMP_immediate();
+                    break;
+                case 0xc5:
+                    CMP_zeropage();
+                    break;
+                case 0xd5:
+                    CMP_zeropage_xindexed();
+                    break;
+                case 0xcd:
+                    CMP_absolute();
+                    break;
+                case 0xdd:
+                    CMP_absolute_xindexed();
+                    break;
+                case 0xd9:
+                    CMP_absolute_yindexed();
+                    break;
+                case 0xc1:
+                    CMP_indirect_xindexed();
+                    break;
+                case 0xd1:
+                    CMP_indirect_yindexed();
+                    break;
+
                 case 0xa9:
                     LDA_immediate();
                     break;
@@ -415,6 +440,19 @@ public sealed partial class Mos6502Cpu
     private void CLV()
     {
         m_Registers.POverflow = false;
+    }
+
+    private void CMP(byte arg)
+    {
+        byte invArg = (byte)~arg;
+
+        int resultFull = m_Registers.A + invArg + 1;
+        byte result = (byte)resultFull;
+
+        bool carryOut = resultFull > 0xFF;
+        m_Registers.PCarry = carryOut;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
     }
 
     private void LDA(byte arg)

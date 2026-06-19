@@ -43,6 +43,15 @@ public sealed partial class Mos6502Cpu
 
 <# Impl("CLV"); #>
 
+<# ReadImmediate("CMP"); #>
+<# ReadZeropage("CMP"); #>
+<# ReadZeropageXIndexed("CMP"); #>
+<# ReadAbsolute("CMP"); #>
+<# ReadAbsoluteXIndexed("CMP"); #>
+<# ReadAbsoluteYIndexed("CMP"); #>
+<# ReadIndirectXIndexed("CMP"); #>
+<# ReadIndirectYIndexed("CMP"); #>
+
 <# Accumulator("ASL"); #>
 <# ReadWriteZeropage("ASL"); #>
 <# ReadWriteZeropageXIndexed("ASL"); #>

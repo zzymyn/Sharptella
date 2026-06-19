@@ -19,6 +19,11 @@
       "commandLineArgs": "0a.json 06.json 16.json 0e.json 1e.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
+    "Sharptari.CpuTest CMP": {
+      "commandName": "Project",
+      "commandLineArgs": "c9.json c5.json d5.json cd.json dd.json d9.json c1.json d1.json",
+      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
+    },
     "Sharptari.CpuTest LDA LDX LDY": {
       "commandName": "Project",
       "commandLineArgs": "a9.json a5.json b5.json ad.json bd.json b9.json a1.json b1.json a2.json a6.json b6.json ae.json be.json a0.json a4.json b4.json ac.json bc.json",
