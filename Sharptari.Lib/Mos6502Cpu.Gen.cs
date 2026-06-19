@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sharptari.Lib;
 
-public sealed partial class Mos6502Cpu
+public sealed partial class Mos6502Cpu<BusT>
 {
     private void ADC_immediate()
     {

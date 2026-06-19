@@ -128,16 +128,13 @@ internal class Program
             TestP = test.Final.P,
         };
 
-        var ram = new Mos6502TestRam();
+        var bus = new Mos6502TestBus();
         foreach (var entry in test.Initial.Ram!)
         {
-            ram.WriteDirect(entry.Address, entry.Value);
+            bus.WriteDirect(entry.Address, entry.Value);
         }
 
-        var bus = new Mos6502Bus();
-        bus.Items.Add(ram);
-
-        var cpu = new Mos6502Cpu(bus, initialResigers);
+        var cpu = new Mos6502Cpu<Mos6502TestBus>(bus, initialResigers);
 
         // limit to 10 steps because JAM instructions can cause infinite loops
         // and if the test is correct it should reach the next opcode within 10 steps at most
@@ -202,14 +199,14 @@ internal class Program
         foreach (var tuple in test.Final.Ram!)
         {
             var expectedValue = tuple.Value;
-            var actualValue = ram.ReadDirect(tuple.Address);
+            var actualValue = bus.ReadDirect(tuple.Address);
             if (actualValue != expectedValue)
             {
                 return false;
             }
         }
 
-        var log = ram.Log;
+        var log = bus.Log;
 
         if (log.Count != test.Cycles!.Count)
         {

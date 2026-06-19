@@ -6,27 +6,34 @@ using System.Threading.Tasks;
 
 namespace Sharptari.Lib;
 
-public sealed partial class Mos6502Cpu
+public sealed partial class Mos6502Cpu<BusT>
+    where BusT : IMos6502Bus
 {
-    private readonly Mos6502Bus m_Bus;
+    private readonly BusT m_Bus;
     private Mos6502Registers m_Registers;
 
-    private byte m_CurrentOpCode;
+    private int m_CurrentOpCode;
     private int m_CurrentOpCodeCycle;
 
     private byte m_SavedValue0;
     private byte m_SavedValue1;
     private byte m_SavedValue2;
 
-    public Mos6502Bus Bus => m_Bus;
+    public BusT Bus => m_Bus;
     public Mos6502Registers Registers => m_Registers;
 
     public bool IsAtOpCodeStart => m_CurrentOpCodeCycle == 0;
 
-    public Mos6502Cpu(Mos6502Bus bus, Mos6502Registers initialRegisters = default)
+    public Mos6502Cpu(BusT bus, Mos6502Registers initialRegisters = default)
     {
         m_Bus = bus;
         m_Registers = initialRegisters;
+    }
+
+    public void Reboot()
+    {
+        m_CurrentOpCode = 0x100;
+        m_CurrentOpCodeCycle = 1;
     }
 
     public void Step()
@@ -42,6 +49,10 @@ public sealed partial class Mos6502Cpu
         {
             switch (m_CurrentOpCode)
             {
+                case 0x100:
+                    BOOT();
+                    break;
+
                 case 0x69:
                     ADC_immediate();
                     break;
@@ -793,6 +804,36 @@ public sealed partial class Mos6502Cpu
         }
 
         m_Bus.Step();
+    }
+
+    private void BOOT()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_Registers.PInterruptDisable = true;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+            case 4:
+            case 5:
+                _ = m_Bus.Read(GetStackAddress(m_Registers.S));
+                ++m_CurrentOpCodeCycle;
+                break;
+            case 6:
+                m_SavedValue0 = m_Bus.Read(0xFFFC);
+                m_CurrentOpCodeCycle = 7;
+                break;
+            case 7:
+                m_SavedValue1 = m_Bus.Read(0xFFFD);
+                m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
+                m_Registers.PInterruptDisable = false;
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
     }
 
     private void ADC(byte arg)
