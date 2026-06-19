@@ -363,6 +363,10 @@ public sealed partial class Mos6502Cpu
                     JSR_absolute();
                     break;
 
+                case 0xbb:
+                    LAS_absolute_yindexed();
+                    break;
+
                 case 0xa9:
                     LDA_immediate();
                     break;
@@ -1140,6 +1144,16 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 0;
                 break;
         }
+    }
+
+    private void LAS(byte arg)
+    {
+        byte result = (byte)(m_Registers.S & arg);
+        m_Registers.A = result;
+        m_Registers.X = result;
+        m_Registers.S = result;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
     }
 
     private void LDA(byte arg)

@@ -131,6 +131,8 @@ public sealed partial class Mos6502Cpu
 <# ReadWriteIndirectXIndexed("ISC"); #>
 <# ReadWriteIndirectYIndexed("ISC"); #>
 
+<# ReadAbsoluteYIndexed("LAS"); #>
+
 <# ReadImmediate("LDA"); #>
 <# ReadZeropage("LDA"); #>
 <# ReadZeropageXIndexed("LDA"); #>
