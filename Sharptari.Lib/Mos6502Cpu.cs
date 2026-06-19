@@ -101,6 +101,10 @@ public sealed partial class Mos6502Cpu
                     AND_indirect_yindexed();
                     break;
 
+                case 0x6b:
+                    ARR_immediate();
+                    break;
+
                 case 0x0a:
                     ASL_impl();
                     break;
@@ -712,6 +716,57 @@ public sealed partial class Mos6502Cpu
         m_Registers.A = result;
         m_Registers.PZero = CheckZero(result);
         m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private void ARR(byte arg)
+    {
+        int carryIn = m_Registers.PCarry ? 1 : 0;
+
+        int andResult = m_Registers.A & arg;
+        int rorResult = (andResult >> 1) | (carryIn << 7);
+        byte result = (byte)rorResult;
+
+        bool bit6 = (result & 0x40) != 0;
+        bool bit5 = (result & 0x20) != 0;
+
+        m_Registers.A = result;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+
+        // Carry is set to Bit 6 of the rotated result
+        m_Registers.PCarry = bit6;
+
+        // Overflow is set to Bit 6 XOR Bit 5 of the rotated result
+        m_Registers.POverflow = bit6 != bit5;
+
+        if (m_Registers.PDecimal)
+        {
+            int bcdResult = 0;
+
+            // Low Nibble BCD Correction
+            if ((andResult & 0x0F) + (andResult & 0x01) >= 6)
+            {
+                bcdResult |= (rorResult + 6) & 0x0F;
+            }
+            else
+            {
+                bcdResult |= rorResult & 0x0F;
+            }
+
+            // High Nibble BCD Correction
+            if ((andResult & 0xF0) + (andResult & 0x10) >= 0x60)
+            {
+                bcdResult |= (rorResult + 0x60) & 0xF0;
+                m_Registers.PCarry = true;
+            }
+            else
+            {
+                bcdResult |= rorResult & 0xF0;
+                m_Registers.PCarry = false;
+            }
+
+            m_Registers.A = (byte)bcdResult;
+        }
     }
 
     private void ASL()

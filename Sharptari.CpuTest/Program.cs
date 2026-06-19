@@ -44,6 +44,11 @@ internal class Program
                 new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
                 test =>
                 {
+                    //if ((test.Initial.P & Mos6502Registers.FlagDecimalMask) != 0)
+                    //{
+                    //    return;
+                    //}
+
                     bool success = false;
 
                     try
@@ -144,12 +149,51 @@ internal class Program
 
         var finalRegisters = cpu.Registers;
 
-        if (finalRegisters.A != expectedRegisters.A ||
-            finalRegisters.X != expectedRegisters.X ||
-            finalRegisters.Y != expectedRegisters.Y ||
-            finalRegisters.S != expectedRegisters.S ||
-            finalRegisters.PC != expectedRegisters.PC ||
-            finalRegisters.TestP != expectedRegisters.TestP)
+        if (finalRegisters.A != expectedRegisters.A)
+        {
+            return false;
+        }
+        if (finalRegisters.X != expectedRegisters.X)
+        {
+            return false;
+        }
+        if (finalRegisters.Y != expectedRegisters.Y)
+        {
+            return false;
+        }
+        if (finalRegisters.S != expectedRegisters.S)
+        {
+            return false;
+        }
+        if (finalRegisters.PC != expectedRegisters.PC)
+        {
+            return false;
+        }
+        if (finalRegisters.PNegative != expectedRegisters.PNegative)
+        {
+            return false;
+        }
+        if (finalRegisters.POverflow != expectedRegisters.POverflow)
+        {
+            return false;
+        }
+        if (finalRegisters.PDecimal != expectedRegisters.PDecimal)
+        {
+            return false;
+        }
+        if (finalRegisters.PInterruptDisable != expectedRegisters.PInterruptDisable)
+        {
+            return false;
+        }
+        if (finalRegisters.PZero != expectedRegisters.PZero)
+        {
+            return false;
+        }
+        if (finalRegisters.PCarry != expectedRegisters.PCarry)
+        {
+            return false;
+        }
+        if (finalRegisters.TestP != expectedRegisters.TestP)
         {
             return false;
         }

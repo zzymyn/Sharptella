@@ -420,6 +420,14 @@ public sealed partial class Mos6502Cpu
         }
     }
 
+    private void ARR_immediate()
+    {
+        m_SavedValue2 = m_Bus.Read(m_Registers.PC);
+        ++m_Registers.PC;
+        m_CurrentOpCodeCycle = 0;
+        ARR(m_SavedValue2);
+    }
+
     private void BCC_relative()
     {
         switch (m_CurrentOpCodeCycle)

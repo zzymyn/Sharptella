@@ -76,7 +76,7 @@
     },
     "Sharptari.CpuTest ILLEGALS": {
       "commandName": "Project",
-      "commandLineArgs": "07.json 17.json 0f.json 1f.json 1b.json 03.json 13.json 4b.json 0b.json 2b.json",
+      "commandLineArgs": "07.json 17.json 0f.json 1f.json 1b.json 03.json 13.json 4b.json 0b.json 2b.json 6b.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     }
   }
