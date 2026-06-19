@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -154,6 +154,93 @@ public sealed partial class Mos6502Cpu
                     break;
                 case 0xd1:
                     CMP_indirect_yindexed();
+                    break;
+
+                case 0xe0:
+                    CPX_immediate();
+                    break;
+                case 0xe4:
+                    CPX_zeropage();
+                    break;
+                case 0xec:
+                    CPX_absolute();
+                    break;
+
+                case 0xc0:
+                    CPY_immediate();
+                    break;
+                case 0xc4:
+                    CPY_zeropage();
+                    break;
+                case 0xcc:
+                    CPY_absolute();
+                    break;
+
+                case 0xc6:
+                    DEC_zeropage();
+                    break;
+                case 0xd6:
+                    DEC_zeropage_xindexed();
+                    break;
+                case 0xce:
+                    DEC_absolute();
+                    break;
+                case 0xde:
+                    DEC_absolute_xindexed();
+                    break;
+
+                case 0xca:
+                    DEX_impl();
+                    break;
+
+                case 0x88:
+                    DEY_impl();
+                    break;
+
+                case 0x49:
+                    EOR_immediate();
+                    break;
+                case 0x45:
+                    EOR_zeropage();
+                    break;
+                case 0x55:
+                    EOR_zeropage_xindexed();
+                    break;
+                case 0x4d:
+                    EOR_absolute();
+                    break;
+                case 0x5d:
+                    EOR_absolute_xindexed();
+                    break;
+                case 0x59:
+                    EOR_absolute_yindexed();
+                    break;
+                case 0x41:
+                    EOR_indirect_xindexed();
+                    break;
+                case 0x51:
+                    EOR_indirect_yindexed();
+                    break;
+
+                case 0xe6:
+                    INC_zeropage();
+                    break;
+                case 0xf6:
+                    INC_zeropage_xindexed();
+                    break;
+                case 0xee:
+                    INC_absolute();
+                    break;
+                case 0xfe:
+                    INC_absolute_xindexed();
+                    break;
+
+                case 0xe8:
+                    INX_impl();
+                    break;
+
+                case 0xc8:
+                    INY_impl();
                     break;
 
                 case 0xa9:
@@ -453,6 +540,84 @@ public sealed partial class Mos6502Cpu
         m_Registers.PCarry = carryOut;
         m_Registers.PZero = CheckZero(result);
         m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private void CPX(byte arg)
+    {
+        byte invArg = (byte)~arg;
+
+        int resultFull = m_Registers.X + invArg + 1;
+        byte result = (byte)resultFull;
+
+        bool carryOut = resultFull > 0xFF;
+        m_Registers.PCarry = carryOut;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private void CPY(byte arg)
+    {
+        byte invArg = (byte)~arg;
+
+        int resultFull = m_Registers.Y + invArg + 1;
+        byte result = (byte)resultFull;
+
+        bool carryOut = resultFull > 0xFF;
+        m_Registers.PCarry = carryOut;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private byte DEC(byte arg)
+    {
+        byte result = (byte)(arg - 1);
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+        return result;
+    }
+
+    private void DEX()
+    {
+        m_Registers.X = (byte)(m_Registers.X - 1);
+        m_Registers.PZero = CheckZero(m_Registers.X);
+        m_Registers.PNegative = CheckNegative(m_Registers.X);
+    }
+
+    private void DEY()
+    {
+        m_Registers.Y = (byte)(m_Registers.Y - 1);
+        m_Registers.PZero = CheckZero(m_Registers.Y);
+        m_Registers.PNegative = CheckNegative(m_Registers.Y);
+    }
+
+    private void EOR(byte arg)
+    {
+        byte result = (byte)(m_Registers.A ^ arg);
+        m_Registers.A = result;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private byte INC(byte arg)
+    {
+        byte result = (byte)(arg + 1);
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+        return result;
+    }
+
+    private void INX()
+    {
+        m_Registers.X = (byte)(m_Registers.X + 1);
+        m_Registers.PZero = CheckZero(m_Registers.X);
+        m_Registers.PNegative = CheckNegative(m_Registers.X);
+    }
+
+    private void INY()
+    {
+        m_Registers.Y = (byte)(m_Registers.Y + 1);
+        m_Registers.PZero = CheckZero(m_Registers.Y);
+        m_Registers.PNegative = CheckNegative(m_Registers.Y);
     }
 
     private void LDA(byte arg)
