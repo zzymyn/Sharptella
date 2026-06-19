@@ -3777,6 +3777,88 @@ public sealed partial class Mos6502Cpu
         }
     }
 
+    private void SAX_zeropage()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            default:
+                m_Bus.Write(m_SavedValue0, SAX());
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+    private void SAX_zeropage_yindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(m_SavedValue0);
+                m_CurrentOpCodeCycle = 3;
+                break;
+            default:
+                m_Bus.Write(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.Y), SAX());
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+    private void SAX_absolute()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            default:
+                m_Bus.Write(GetAbsolute(m_SavedValue0, m_SavedValue1), SAX());
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+    private void SAX_indirect_xindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(m_SavedValue1);
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue1, m_Registers.X));
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                m_SavedValue1 = m_Bus.Read(GetZeropageIndexedAdd1NoCarry(m_SavedValue1, m_Registers.X));
+                m_CurrentOpCodeCycle = 5;
+                break;
+            default:
+                m_Bus.Write(GetAbsolute(m_SavedValue0, m_SavedValue1), SAX());
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+
     private void SBC_immediate()
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);

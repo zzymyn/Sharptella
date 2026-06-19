@@ -625,6 +625,19 @@ public sealed partial class Mos6502Cpu
                     RTS_impl();
                     break;
 
+                case 0x87:
+                    SAX_zeropage();
+                    break;
+                case 0x97:
+                    SAX_zeropage_yindexed();
+                    break;
+                case 0x8f:
+                    SAX_absolute();
+                    break;
+                case 0x83:
+                    SAX_indirect_xindexed();
+                    break;
+
                 case 0xe9:
                     SBC_immediate();
                     break;
@@ -1479,6 +1492,11 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 0;
                 break;
         }
+    }
+
+    private byte SAX()
+    {
+        return (byte)(m_Registers.A & m_Registers.X);
     }
 
     private void SBC(byte arg)
