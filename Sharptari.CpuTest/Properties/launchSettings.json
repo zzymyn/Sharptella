@@ -76,7 +76,7 @@
     },
     "Sharptari.CpuTest ILLEGALS": {
       "commandName": "Project",
-      "commandLineArgs": "07.json 17.json 0f.json 1f.json 1b.json 03.json 13.json 4b.json 0b.json 2b.json 6b.json c7.json d7.json cf.json df.json db.json c3.json d3.json e7.json f7.json ef.json ff.json fb.json e3.json f3.json bb.json a7.json b7.json af.json bf.json a3.json b3.json 27.json 37.json 2f.json 3f.json 3b.json 23.json 33.json 67.json 77.json 6f.json 7f.json 63.json 73.json 87.json 97.json 8f.json 83.json cb.json",
+      "commandLineArgs": "07.json 17.json 0f.json 1f.json 1b.json 03.json 13.json 4b.json 0b.json 2b.json 6b.json c7.json d7.json cf.json df.json db.json c3.json d3.json e7.json f7.json ef.json ff.json fb.json e3.json f3.json bb.json a7.json b7.json af.json bf.json a3.json b3.json 27.json 37.json 2f.json 3f.json 3b.json 23.json 33.json 67.json 77.json 6f.json 7f.json 63.json 73.json 87.json 97.json 8f.json 83.json cb.json 47.json 57.json 4f.json 5f.json 5b.json 43.json 53.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     }
   }

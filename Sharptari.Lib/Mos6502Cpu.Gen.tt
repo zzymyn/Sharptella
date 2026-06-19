@@ -241,6 +241,14 @@ public sealed partial class Mos6502Cpu
 <# ReadWriteIndirectXIndexed("SLO"); #>
 <# ReadWriteIndirectYIndexed("SLO"); #>
 
+<# ReadWriteZeropage("SRE"); #>
+<# ReadWriteZeropageXIndexed("SRE"); #>
+<# ReadWriteAbsolute("SRE"); #>
+<# ReadWriteAbsoluteXIndexed("SRE"); #>
+<# ReadWriteAbsoluteYIndexed("SRE"); #>
+<# ReadWriteIndirectXIndexed("SRE"); #>
+<# ReadWriteIndirectYIndexed("SRE"); #>
+
 <# WriteZeropage("STA"); #>
 <# WriteZeropageXIndexed("STA"); #>
 <# WriteAbsolute("STA"); #>

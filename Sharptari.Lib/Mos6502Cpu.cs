@@ -701,6 +701,28 @@ public sealed partial class Mos6502Cpu
                     SLO_indirect_yindexed();
                     break;
 
+                case 0x47:
+                    SRE_zeropage();
+                    break;
+                case 0x57:
+                    SRE_zeropage_xindexed();
+                    break;
+                case 0x4f:
+                    SRE_absolute();
+                    break;
+                case 0x5f:
+                    SRE_absolute_xindexed();
+                    break;
+                case 0x5b:
+                    SRE_absolute_yindexed();
+                    break;
+                case 0x43:
+                    SRE_indirect_xindexed();
+                    break;
+                case 0x53:
+                    SRE_indirect_yindexed();
+                    break;
+
                 case 0x85:
                     STA_zeropage();
                     break;
@@ -1587,6 +1609,13 @@ public sealed partial class Mos6502Cpu
     {
         arg = ASL(arg);
         ORA(arg);
+        return arg;
+    }
+
+    private byte SRE(byte arg)
+    {
+        arg = LSR(arg);
+        EOR(arg);
         return arg;
     }
 
