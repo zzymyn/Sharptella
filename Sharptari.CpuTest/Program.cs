@@ -103,6 +103,7 @@ internal class Program
             Console.WriteLine("All tests passed successfully!");
         }
         Console.ResetColor();
+        Console.WriteLine();
     }
 
     private static bool RunTest(TestData test)

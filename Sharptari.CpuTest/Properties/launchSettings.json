@@ -76,7 +76,7 @@
     },
     "Sharptari.CpuTest ILLEGALS": {
       "commandName": "Project",
-      "commandLineArgs": "07.json 17.json 0f.json 1f.json 1b.json 03.json 13.json 4b.json 0b.json 2b.json 6b.json c7.json d7.json cf.json df.json db.json c3.json d3.json",
+      "commandLineArgs": "07.json 17.json 0f.json 1f.json 1b.json 03.json 13.json 4b.json 0b.json 2b.json 6b.json c7.json d7.json cf.json df.json db.json c3.json d3.json e7.json f7.json ef.json ff.json fb.json e3.json f3.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     }
   }

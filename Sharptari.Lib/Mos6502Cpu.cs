@@ -314,6 +314,28 @@ public sealed partial class Mos6502Cpu
                     INY_impl();
                     break;
 
+                case 0xe7:
+                    ISC_zeropage();
+                    break;
+                case 0xf7:
+                    ISC_zeropage_xindexed();
+                    break;
+                case 0xef:
+                    ISC_absolute();
+                    break;
+                case 0xff:
+                    ISC_absolute_xindexed();
+                    break;
+                case 0xfb:
+                    ISC_absolute_yindexed();
+                    break;
+                case 0xe3:
+                    ISC_indirect_xindexed();
+                    break;
+                case 0xf3:
+                    ISC_indirect_yindexed();
+                    break;
+
                 case 0x02:
                 case 0x12:
                 case 0x22:
@@ -1015,6 +1037,13 @@ public sealed partial class Mos6502Cpu
         m_Registers.Y = (byte)(m_Registers.Y + 1);
         m_Registers.PZero = CheckZero(m_Registers.Y);
         m_Registers.PNegative = CheckNegative(m_Registers.Y);
+    }
+
+    private byte ISC(byte arg)
+    {
+        byte incResult = INC(arg);
+        SBC(incResult);
+        return incResult;
     }
 
     private void JAM_impl()
