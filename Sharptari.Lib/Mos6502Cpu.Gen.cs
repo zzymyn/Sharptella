@@ -442,6 +442,34 @@ public sealed partial class Mos6502Cpu
         }
     }
 
+    private void CLC_impl()
+    {
+        _ = m_Bus.Read(m_Registers.PC);
+        m_CurrentOpCodeCycle = 0;
+        CLC();
+    }
+
+    private void CLD_impl()
+    {
+        _ = m_Bus.Read(m_Registers.PC);
+        m_CurrentOpCodeCycle = 0;
+        CLD();
+    }
+
+    private void CLI_impl()
+    {
+        _ = m_Bus.Read(m_Registers.PC);
+        m_CurrentOpCodeCycle = 0;
+        CLI();
+    }
+
+    private void CLV_impl()
+    {
+        _ = m_Bus.Read(m_Registers.PC);
+        m_CurrentOpCodeCycle = 0;
+        CLV();
+    }
+
     private void ASL_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);

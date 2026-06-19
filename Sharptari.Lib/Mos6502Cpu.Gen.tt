@@ -35,6 +35,14 @@ public sealed partial class Mos6502Cpu
 <# ReadZeropage("BIT"); #>
 <# ReadAbsolute("BIT"); #>
 
+<# Impl("CLC"); #>
+
+<# Impl("CLD"); #>
+
+<# Impl("CLI"); #>
+
+<# Impl("CLV"); #>
+
 <# Accumulator("ASL"); #>
 <# ReadWriteZeropage("ASL"); #>
 <# ReadWriteZeropageXIndexed("ASL"); #>

@@ -115,6 +115,22 @@ public sealed partial class Mos6502Cpu
                     BIT_absolute();
                     break;
 
+                case 0x18:
+                    CLC_impl();
+                    break;
+
+                case 0xd8:
+                    CLD_impl();
+                    break;
+
+                case 0x58:
+                    CLI_impl();
+                    break;
+
+                case 0xb8:
+                    CLV_impl();
+                    break;
+
                 case 0xa9:
                     LDA_immediate();
                     break;
@@ -379,6 +395,26 @@ public sealed partial class Mos6502Cpu
         m_Registers.PZero = CheckZero(result);
         m_Registers.PNegative = (arg & 0x80) != 0;
         m_Registers.POverflow = (arg & 0x40) != 0;
+    }
+
+    private void CLC()
+    {
+        m_Registers.PCarry = false;
+    }
+
+    private void CLD()
+    {
+        m_Registers.PDecimal = false;
+    }
+
+    private void CLI()
+    {
+        m_Registers.PInterruptDisable = false;
+    }
+
+    private void CLV()
+    {
+        m_Registers.POverflow = false;
     }
 
     private void LDA(byte arg)
