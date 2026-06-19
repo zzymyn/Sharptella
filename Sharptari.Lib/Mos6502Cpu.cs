@@ -108,11 +108,43 @@ public sealed partial class Mos6502Cpu
                     ASL_absolute_xindexed();
                     break;
 
+                case 0x90:
+                    BCC_relative();
+                    break;
+
+                case 0xb0:
+                    BCS_relative();
+                    break;
+
+                case 0xf0:
+                    BEQ_relative();
+                    break;
+
                 case 0x24:
                     BIT_zeropage();
                     break;
                 case 0x2c:
                     BIT_absolute();
+                    break;
+
+                case 0x30:
+                    BMI_relative();
+                    break;
+
+                case 0xd0:
+                    BNE_relative();
+                    break;
+
+                case 0x10:
+                    BPL_relative();
+                    break;
+
+                case 0x50:
+                    BVC_relative();
+                    break;
+
+                case 0x70:
+                    BVS_relative();
                     break;
 
                 case 0x18:
@@ -621,12 +653,52 @@ public sealed partial class Mos6502Cpu
         return result;
     }
 
+    private bool BCC()
+    {
+        return m_Registers.PCarry;
+    }
+
+    private bool BCS()
+    {
+        return !m_Registers.PCarry;
+    }
+
+    private bool BEQ()
+    {
+        return !m_Registers.PZero;
+    }
+
     private void BIT(byte arg)
     {
         byte result = (byte)(m_Registers.A & arg);
         m_Registers.PZero = CheckZero(result);
         m_Registers.PNegative = (arg & 0x80) != 0;
         m_Registers.POverflow = (arg & 0x40) != 0;
+    }
+
+    private bool BMI()
+    {
+        return !m_Registers.PNegative;
+    }
+
+    private bool BNE()
+    {
+        return m_Registers.PZero;
+    }
+
+    private bool BPL()
+    {
+        return m_Registers.PNegative;
+    }
+
+    private bool BVC()
+    {
+        return m_Registers.POverflow;
+    }
+
+    private bool BVS()
+    {
+        return !m_Registers.POverflow;
     }
 
     private void CLC()
@@ -1095,6 +1167,16 @@ public sealed partial class Mos6502Cpu
     private static ushort GetAbsoluteIndexed(byte low, byte high, byte x)
     {
         return (ushort)((low | high << 8) + x);
+    }
+
+    private static ushort GetRelativeSigned(ushort pc, byte offset)
+    {
+        return (ushort)(pc + (sbyte)offset);
+    }
+
+    private static ushort GetRelativeSignedNoCarry(ushort pc, byte offset)
+    {
+        return (ushort)(pc & 0xFF00 | (byte)(pc + offset));
     }
 
     private static ushort GetStackAddress(byte offset)

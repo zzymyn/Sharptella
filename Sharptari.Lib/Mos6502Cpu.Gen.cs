@@ -404,6 +404,132 @@ public sealed partial class Mos6502Cpu
         }
     }
 
+    private void BCC_relative()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+
+                if (BCC())
+                {
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 2;
+                }
+                break;
+            case 2:
+                _ = m_Bus.Read(m_Registers.PC);
+
+                ushort newPc = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                ushort pcNoCarry = GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0);
+
+                if (newPc == pcNoCarry)
+                {
+                    m_Registers.PC = newPc;
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 3;
+                }
+                break;
+            default:
+                _ = m_Bus.Read(GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0));
+                m_Registers.PC = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+
+    }
+
+    private void BCS_relative()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+
+                if (BCS())
+                {
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 2;
+                }
+                break;
+            case 2:
+                _ = m_Bus.Read(m_Registers.PC);
+
+                ushort newPc = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                ushort pcNoCarry = GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0);
+
+                if (newPc == pcNoCarry)
+                {
+                    m_Registers.PC = newPc;
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 3;
+                }
+                break;
+            default:
+                _ = m_Bus.Read(GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0));
+                m_Registers.PC = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+
+    }
+
+    private void BEQ_relative()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+
+                if (BEQ())
+                {
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 2;
+                }
+                break;
+            case 2:
+                _ = m_Bus.Read(m_Registers.PC);
+
+                ushort newPc = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                ushort pcNoCarry = GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0);
+
+                if (newPc == pcNoCarry)
+                {
+                    m_Registers.PC = newPc;
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 3;
+                }
+                break;
+            default:
+                _ = m_Bus.Read(GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0));
+                m_Registers.PC = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+
+    }
+
     private void BIT_zeropage()
     {
         switch (m_CurrentOpCodeCycle)
@@ -440,6 +566,216 @@ public sealed partial class Mos6502Cpu
                 BIT(m_SavedValue2);
                 break;
         }
+    }
+
+    private void BMI_relative()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+
+                if (BMI())
+                {
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 2;
+                }
+                break;
+            case 2:
+                _ = m_Bus.Read(m_Registers.PC);
+
+                ushort newPc = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                ushort pcNoCarry = GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0);
+
+                if (newPc == pcNoCarry)
+                {
+                    m_Registers.PC = newPc;
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 3;
+                }
+                break;
+            default:
+                _ = m_Bus.Read(GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0));
+                m_Registers.PC = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+
+    }
+
+    private void BNE_relative()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+
+                if (BNE())
+                {
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 2;
+                }
+                break;
+            case 2:
+                _ = m_Bus.Read(m_Registers.PC);
+
+                ushort newPc = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                ushort pcNoCarry = GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0);
+
+                if (newPc == pcNoCarry)
+                {
+                    m_Registers.PC = newPc;
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 3;
+                }
+                break;
+            default:
+                _ = m_Bus.Read(GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0));
+                m_Registers.PC = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+
+    }
+
+    private void BPL_relative()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+
+                if (BPL())
+                {
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 2;
+                }
+                break;
+            case 2:
+                _ = m_Bus.Read(m_Registers.PC);
+
+                ushort newPc = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                ushort pcNoCarry = GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0);
+
+                if (newPc == pcNoCarry)
+                {
+                    m_Registers.PC = newPc;
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 3;
+                }
+                break;
+            default:
+                _ = m_Bus.Read(GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0));
+                m_Registers.PC = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+
+    }
+
+    private void BVC_relative()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+
+                if (BVC())
+                {
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 2;
+                }
+                break;
+            case 2:
+                _ = m_Bus.Read(m_Registers.PC);
+
+                ushort newPc = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                ushort pcNoCarry = GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0);
+
+                if (newPc == pcNoCarry)
+                {
+                    m_Registers.PC = newPc;
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 3;
+                }
+                break;
+            default:
+                _ = m_Bus.Read(GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0));
+                m_Registers.PC = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+
+    }
+
+    private void BVS_relative()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+
+                if (BVS())
+                {
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 2;
+                }
+                break;
+            case 2:
+                _ = m_Bus.Read(m_Registers.PC);
+
+                ushort newPc = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                ushort pcNoCarry = GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0);
+
+                if (newPc == pcNoCarry)
+                {
+                    m_Registers.PC = newPc;
+                    m_CurrentOpCodeCycle = 0;
+                }
+                else
+                {
+                    m_CurrentOpCodeCycle = 3;
+                }
+                break;
+            default:
+                _ = m_Bus.Read(GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0));
+                m_Registers.PC = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+
     }
 
     private void CLC_impl()
