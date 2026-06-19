@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -12,9 +10,11 @@ using Sharptari.Lib;
 namespace Sharptari.CpuTest;
 
 internal class Program
-{
+{    
     private static async Task Main(string[] args)
     {
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+
         var testFiles = ResolveFilePaths(args);
 
         await foreach (var (name, tests) in LoadAllTests(testFiles))
@@ -57,6 +57,9 @@ internal class Program
             Console.WriteLine($"{successCount}/{totalCount} tests passed.");
             Console.ResetColor();
         }
+
+        sw.Stop();
+        Console.WriteLine($"All tests completed in {sw.Elapsed.TotalSeconds:F2} seconds.");
     }
 
     private static bool RunTest(TestData test)
@@ -82,9 +85,9 @@ internal class Program
         };
 
         var ram = new Mos6502TestRam();
-        foreach (var tuple in test.Initial.Ram!)
+        foreach (var entry in test.Initial.Ram!)
         {
-            ram.WriteDirect((ushort)tuple![0], (byte)tuple[1]);
+            ram.WriteDirect(entry.Address, entry.Value);
         }
 
         var bus = new Mos6502Bus();
@@ -111,8 +114,8 @@ internal class Program
 
         foreach (var tuple in test.Final.Ram!)
         {
-            var expectedValue = (byte)tuple![1];
-            var actualValue = ram.ReadDirect((ushort)tuple[0]);
+            var expectedValue = tuple.Value;
+            var actualValue = ram.ReadDirect(tuple.Address);
             if (actualValue != expectedValue)
             {
                 return false;
@@ -121,12 +124,12 @@ internal class Program
 
         var log = ram.Log;
 
-        if (log.Count != test.Cycles!.Length)
+        if (log.Count != test.Cycles!.Count)
         {
             return false; // Number of cycles does not match
         }
 
-        for (int i = 0; i < test.Cycles!.Length; i++)
+        for (int i = 0; i < test.Cycles!.Count; i++)
         {
             var expectedCycle = test.Cycles[i]!;
             var actualCycle = log[i];
@@ -211,22 +214,23 @@ internal class Program
         return resolvedFiles.Distinct().ToList();
     }
 
-    private static IAsyncEnumerable<(string, TestData[])> LoadAllTests(List<string> testFiles)
+    private static IAsyncEnumerable<(string, List<TestData>)> LoadAllTests(List<string> testFiles)
     {
-        var channel = Channel.CreateBounded<(string, TestData[])>(new BoundedChannelOptions(4)
+        var channel = Channel.CreateUnbounded<(string, List<TestData>)>(new UnboundedChannelOptions()
         {
-            SingleWriter = true,
+            SingleWriter = false,
             SingleReader = true,
-            FullMode = BoundedChannelFullMode.Wait // Wait/Pause the writer if the buffer is full
         });
 
         _ = Task.Run(async () =>
         {
-            foreach (var testFile in testFiles)
-            {
-                var tests = await LoadTests(testFile);
-                await channel.Writer.WriteAsync((Path.GetFileNameWithoutExtension(testFile), tests));
-            }
+            await Parallel.ForEachAsync(testFiles,
+                new ParallelOptions { MaxDegreeOfParallelism = 4 },
+                async (testFile, ct) =>
+                {
+                    var tests = await LoadTests(testFile);
+                    await channel.Writer.WriteAsync((Path.GetFileNameWithoutExtension(testFile), tests), ct);
+                });
 
             channel.Writer.Complete();
         });
@@ -234,13 +238,14 @@ internal class Program
         return channel.Reader.ReadAllAsync();
     }
 
-    private static async Task<TestData[]> LoadTests(string filePath)
+    private static async Task<List<TestData>> LoadTests(string filePath)
     {
         try
         {
             var fileData = await File.ReadAllBytesAsync(filePath);
 
-            var result = JsonSerializer.Deserialize<TestData[]>(fileData);
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var result = FastCpuTestParser.Parse(fileData);
 
             if (result == null)
             {
