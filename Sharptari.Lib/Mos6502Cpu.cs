@@ -139,6 +139,10 @@ public sealed partial class Mos6502Cpu
                     BPL_relative();
                     break;
 
+                case 0x00:
+                    BRK_impl();
+                    break;
+
                 case 0x50:
                     BVC_relative();
                     break;
@@ -474,6 +478,10 @@ public sealed partial class Mos6502Cpu
                     ROR_absolute_xindexed();
                     break;
 
+                case 0x40:
+                    RTI_impl();
+                    break;
+
                 case 0x60:
                     RTS_impl();
                     break;
@@ -705,6 +713,43 @@ public sealed partial class Mos6502Cpu
     private bool BPL()
     {
         return m_Registers.PNegative;
+    }
+
+    private void BRK_impl()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                _ = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_Bus.Write(GetStackAddress(m_Registers.S), GetHi(m_Registers.PC));
+                --m_Registers.S;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_Bus.Write(GetStackAddress(m_Registers.S), GetLo(m_Registers.PC));
+                --m_Registers.S;
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                m_Bus.Write(GetStackAddress(m_Registers.S), m_Registers.ReadP(true));
+                --m_Registers.S;
+                m_CurrentOpCodeCycle = 5;
+                break;
+            case 5:
+                m_SavedValue0 = m_Bus.Read(0xFFFE);
+                m_CurrentOpCodeCycle = 6;
+                break;
+            case 6:
+                m_SavedValue1 = m_Bus.Read(0xFFFF);
+                m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
+                m_Registers.PInterruptDisable = true;
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
     }
 
     private bool BVC()
@@ -1081,6 +1126,37 @@ public sealed partial class Mos6502Cpu
         m_Registers.PZero = CheckZero(result);
         m_Registers.PNegative = CheckNegative(result);
         return result;
+    }
+
+    private void RTI_impl()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                _ = m_Bus.Read(m_Registers.PC);
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(GetStackAddress(m_Registers.S));
+                m_Registers.S++;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_Registers.WriteP(m_Bus.Read(GetStackAddress(m_Registers.S)));
+                m_Registers.S++;
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                m_SavedValue0 = m_Bus.Read(GetStackAddress(m_Registers.S));
+                m_Registers.S++;
+                m_CurrentOpCodeCycle = 5;
+                break;
+            case 5:
+                m_SavedValue1 = m_Bus.Read(GetStackAddress(m_Registers.S));
+                m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
     }
 
     private void RTS_impl()
