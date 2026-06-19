@@ -10,10 +10,10 @@ public sealed partial class Mos6502Cpu
 {
     private void ADC_immediate()
     {
-        m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
         m_CurrentOpCodeCycle = 0;
-        ADC(m_SavedValue0);
+        ADC(m_SavedValue2);
     }
     private void ADC_zeropage()
     {
@@ -25,9 +25,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(m_SavedValue0);
+                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
                 m_CurrentOpCodeCycle = 0;
-                ADC(m_SavedValue0);
+                ADC(m_SavedValue2);
                 break;
         }
     }
@@ -45,9 +45,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
+                m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                ADC(m_SavedValue0);
+                ADC(m_SavedValue2);
                 break;
         }
     }
@@ -66,9 +66,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_CurrentOpCodeCycle = 0;
-                ADC(m_SavedValue0);
+                ADC(m_SavedValue2);
                 break;
         }
     }
@@ -94,15 +94,15 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
                     m_CurrentOpCodeCycle = 0;
-                    ADC(m_SavedValue0);
+                    ADC(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                ADC(m_SavedValue0);
+                ADC(m_SavedValue2);
                 break;
         }
     }
@@ -128,15 +128,15 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                     m_CurrentOpCodeCycle = 0;
-                    ADC(m_SavedValue0);
+                    ADC(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                 m_CurrentOpCodeCycle = 0;
-                ADC(m_SavedValue0);
+                ADC(m_SavedValue2);
                 break;
         }
     }
@@ -162,9 +162,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 5;
                 break;
             case 5:
-                m_SavedValue0 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_CurrentOpCodeCycle = 0;
-                ADC(m_SavedValue0);
+                ADC(m_SavedValue2);
                 break;
         }
     }
@@ -193,25 +193,25 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                     m_CurrentOpCodeCycle = 0;
-                    ADC(m_SavedValue0);
+                    ADC(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                 m_CurrentOpCodeCycle = 0;
-                ADC(m_SavedValue0);
+                ADC(m_SavedValue2);
                 break;
         }
     }
 
     private void AND_immediate()
     {
-        m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
         m_CurrentOpCodeCycle = 0;
-        AND(m_SavedValue0);
+        AND(m_SavedValue2);
     }
     private void AND_zeropage()
     {
@@ -223,9 +223,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(m_SavedValue0);
+                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
                 m_CurrentOpCodeCycle = 0;
-                AND(m_SavedValue0);
+                AND(m_SavedValue2);
                 break;
         }
     }
@@ -243,9 +243,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
+                m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                AND(m_SavedValue0);
+                AND(m_SavedValue2);
                 break;
         }
     }
@@ -264,9 +264,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_CurrentOpCodeCycle = 0;
-                AND(m_SavedValue0);
+                AND(m_SavedValue2);
                 break;
         }
     }
@@ -292,15 +292,15 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
                     m_CurrentOpCodeCycle = 0;
-                    AND(m_SavedValue0);
+                    AND(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                AND(m_SavedValue0);
+                AND(m_SavedValue2);
                 break;
         }
     }
@@ -326,15 +326,15 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                     m_CurrentOpCodeCycle = 0;
-                    AND(m_SavedValue0);
+                    AND(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                 m_CurrentOpCodeCycle = 0;
-                AND(m_SavedValue0);
+                AND(m_SavedValue2);
                 break;
         }
     }
@@ -360,9 +360,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 5;
                 break;
             case 5:
-                m_SavedValue0 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_CurrentOpCodeCycle = 0;
-                AND(m_SavedValue0);
+                AND(m_SavedValue2);
                 break;
         }
     }
@@ -391,25 +391,142 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                     m_CurrentOpCodeCycle = 0;
-                    AND(m_SavedValue0);
+                    AND(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                 m_CurrentOpCodeCycle = 0;
-                AND(m_SavedValue0);
+                AND(m_SavedValue2);
+                break;
+        }
+    }
+
+    private void ASL_impl()
+    {
+        _ = m_Bus.Read(m_Registers.PC);
+        m_CurrentOpCodeCycle = 0;
+        ASL();
+    }
+    private void ASL_zeropage()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_Bus.Write(m_SavedValue0, m_SavedValue2);
+                m_CurrentOpCodeCycle = 4;
+                break;
+            default:
+                m_Bus.Write(m_SavedValue0, ASL(m_SavedValue2));
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+    private void ASL_zeropage_xindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(m_SavedValue0);
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                m_Bus.Write(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X), m_SavedValue2);
+                m_CurrentOpCodeCycle = 5;
+                break;
+            default:
+                m_Bus.Write(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X), ASL(m_SavedValue2));
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+    private void ASL_absolute()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                m_Bus.Write(GetAbsolute(m_SavedValue0, m_SavedValue1), m_SavedValue2);
+                m_CurrentOpCodeCycle = 5;
+                break;
+            default:
+                m_Bus.Write(GetAbsolute(m_SavedValue0, m_SavedValue1), ASL(m_SavedValue2));
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+    private void ASL_absolute_xindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                m_CurrentOpCodeCycle = 5;
+                break;
+            case 5:
+                m_Bus.Write(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X), m_SavedValue2);
+                m_CurrentOpCodeCycle = 6;
+                break;
+            default:
+                m_Bus.Write(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X), ASL(m_SavedValue2));
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
 
     private void LDA_immediate()
     {
-        m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
         m_CurrentOpCodeCycle = 0;
-        LDA(m_SavedValue0);
+        LDA(m_SavedValue2);
     }
     private void LDA_zeropage()
     {
@@ -421,9 +538,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(m_SavedValue0);
+                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
                 m_CurrentOpCodeCycle = 0;
-                LDA(m_SavedValue0);
+                LDA(m_SavedValue2);
                 break;
         }
     }
@@ -441,9 +558,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
+                m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                LDA(m_SavedValue0);
+                LDA(m_SavedValue2);
                 break;
         }
     }
@@ -462,9 +579,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_CurrentOpCodeCycle = 0;
-                LDA(m_SavedValue0);
+                LDA(m_SavedValue2);
                 break;
         }
     }
@@ -490,15 +607,15 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
                     m_CurrentOpCodeCycle = 0;
-                    LDA(m_SavedValue0);
+                    LDA(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                LDA(m_SavedValue0);
+                LDA(m_SavedValue2);
                 break;
         }
     }
@@ -524,15 +641,15 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                     m_CurrentOpCodeCycle = 0;
-                    LDA(m_SavedValue0);
+                    LDA(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                 m_CurrentOpCodeCycle = 0;
-                LDA(m_SavedValue0);
+                LDA(m_SavedValue2);
                 break;
         }
     }
@@ -558,9 +675,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 5;
                 break;
             case 5:
-                m_SavedValue0 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_CurrentOpCodeCycle = 0;
-                LDA(m_SavedValue0);
+                LDA(m_SavedValue2);
                 break;
         }
     }
@@ -589,25 +706,25 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                     m_CurrentOpCodeCycle = 0;
-                    LDA(m_SavedValue0);
+                    LDA(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                 m_CurrentOpCodeCycle = 0;
-                LDA(m_SavedValue0);
+                LDA(m_SavedValue2);
                 break;
         }
     }
 
     private void LDX_immediate()
     {
-        m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
         m_CurrentOpCodeCycle = 0;
-        LDX(m_SavedValue0);
+        LDX(m_SavedValue2);
     }
     private void LDX_zeropage()
     {
@@ -619,9 +736,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(m_SavedValue0);
+                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
                 m_CurrentOpCodeCycle = 0;
-                LDX(m_SavedValue0);
+                LDX(m_SavedValue2);
                 break;
         }
     }
@@ -639,9 +756,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.Y));
+                m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.Y));
                 m_CurrentOpCodeCycle = 0;
-                LDX(m_SavedValue0);
+                LDX(m_SavedValue2);
                 break;
         }
     }
@@ -660,9 +777,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_CurrentOpCodeCycle = 0;
-                LDX(m_SavedValue0);
+                LDX(m_SavedValue2);
                 break;
         }
     }
@@ -688,25 +805,25 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                     m_CurrentOpCodeCycle = 0;
-                    LDX(m_SavedValue0);
+                    LDX(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                 m_CurrentOpCodeCycle = 0;
-                LDX(m_SavedValue0);
+                LDX(m_SavedValue2);
                 break;
         }
     }
 
     private void LDY_immediate()
     {
-        m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
         m_CurrentOpCodeCycle = 0;
-        LDY(m_SavedValue0);
+        LDY(m_SavedValue2);
     }
     private void LDY_zeropage()
     {
@@ -718,9 +835,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(m_SavedValue0);
+                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
                 m_CurrentOpCodeCycle = 0;
-                LDY(m_SavedValue0);
+                LDY(m_SavedValue2);
                 break;
         }
     }
@@ -738,9 +855,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
+                m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                LDY(m_SavedValue0);
+                LDY(m_SavedValue2);
                 break;
         }
     }
@@ -759,9 +876,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_CurrentOpCodeCycle = 0;
-                LDY(m_SavedValue0);
+                LDY(m_SavedValue2);
                 break;
         }
     }
@@ -787,15 +904,15 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
                     m_CurrentOpCodeCycle = 0;
-                    LDY(m_SavedValue0);
+                    LDY(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                LDY(m_SavedValue0);
+                LDY(m_SavedValue2);
                 break;
         }
     }
@@ -808,10 +925,10 @@ public sealed partial class Mos6502Cpu
     }
     private void NOP_immediate()
     {
-        m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
         m_CurrentOpCodeCycle = 0;
-        NOP(m_SavedValue0);
+        NOP(m_SavedValue2);
     }
     private void NOP_zeropage()
     {
@@ -823,9 +940,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(m_SavedValue0);
+                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
                 m_CurrentOpCodeCycle = 0;
-                NOP(m_SavedValue0);
+                NOP(m_SavedValue2);
                 break;
         }
     }
@@ -843,9 +960,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
+                m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                NOP(m_SavedValue0);
+                NOP(m_SavedValue2);
                 break;
         }
     }
@@ -864,9 +981,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_CurrentOpCodeCycle = 0;
-                NOP(m_SavedValue0);
+                NOP(m_SavedValue2);
                 break;
         }
     }
@@ -892,25 +1009,25 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
                     m_CurrentOpCodeCycle = 0;
-                    NOP(m_SavedValue0);
+                    NOP(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                NOP(m_SavedValue0);
+                NOP(m_SavedValue2);
                 break;
         }
     }
 
     private void SBC_immediate()
     {
-        m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
         m_CurrentOpCodeCycle = 0;
-        SBC(m_SavedValue0);
+        SBC(m_SavedValue2);
     }
     private void SBC_zeropage()
     {
@@ -922,9 +1039,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(m_SavedValue0);
+                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
                 m_CurrentOpCodeCycle = 0;
-                SBC(m_SavedValue0);
+                SBC(m_SavedValue2);
                 break;
         }
     }
@@ -942,9 +1059,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
+                m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                SBC(m_SavedValue0);
+                SBC(m_SavedValue2);
                 break;
         }
     }
@@ -963,9 +1080,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_CurrentOpCodeCycle = 0;
-                SBC(m_SavedValue0);
+                SBC(m_SavedValue2);
                 break;
         }
     }
@@ -991,15 +1108,15 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
                     m_CurrentOpCodeCycle = 0;
-                    SBC(m_SavedValue0);
+                    SBC(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                SBC(m_SavedValue0);
+                SBC(m_SavedValue2);
                 break;
         }
     }
@@ -1025,15 +1142,15 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                     m_CurrentOpCodeCycle = 0;
-                    SBC(m_SavedValue0);
+                    SBC(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                 m_CurrentOpCodeCycle = 0;
-                SBC(m_SavedValue0);
+                SBC(m_SavedValue2);
                 break;
         }
     }
@@ -1059,9 +1176,9 @@ public sealed partial class Mos6502Cpu
                 m_CurrentOpCodeCycle = 5;
                 break;
             case 5:
-                m_SavedValue0 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_CurrentOpCodeCycle = 0;
-                SBC(m_SavedValue0);
+                SBC(m_SavedValue2);
                 break;
         }
     }
@@ -1090,15 +1207,15 @@ public sealed partial class Mos6502Cpu
                 }
                 else
                 {
-                    m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                     m_CurrentOpCodeCycle = 0;
-                    SBC(m_SavedValue0);
+                    SBC(m_SavedValue2);
                 }
                 break;
             default:
-                m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                 m_CurrentOpCodeCycle = 0;
-                SBC(m_SavedValue0);
+                SBC(m_SavedValue2);
                 break;
         }
     }

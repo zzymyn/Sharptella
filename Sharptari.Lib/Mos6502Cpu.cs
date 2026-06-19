@@ -16,6 +16,7 @@ public sealed partial class Mos6502Cpu
 
     private byte m_SavedValue0;
     private byte m_SavedValue1;
+    private byte m_SavedValue2;
 
     public Mos6502Bus Bus => m_Bus;
     public Mos6502Registers Registers => m_Registers;
@@ -89,6 +90,22 @@ public sealed partial class Mos6502Cpu
                     break;
                 case 0x31:
                     AND_indirect_yindexed();
+                    break;
+
+                case 0x0a:
+                    ASL_impl();
+                    break;
+                case 0x06:
+                    ASL_zeropage();
+                    break;
+                case 0x16:
+                    ASL_zeropage_xindexed();
+                    break;
+                case 0x0e:
+                    ASL_absolute();
+                    break;
+                case 0x1e:
+                    ASL_absolute_xindexed();
                     break;
 
                 case 0xa9:
@@ -326,6 +343,27 @@ public sealed partial class Mos6502Cpu
         m_Registers.A = result;
         m_Registers.PZero = CheckZero(result);
         m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private void ASL()
+    {
+        byte arg = m_Registers.A;
+        byte result = (byte)(arg << 1);
+        bool carryOut = (arg & 0x80) != 0;
+        m_Registers.A = result;
+        m_Registers.PCarry = carryOut;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private byte ASL(byte arg)
+    {
+        byte result = (byte)(arg << 1);
+        bool carryOut = (arg & 0x80) != 0;
+        m_Registers.PCarry = carryOut;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+        return result;
     }
 
     private void LDA(byte arg)
