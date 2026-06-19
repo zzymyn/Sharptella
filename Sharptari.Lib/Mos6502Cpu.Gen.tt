@@ -35,13 +35,13 @@ public sealed partial class Mos6502Cpu
 <# ReadZeropage("BIT"); #>
 <# ReadAbsolute("BIT"); #>
 
-<# Impl("CLC"); #>
+<# Implied("CLC"); #>
 
-<# Impl("CLD"); #>
+<# Implied("CLD"); #>
 
-<# Impl("CLI"); #>
+<# Implied("CLI"); #>
 
-<# Impl("CLV"); #>
+<# Implied("CLV"); #>
 
 <# ReadImmediate("CMP"); #>
 <# ReadZeropage("CMP"); #>
@@ -65,9 +65,9 @@ public sealed partial class Mos6502Cpu
 <# ReadWriteAbsolute("DEC"); #>
 <# ReadWriteAbsoluteXIndexed("DEC"); #>
 
-<# Impl("DEX"); #>
+<# Implied("DEX"); #>
 
-<# Impl("DEY"); #>
+<# Implied("DEY"); #>
 
 <# ReadImmediate("EOR"); #>
 <# ReadZeropage("EOR"); #>
@@ -83,9 +83,9 @@ public sealed partial class Mos6502Cpu
 <# ReadWriteAbsolute("INC"); #>
 <# ReadWriteAbsoluteXIndexed("INC"); #>
 
-<# Impl("INX"); #>
+<# Implied("INX"); #>
 
-<# Impl("INY"); #>
+<# Implied("INY"); #>
 
 <# Accumulator("ASL"); #>
 <# ReadWriteZeropage("ASL"); #>
@@ -120,7 +120,7 @@ public sealed partial class Mos6502Cpu
 <# ReadWriteAbsolute("LSR"); #>
 <# ReadWriteAbsoluteXIndexed("LSR"); #>
 
-<# Impl("NOP"); #>
+<# Implied("NOP"); #>
 <# ReadImmediate("NOP"); #>
 <# ReadZeropage("NOP"); #>
 <# ReadZeropageXIndexed("NOP"); #>
@@ -157,11 +157,11 @@ public sealed partial class Mos6502Cpu
 <# ReadIndirectXIndexed("SBC"); #>
 <# ReadIndirectYIndexed("SBC"); #>
 
-<# Impl("SEC"); #>
+<# Implied("SEC"); #>
 
-<# Impl("SED"); #>
+<# Implied("SED"); #>
 
-<# Impl("SEI"); #>
+<# Implied("SEI"); #>
 
 <# WriteZeropage("STA"); #>
 <# WriteZeropageXIndexed("STA"); #>
@@ -179,22 +179,22 @@ public sealed partial class Mos6502Cpu
 <# WriteZeropageXIndexed("STY"); #>
 <# WriteAbsolute("STY"); #>
 
-<# Impl("TAX"); #>
+<# Implied("TAX"); #>
 
-<# Impl("TAY"); #>
+<# Implied("TAY"); #>
 
-<# Impl("TSX"); #>
+<# Implied("TSX"); #>
 
-<# Impl("TXA"); #>
+<# Implied("TXA"); #>
 
-<# Impl("TXS"); #>
+<# Implied("TXS"); #>
 
-<# Impl("TYA"); #>
+<# Implied("TYA"); #>
 
 }
 <#+
 
-private void Impl(string op)
+private void Implied(string op)
 {
 #>
     private void <#= op #>_impl()

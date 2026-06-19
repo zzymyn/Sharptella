@@ -382,6 +382,22 @@ public sealed partial class Mos6502Cpu
                     ORA_indirect_yindexed();
                     break;
 
+                case 0x48:
+                    PHA();
+                    break;
+
+                case 0x08:
+                    PHP();
+                    break;
+
+                case 0x68:
+                    PLA();
+                    break;
+
+                case 0x28:
+                    PLP();
+                    break;
+
                 case 0x2a:
                     ROL_impl();
                     break;
@@ -682,16 +698,18 @@ public sealed partial class Mos6502Cpu
 
     private void DEX()
     {
-        m_Registers.X = (byte)(m_Registers.X - 1);
-        m_Registers.PZero = CheckZero(m_Registers.X);
-        m_Registers.PNegative = CheckNegative(m_Registers.X);
+        byte result = (byte)(m_Registers.X - 1);
+        m_Registers.X = result;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
     }
 
     private void DEY()
     {
-        m_Registers.Y = (byte)(m_Registers.Y - 1);
-        m_Registers.PZero = CheckZero(m_Registers.Y);
-        m_Registers.PNegative = CheckNegative(m_Registers.Y);
+        byte result = (byte)(m_Registers.Y - 1);
+        m_Registers.Y = result;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
     }
 
     private void EOR(byte arg)
@@ -782,6 +800,82 @@ public sealed partial class Mos6502Cpu
         m_Registers.A = result;
         m_Registers.PZero = CheckZero(result);
         m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private void PHA()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                _ = m_Bus.Read(m_Registers.PC);
+                m_CurrentOpCodeCycle = 2;
+                break;
+            default:
+                m_Bus.Write(GetStackAddress(m_Registers.S), m_Registers.A);
+                --m_Registers.S;
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+
+    private void PHP()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                _ = m_Bus.Read(m_Registers.PC);
+                m_CurrentOpCodeCycle = 2;
+                break;
+            default:
+                m_Bus.Write(GetStackAddress(m_Registers.S), m_Registers.ReadP(true));
+                --m_Registers.S;
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+
+    private void PLA()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                _ = m_Bus.Read(m_Registers.PC);
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(GetStackAddress(m_Registers.S));
+                m_Registers.S++;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            default:
+                m_SavedValue2 = m_Bus.Read(GetStackAddress(m_Registers.S));
+                m_CurrentOpCodeCycle = 0;
+                m_Registers.A = m_SavedValue2;
+                m_Registers.PZero = CheckZero(m_SavedValue2);
+                m_Registers.PNegative = CheckNegative(m_SavedValue2);
+                break;
+        }
+    }
+
+    private void PLP()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                _ = m_Bus.Read(m_Registers.PC);
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(GetStackAddress(m_Registers.S));
+                m_Registers.S++;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            default:
+                m_SavedValue2 = m_Bus.Read(GetStackAddress(m_Registers.S));
+                m_CurrentOpCodeCycle = 0;
+                m_Registers.WriteP(m_SavedValue2);
+                break;
+        }
     }
 
     private void ROL()
@@ -1001,5 +1095,10 @@ public sealed partial class Mos6502Cpu
     private static ushort GetAbsoluteIndexed(byte low, byte high, byte x)
     {
         return (ushort)((low | high << 8) + x);
+    }
+
+    private static ushort GetStackAddress(byte offset)
+    {
+        return (ushort)(0x100 | offset);
     }
 }

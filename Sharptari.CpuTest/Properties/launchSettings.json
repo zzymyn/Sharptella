@@ -4,6 +4,21 @@
       "commandName": "Project",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
+    "Sharptari.CpuTest LDA LDX LDY STA STX STY TAX TAY TSX TXA TXS TYA": {
+      "commandName": "Project",
+      "commandLineArgs": "a9.json a5.json b5.json ad.json bd.json b9.json a1.json b1.json a2.json a6.json b6.json ae.json be.json a0.json a4.json b4.json ac.json bc.json 85.json 95.json 8d.json 9d.json 99.json 81.json 91.json 86.json 96.json 8e.json 84.json 94.json 8c.json aa.json a8.json ba.json 8a.json 9a.json 98.json",
+      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
+    },
+    "Sharptari.CpuTest PHA PHP PLA PLP": {
+      "commandName": "Project",
+      "commandLineArgs": "48.json 08.json 68.json 28.json",
+      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
+    },
+    "Sharptari.CpuTest DEC DEX DEY INC INX INY": {
+      "commandName": "Project",
+      "commandLineArgs": "c6.json d6.json ce.json de.json ca.json 88.json e6.json f6.json ee.json fe.json e8.json c8.json",
+      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
+    },
     "Sharptari.CpuTest ADC SBC": {
       "commandName": "Project",
       "commandLineArgs": "69.json 65.json 75.json 6d.json 7d.json 79.json 61.json 71.json e9.json e5.json f5.json ed.json fd.json f9.json e1.json f1.json",
@@ -19,29 +34,9 @@
       "commandLineArgs": "c9.json c5.json d5.json cd.json dd.json d9.json c1.json d1.json e0.json e4.json ec.json c0.json c4.json cc.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest DEC DEX DEY INC INX INY": {
-      "commandName": "Project",
-      "commandLineArgs": "c6.json d6.json ce.json de.json ca.json 88.json e6.json f6.json ee.json fe.json e8.json c8.json",
-      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
-    },
     "Sharptari.CpuTest ASL LSR ORA ROL ROR": {
       "commandName": "Project",
       "commandLineArgs": "0a.json 06.json 16.json 0e.json 1e.json 4a.json 46.json 56.json 4e.json 5e.json 09.json 05.json 15.json 0d.json 1d.json 19.json 01.json 11.json 2a.json 26.json 36.json 2e.json 3e.json 6a.json 66.json 76.json 6e.json 7e.json",
-      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
-    },
-    "Sharptari.CpuTest TAX TAY TSX TXA TXS TYA": {
-      "commandName": "Project",
-      "commandLineArgs": "aa.json a8.json ba.json 8a.json 9a.json 98.json",
-      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
-    },
-    "Sharptari.CpuTest LDA LDX LDY": {
-      "commandName": "Project",
-      "commandLineArgs": "a9.json a5.json b5.json ad.json bd.json b9.json a1.json b1.json a2.json a6.json b6.json ae.json be.json a0.json a4.json b4.json ac.json bc.json",
-      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
-    },
-    "Sharptari.CpuTest STA STX STY": {
-      "commandName": "Project",
-      "commandLineArgs": "85.json 95.json 8d.json 9d.json 99.json 81.json 91.json 86.json 96.json 8e.json 84.json 94.json 8c.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
     "Sharptari.CpuTest NOP": {
