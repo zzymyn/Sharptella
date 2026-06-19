@@ -275,6 +275,18 @@ public sealed partial class Mos6502Cpu
                     INY_impl();
                     break;
 
+                case 0x4c:
+                    JMP_absolute();
+                    break;
+
+                case 0x6c:
+                    JMP_indirect();
+                    break;
+
+                case 0x20:
+                    JSR_absolute();
+                    break;
+
                 case 0xa9:
                     LDA_immediate();
                     break;
@@ -415,19 +427,19 @@ public sealed partial class Mos6502Cpu
                     break;
 
                 case 0x48:
-                    PHA();
+                    PHA_impl();
                     break;
 
                 case 0x08:
-                    PHP();
+                    PHP_impl();
                     break;
 
                 case 0x68:
-                    PLA();
+                    PLA_impl();
                     break;
 
                 case 0x28:
-                    PLP();
+                    PLP_impl();
                     break;
 
                 case 0x2a:
@@ -460,6 +472,10 @@ public sealed partial class Mos6502Cpu
                     break;
                 case 0x7e:
                     ROR_absolute_xindexed();
+                    break;
+
+                case 0x60:
+                    RTS_impl();
                     break;
 
                 case 0xe9:
@@ -814,6 +830,81 @@ public sealed partial class Mos6502Cpu
         m_Registers.PNegative = CheckNegative(m_Registers.Y);
     }
 
+    private void JMP_absolute()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            default:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+
+    private void JMP_indirect()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                ++m_SavedValue0;
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                m_SavedValue1 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_Registers.PC = GetAbsolute(m_SavedValue2, m_SavedValue1);
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+
+    private void JSR_absolute()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(GetStackAddress(m_Registers.S));
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_Bus.Write(GetStackAddress(m_Registers.S), GetHi(m_Registers.PC));
+                --m_Registers.S;
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                m_Bus.Write(GetStackAddress(m_Registers.S), GetLo(m_Registers.PC));
+                --m_Registers.S;
+                m_CurrentOpCodeCycle = 5;
+                break;
+            default:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+
     private void LDA(byte arg)
     {
         m_Registers.A = arg;
@@ -874,7 +965,7 @@ public sealed partial class Mos6502Cpu
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    private void PHA()
+    private void PHA_impl()
     {
         switch (m_CurrentOpCodeCycle)
         {
@@ -890,7 +981,7 @@ public sealed partial class Mos6502Cpu
         }
     }
 
-    private void PHP()
+    private void PHP_impl()
     {
         switch (m_CurrentOpCodeCycle)
         {
@@ -906,7 +997,7 @@ public sealed partial class Mos6502Cpu
         }
     }
 
-    private void PLA()
+    private void PLA_impl()
     {
         switch (m_CurrentOpCodeCycle)
         {
@@ -929,7 +1020,7 @@ public sealed partial class Mos6502Cpu
         }
     }
 
-    private void PLP()
+    private void PLP_impl()
     {
         switch (m_CurrentOpCodeCycle)
         {
@@ -990,6 +1081,37 @@ public sealed partial class Mos6502Cpu
         m_Registers.PZero = CheckZero(result);
         m_Registers.PNegative = CheckNegative(result);
         return result;
+    }
+
+    private void RTS_impl()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                _ = m_Bus.Read(m_Registers.PC);
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(GetStackAddress(m_Registers.S));
+                m_Registers.S++;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_SavedValue0 = m_Bus.Read(GetStackAddress(m_Registers.S));
+                m_Registers.S++;
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                m_SavedValue1 = m_Bus.Read(GetStackAddress(m_Registers.S));
+                m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
+                m_CurrentOpCodeCycle = 5;
+                break;
+            case 5:
+                _ = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
     }
 
     private void SBC(byte arg)
@@ -1137,6 +1259,16 @@ public sealed partial class Mos6502Cpu
     private static bool CheckZero(byte value)
     {
         return value == 0;
+    }
+
+    private static byte GetLo(ushort value)
+    {
+        return (byte)value;
+    }
+
+    private static byte GetHi(ushort value)
+    {
+        return (byte)(value >> 8);
     }
 
     private static ushort GetAdd1NoCarry(byte value)
