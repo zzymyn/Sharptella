@@ -638,6 +638,10 @@ public sealed partial class Mos6502Cpu
                     SAX_indirect_xindexed();
                     break;
 
+                case 0xcb:
+                    SBX_immediate();
+                    break;
+
                 case 0xe9:
                     SBC_immediate();
                     break;
@@ -1497,6 +1501,17 @@ public sealed partial class Mos6502Cpu
     private byte SAX()
     {
         return (byte)(m_Registers.A & m_Registers.X);
+    }
+
+    private void SBX(byte arg)
+    {
+        int resultFull = (m_Registers.X & m_Registers.A) - arg;
+        byte result = (byte)resultFull;
+        bool carryOut = resultFull >= 0;
+        m_Registers.X = result;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+        m_Registers.PCarry = carryOut;
     }
 
     private void SBC(byte arg)

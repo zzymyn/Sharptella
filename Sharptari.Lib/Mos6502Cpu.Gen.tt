@@ -216,6 +216,8 @@ public sealed partial class Mos6502Cpu
 <# WriteAbsolute("SAX"); #>
 <# WriteIndirectXIndexed("SAX"); #>
 
+<# ReadImmediate("SBX"); #>
+
 <# ReadImmediate("SBC"); #>
 <# ReadZeropage("SBC"); #>
 <# ReadZeropageXIndexed("SBC"); #>

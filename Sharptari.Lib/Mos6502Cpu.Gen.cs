@@ -3859,6 +3859,14 @@ public sealed partial class Mos6502Cpu
         }
     }
 
+    private void SBX_immediate()
+    {
+        m_SavedValue2 = m_Bus.Read(m_Registers.PC);
+        ++m_Registers.PC;
+        m_CurrentOpCodeCycle = 0;
+        SBX(m_SavedValue2);
+    }
+
     private void SBC_immediate()
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
