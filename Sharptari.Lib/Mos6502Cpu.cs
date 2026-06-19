@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -223,6 +223,28 @@ public sealed partial class Mos6502Cpu
                     break;
                 case 0xcc:
                     CPY_absolute();
+                    break;
+
+                case 0xc7:
+                    DCP_zeropage();
+                    break;
+                case 0xd7:
+                    DCP_zeropage_xindexed();
+                    break;
+                case 0xcf:
+                    DCP_absolute();
+                    break;
+                case 0xdf:
+                    DCP_absolute_xindexed();
+                    break;
+                case 0xdb:
+                    DCP_absolute_yindexed();
+                    break;
+                case 0xc3:
+                    DCP_indirect_xindexed();
+                    break;
+                case 0xd3:
+                    DCP_indirect_yindexed();
                     break;
 
                 case 0xc6:
@@ -932,6 +954,13 @@ public sealed partial class Mos6502Cpu
         m_Registers.PCarry = carryOut;
         m_Registers.PZero = CheckZero(result);
         m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private byte DCP(byte arg)
+    {
+        byte decResult = DEC(arg);
+        CMP(decResult);
+        return decResult;
     }
 
     private byte DEC(byte arg)

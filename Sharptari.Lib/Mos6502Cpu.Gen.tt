@@ -82,6 +82,14 @@ public sealed partial class Mos6502Cpu
 <# ReadZeropage("CPY"); #>
 <# ReadAbsolute("CPY"); #>
 
+<# ReadWriteZeropage("DCP"); #>
+<# ReadWriteZeropageXIndexed("DCP"); #>
+<# ReadWriteAbsolute("DCP"); #>
+<# ReadWriteAbsoluteXIndexed("DCP"); #>
+<# ReadWriteAbsoluteYIndexed("DCP"); #>
+<# ReadWriteIndirectXIndexed("DCP"); #>
+<# ReadWriteIndirectYIndexed("DCP"); #>
+
 <# ReadWriteZeropage("DEC"); #>
 <# ReadWriteZeropageXIndexed("DEC"); #>
 <# ReadWriteAbsolute("DEC"); #>
