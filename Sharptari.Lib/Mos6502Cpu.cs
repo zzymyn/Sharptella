@@ -643,6 +643,7 @@ public sealed partial class Mos6502Cpu
                     break;
 
                 case 0xe9:
+                case 0xeb:
                     SBC_immediate();
                     break;
                 case 0xe5:
