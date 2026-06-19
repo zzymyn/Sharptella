@@ -2144,6 +2144,163 @@ public sealed partial class Mos6502Cpu
         }
     }
 
+    private void LAX_zeropage()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            default:
+                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
+                m_CurrentOpCodeCycle = 0;
+                LAX(m_SavedValue2);
+                break;
+        }
+    }
+    private void LAX_zeropage_yindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(m_SavedValue0);
+                m_CurrentOpCodeCycle = 3;
+                break;
+            default:
+                m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.Y));
+                m_CurrentOpCodeCycle = 0;
+                LAX(m_SavedValue2);
+                break;
+        }
+    }
+    private void LAX_absolute()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            default:
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_CurrentOpCodeCycle = 0;
+                LAX(m_SavedValue2);
+                break;
+        }
+    }
+    private void LAX_absolute_yindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                if (m_SavedValue0 + m_Registers.Y > 0xFF)
+                {
+                    _ = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                    m_CurrentOpCodeCycle = 4;
+                }
+                else
+                {
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                    m_CurrentOpCodeCycle = 0;
+                    LAX(m_SavedValue2);
+                }
+                break;
+            default:
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                m_CurrentOpCodeCycle = 0;
+                LAX(m_SavedValue2);
+                break;
+        }
+    }
+    private void LAX_indirect_xindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(m_SavedValue1);
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue1, m_Registers.X));
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                m_SavedValue1 = m_Bus.Read(GetZeropageIndexedAdd1NoCarry(m_SavedValue1, m_Registers.X));
+                m_CurrentOpCodeCycle = 5;
+                break;
+            default:
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_CurrentOpCodeCycle = 0;
+                LAX(m_SavedValue2);
+                break;
+        }
+    }
+    private void LAX_indirect_yindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_SavedValue0 = m_Bus.Read(m_SavedValue1);
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_SavedValue1 = m_Bus.Read(GetAdd1NoCarry(m_SavedValue1));
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                if (m_SavedValue0 + m_Registers.Y > 0xFF)
+                {
+                    _ = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                    m_CurrentOpCodeCycle = 5;
+                }
+                else
+                {
+                    m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                    m_CurrentOpCodeCycle = 0;
+                    LAX(m_SavedValue2);
+                }
+                break;
+            default:
+                m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                m_CurrentOpCodeCycle = 0;
+                LAX(m_SavedValue2);
+                break;
+        }
+    }
+
     private void LDA_immediate()
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);

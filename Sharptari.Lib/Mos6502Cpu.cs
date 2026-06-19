@@ -367,6 +367,25 @@ public sealed partial class Mos6502Cpu
                     LAS_absolute_yindexed();
                     break;
 
+                case 0xa7:
+                    LAX_zeropage();
+                    break;
+                case 0xb7:
+                    LAX_zeropage_yindexed();
+                    break;
+                case 0xaf:
+                    LAX_absolute();
+                    break;
+                case 0xbf:
+                    LAX_absolute_yindexed();
+                    break;
+                case 0xa3:
+                    LAX_indirect_xindexed();
+                    break;
+                case 0xb3:
+                    LAX_indirect_yindexed();
+                    break;
+
                 case 0xa9:
                     LDA_immediate();
                     break;
@@ -1154,6 +1173,14 @@ public sealed partial class Mos6502Cpu
         m_Registers.S = result;
         m_Registers.PZero = CheckZero(result);
         m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private void LAX(byte arg)
+    {
+        m_Registers.A = arg;
+        m_Registers.X = arg;
+        m_Registers.PZero = CheckZero(arg);
+        m_Registers.PNegative = CheckNegative(arg);
     }
 
     private void LDA(byte arg)

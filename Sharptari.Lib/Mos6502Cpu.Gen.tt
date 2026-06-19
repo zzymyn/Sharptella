@@ -133,6 +133,13 @@ public sealed partial class Mos6502Cpu
 
 <# ReadAbsoluteYIndexed("LAS"); #>
 
+<# ReadZeropage("LAX"); #>
+<# ReadZeropageYIndexed("LAX"); #>
+<# ReadAbsolute("LAX"); #>
+<# ReadAbsoluteYIndexed("LAX"); #>
+<# ReadIndirectXIndexed("LAX"); #>
+<# ReadIndirectYIndexed("LAX"); #>
+
 <# ReadImmediate("LDA"); #>
 <# ReadZeropage("LDA"); #>
 <# ReadZeropageXIndexed("LDA"); #>
