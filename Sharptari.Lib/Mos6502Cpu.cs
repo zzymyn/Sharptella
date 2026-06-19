@@ -188,6 +188,74 @@ public sealed partial class Mos6502Cpu
                 case 0xfc:
                     NOP_absolute_xindexed();
                     break;
+
+                case 0xe9:
+                    SBC_immediate();
+                    break;
+                case 0xe5:
+                    SBC_zeropage();
+                    break;
+                case 0xf5:
+                    SBC_zeropage_xindexed();
+                    break;
+                case 0xed:
+                    SBC_absolute();
+                    break;
+                case 0xfd:
+                    SBC_absolute_xindexed();
+                    break;
+                case 0xf9:
+                    SBC_absolute_yindexed();
+                    break;
+                case 0xe1:
+                    SBC_indirect_xindexed();
+                    break;
+                case 0xf1:
+                    SBC_indirect_yindexed();
+                    break;
+
+                case 0x85:
+                    STA_zeropage();
+                    break;
+                case 0x95:
+                    STA_zeropage_xindexed();
+                    break;
+                case 0x8d:
+                    STA_absolute();
+                    break;
+                case 0x9d:
+                    STA_absolute_xindexed();
+                    break;
+                case 0x99:
+                    STA_absolute_yindexed();
+                    break;
+                case 0x81:
+                    STA_indirect_xindexed();
+                    break;
+                case 0x91:
+                    STA_indirect_yindexed();
+                    break;
+
+                case 0x86:
+                    STX_zeropage();
+                    break;
+                case 0x96:
+                    STX_zeropage_yindexed();
+                    break;
+                case 0x8e:
+                    STX_absolute();
+                    break;
+
+                case 0x84:
+                    STY_zeropage();
+                    break;
+                case 0x94:
+                    STY_zeropage_xindexed();
+                    break;
+                case 0x8c:
+                    STY_absolute();
+                    break;
+
                 default:
                     _ = m_Bus.Read(m_Registers.PC);
                     m_CurrentOpCodeCycle = 0;
@@ -198,97 +266,184 @@ public sealed partial class Mos6502Cpu
         m_Bus.Step();
     }
 
-    private void ADC()
+    private void ADC(byte arg)
     {
         if (m_Registers.PDecimal)
         {
             int carryIn = m_Registers.PCarry ? 1 : 0;
 
-            int resultForZero = m_Registers.A + m_SavedValue0 + carryIn;
+            int resultFull = (0x0F & m_Registers.A) + (0x0F & arg) + carryIn;
 
-            int resultBcd = (0x0F & m_Registers.A) + (0x0F & m_SavedValue0) + carryIn;
+            if (resultFull >= 10)
+                resultFull = ((resultFull + 6) & 0x0F) | 0x10;
 
-            if (resultBcd >= 10)
-                resultBcd = ((resultBcd + 6) & 0x0F) | 0x10;
+            resultFull = (0xF0 & m_Registers.A) + (0xF0 & arg) + resultFull;
+            byte result = (byte)resultFull;
 
-            resultBcd = (0xF0 & m_Registers.A) + (0xF0 & m_SavedValue0) + resultBcd;
+            // 6502 sets the negative flag based on the result before adjusting for BCD, for some reason:
+            bool negative = CheckNegative(result);
+            bool overflow = CheckOverflow(m_Registers.A, arg, result);
 
-            bool negative = (resultBcd & 0x80) != 0;
-            bool overflow = ((m_Registers.A ^ m_SavedValue0) & 0x80) == 0 && ((m_Registers.A ^ resultBcd) & 0x80) != 0;
+            if (resultFull >= 0xA0)
+                resultFull += 0x60;
 
-            if (resultBcd >= 0xA0)
-                resultBcd += 0x60;
+            result = (byte)resultFull;
 
-            bool carryOut = resultBcd > 0xFF;
+            bool carryOut = resultFull > 0xFF;
 
-            m_Registers.A = (byte)(resultBcd & 0xFF);
+            // the 6502 calcs the zero flag based on the non-bcd result, for some reason:
+            int resultForZero = m_Registers.A + arg + carryIn;
+            bool zero = CheckZero((byte)resultForZero);
+
+            m_Registers.A = result;
             m_Registers.PCarry = carryOut;
-            m_Registers.PZero = (resultForZero & 0xFF) == 0;
+            m_Registers.PZero = zero;
             m_Registers.PNegative = negative;
             m_Registers.POverflow = overflow;
         }
         else
         {
             int carryIn = m_Registers.PCarry ? 1 : 0;
-            int result = m_Registers.A + m_SavedValue0 + carryIn;
-            bool carryOut = result > 0xFF;
-            bool overflow = ((m_Registers.A ^ m_SavedValue0) & 0x80) == 0 && ((m_Registers.A ^ result) & 0x80) != 0;
-            m_Registers.A = (byte)(result & 0xFF);
+
+            int resultFull = m_Registers.A + arg + carryIn;
+            byte result = (byte)resultFull;
+
+            bool carryOut = resultFull > 0xFF;
+            bool overflow = CheckOverflow(m_Registers.A, arg, result);
+
+            m_Registers.A = result;
             m_Registers.PCarry = carryOut;
-            m_Registers.PZero = (result & 0xFF) == 0;
-            m_Registers.PNegative = (result & 0x80) != 0;
+            m_Registers.PZero = CheckZero(result);
+            m_Registers.PNegative = CheckNegative(result);
             m_Registers.POverflow = overflow;
         }
     }
 
-    private void AND()
+    private void AND(byte arg)
     {
-        int result = m_Registers.A & m_SavedValue0;
-        m_Registers.A = (byte)result;
-        m_Registers.PZero = result == 0;
-        m_Registers.PNegative = (result & 0x80) != 0;
+        byte result = (byte)(m_Registers.A & arg);
+
+        m_Registers.A = result;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
     }
 
-    private void LDA()
+    private void LDA(byte arg)
     {
-        m_Registers.A = m_SavedValue0;
-        m_Registers.PZero = m_Registers.A == 0;
-        m_Registers.PNegative = (m_Registers.A & 0x80) != 0;
+        m_Registers.A = arg;
+        m_Registers.PZero = CheckZero(arg);
+        m_Registers.PNegative = CheckNegative(arg);
     }
 
-    private void LDX()
+    private void LDX(byte arg)
     {
-        m_Registers.X = m_SavedValue0;
-        m_Registers.PZero = m_Registers.X == 0;
-        m_Registers.PNegative = (m_Registers.X & 0x80) != 0;
+        m_Registers.X = arg;
+        m_Registers.PZero = CheckZero(arg);
+        m_Registers.PNegative = CheckNegative(arg);
     }
 
-    private void LDY()
+    private void LDY(byte arg)
     {
-        m_Registers.Y = m_SavedValue0;
-        m_Registers.PZero = m_Registers.Y == 0;
-        m_Registers.PNegative = (m_Registers.Y & 0x80) != 0;
+        m_Registers.Y = arg;
+        m_Registers.PZero = CheckZero(arg);
+        m_Registers.PNegative = CheckNegative(arg);
     }
 
-    private void NOP()
+    private static void NOP()
     {
         // nothing
     }
 
-    private static byte FromBcd(byte value)
+    private static void NOP(byte _)
     {
-        var low = value & 0x0F;
-        var high = (value >> 4) & 0x0F;
-        return (byte)(low + high * 10);
+        // nothing
     }
 
-    private static byte ToBcd(byte value)
+    private void SBC(byte arg)
     {
-        if (value > 99)
-            value = 99;
-        var low = value % 10;
-        var high = value / 10;
-        return (byte)(low + (high << 4));
+        byte inv0 = (byte)~arg;
+
+        if (m_Registers.PDecimal)
+        {
+            int carryIn = m_Registers.PCarry ? 1 : 0;
+
+            int resultFull = (0x0F & m_Registers.A) - (0x0F & arg) + carryIn - 1;
+
+            if (resultFull < 0)
+                resultFull = ((resultFull - 6) & 0x0F) - 0x10;
+
+            resultFull = (0xF0 & m_Registers.A) - (0xF0 & arg) + resultFull;
+            byte result = (byte)resultFull;
+
+            // 6502 sets the negative flag based on the result before adjusting for BCD, for some reason:
+            bool negative = CheckNegative(result);
+            bool overflow = CheckOverflow(m_Registers.A, inv0, result);
+
+            if (resultFull < 0)
+                resultFull -= 0x60;
+
+            result = (byte)resultFull;
+
+            // the 6502 calcs the zero and carry flags based on the non-bcd result, for some reason:
+            int resultForZero = m_Registers.A + inv0 + carryIn;
+            bool carryOut = resultForZero > 0xFF;
+            bool zero = CheckZero((byte)resultForZero);
+
+            m_Registers.A = result;
+            m_Registers.PCarry = carryOut;
+            m_Registers.PZero = zero;
+            m_Registers.PNegative = negative;
+            m_Registers.POverflow = overflow;
+        }
+        else
+        {
+            int carryIn = m_Registers.PCarry ? 1 : 0;
+
+            int resultFull = m_Registers.A + inv0 + carryIn;
+            byte result = (byte)resultFull;
+
+            bool carryOut = resultFull > 0xFF;
+            bool overflow = CheckOverflow(m_Registers.A, inv0, result);
+
+            m_Registers.A = result;
+            m_Registers.PCarry = carryOut;
+            m_Registers.PZero = CheckZero(result);
+            m_Registers.PNegative = CheckNegative(result);
+            m_Registers.POverflow = overflow;
+        }
+    }
+
+    private byte STA()
+    {
+        return m_Registers.A;
+    }
+
+    private byte STX()
+    {
+        return m_Registers.X;
+    }
+
+    private byte STY()
+    {
+        return m_Registers.Y;
+    }
+
+    private static bool CheckOverflow(byte a, byte b, byte result)
+    {
+        var hiA = (a & 0x80) != 0;
+        var hiB = (b & 0x80) != 0;
+        var hiResult = (result & 0x80) != 0;
+        return (hiA == hiB) && (hiA != hiResult);
+    }
+
+    private static bool CheckNegative(byte value)
+    {
+        return (value & 0x80) != 0;
+    }
+
+    private static bool CheckZero(byte value)
+    {
+        return value == 0;
     }
 
     private static ushort GetAdd1NoCarry(byte value)

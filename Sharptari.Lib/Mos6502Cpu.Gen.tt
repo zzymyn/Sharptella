@@ -14,56 +14,82 @@ namespace Sharptari.Lib;
 
 public sealed partial class Mos6502Cpu
 {
-<# GenImmediate("ADC"); #>
-<# GenZeropage("ADC"); #>
-<# GenZeropageXIndexed("ADC"); #>
-<# GenAbsolute("ADC"); #>
-<# GenAbsoluteXIndexed("ADC"); #>
-<# GenAbsoluteYIndexed("ADC"); #>
-<# GenIndirectXIndexed("ADC"); #>
-<# GenIndirectYIndexed("ADC"); #>
+<# ReadImmediate("ADC"); #>
+<# ReadZeropage("ADC"); #>
+<# ReadZeropageXIndexed("ADC"); #>
+<# ReadAbsolute("ADC"); #>
+<# ReadAbsoluteXIndexed("ADC"); #>
+<# ReadAbsoluteYIndexed("ADC"); #>
+<# ReadIndirectXIndexed("ADC"); #>
+<# ReadIndirectYIndexed("ADC"); #>
 
-<# GenImmediate("AND"); #>
-<# GenZeropage("AND"); #>
-<# GenZeropageXIndexed("AND"); #>
-<# GenAbsolute("AND"); #>
-<# GenAbsoluteXIndexed("AND"); #>
-<# GenAbsoluteYIndexed("AND"); #>
-<# GenIndirectXIndexed("AND"); #>
-<# GenIndirectYIndexed("AND"); #>
+<# ReadImmediate("AND"); #>
+<# ReadZeropage("AND"); #>
+<# ReadZeropageXIndexed("AND"); #>
+<# ReadAbsolute("AND"); #>
+<# ReadAbsoluteXIndexed("AND"); #>
+<# ReadAbsoluteYIndexed("AND"); #>
+<# ReadIndirectXIndexed("AND"); #>
+<# ReadIndirectYIndexed("AND"); #>
 
-<# GenImmediate("LDA"); #>
-<# GenZeropage("LDA"); #>
-<# GenZeropageXIndexed("LDA"); #>
-<# GenAbsolute("LDA"); #>
-<# GenAbsoluteXIndexed("LDA"); #>
-<# GenAbsoluteYIndexed("LDA"); #>
-<# GenIndirectXIndexed("LDA"); #>
-<# GenIndirectYIndexed("LDA"); #>
+<# ReadImmediate("LDA"); #>
+<# ReadZeropage("LDA"); #>
+<# ReadZeropageXIndexed("LDA"); #>
+<# ReadAbsolute("LDA"); #>
+<# ReadAbsoluteXIndexed("LDA"); #>
+<# ReadAbsoluteYIndexed("LDA"); #>
+<# ReadIndirectXIndexed("LDA"); #>
+<# ReadIndirectYIndexed("LDA"); #>
 
-<# GenImmediate("LDX"); #>
-<# GenZeropage("LDX"); #>
-<# GenZeropageYIndexed("LDX"); #>
-<# GenAbsolute("LDX"); #>
-<# GenAbsoluteYIndexed("LDX"); #>
+<# ReadImmediate("LDX"); #>
+<# ReadZeropage("LDX"); #>
+<# ReadZeropageYIndexed("LDX"); #>
+<# ReadAbsolute("LDX"); #>
+<# ReadAbsoluteYIndexed("LDX"); #>
 
-<# GenImmediate("LDY"); #>
-<# GenZeropage("LDY"); #>
-<# GenZeropageXIndexed("LDY"); #>
-<# GenAbsolute("LDY"); #>
-<# GenAbsoluteXIndexed("LDY"); #>
+<# ReadImmediate("LDY"); #>
+<# ReadZeropage("LDY"); #>
+<# ReadZeropageXIndexed("LDY"); #>
+<# ReadAbsolute("LDY"); #>
+<# ReadAbsoluteXIndexed("LDY"); #>
 
-<# GenImpl("NOP"); #>
-<# GenImmediate("NOP"); #>
-<# GenZeropage("NOP"); #>
-<# GenZeropageXIndexed("NOP"); #>
-<# GenAbsolute("NOP"); #>
-<# GenAbsoluteXIndexed("NOP"); #>
+<# Impl("NOP"); #>
+<# ReadImmediate("NOP"); #>
+<# ReadZeropage("NOP"); #>
+<# ReadZeropageXIndexed("NOP"); #>
+<# ReadAbsolute("NOP"); #>
+<# ReadAbsoluteXIndexed("NOP"); #>
+
+<# ReadImmediate("SBC"); #>
+<# ReadZeropage("SBC"); #>
+<# ReadZeropageXIndexed("SBC"); #>
+<# ReadAbsolute("SBC"); #>
+<# ReadAbsoluteXIndexed("SBC"); #>
+<# ReadAbsoluteYIndexed("SBC"); #>
+<# ReadIndirectXIndexed("SBC"); #>
+<# ReadIndirectYIndexed("SBC"); #>
+
+<# WriteZeropage("STA"); #>
+<# WriteZeropageXIndexed("STA"); #>
+<# WriteAbsolute("STA"); #>
+<# WriteAbsoluteXIndexed("STA"); #>
+<# WriteAbsoluteYIndexed("STA"); #>
+<# WriteIndirectXIndexed("STA"); #>
+<# WriteIndirectYIndexed("STA"); #>
+
+<# WriteZeropage("STX"); #>
+<# WriteZeropageYIndexed("STX"); #>
+<# WriteAbsolute("STX"); #>
+
+<# WriteZeropage("STY"); #>
+<# WriteZeropageXIndexed("STY"); #>
+<# WriteAbsolute("STY"); #>
+
 }
 <#+
 
 
-private void GenImpl(string op)
+private void Impl(string op)
 {
 #>
     private void <#= op #>_impl()
@@ -75,7 +101,7 @@ private void GenImpl(string op)
 <#+
 }
 
-private void GenImmediate(string op)
+private void ReadImmediate(string op)
 {
 #>
     private void <#= op #>_immediate()
@@ -83,12 +109,12 @@ private void GenImmediate(string op)
         m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
         m_CurrentOpCodeCycle = 0;
-        <#= op #>();
+        <#= op #>(m_SavedValue0);
     }
 <#+
 }
 
-private void GenZeropage(string op)
+private void ReadZeropage(string op)
 {
 #>
     private void <#= op #>_zeropage()
@@ -103,14 +129,35 @@ private void GenZeropage(string op)
             default:
                 m_SavedValue0 = m_Bus.Read(m_SavedValue0);
                 m_CurrentOpCodeCycle = 0;
-                <#= op #>();
+                <#= op #>(m_SavedValue0);
                 break;
         }
     }
 <#+
 }
 
-private void GenZeropageXIndexed(string op)
+private void WriteZeropage(string op)
+{
+#>
+    private void <#= op #>_zeropage()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            default:
+                m_Bus.Write(m_SavedValue0, <#= op #>());
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+<#+
+}
+
+private void ReadZeropageXIndexed(string op)
 {
 #>
     private void <#= op #>_zeropage_xindexed()
@@ -129,14 +176,39 @@ private void GenZeropageXIndexed(string op)
             default:
                 m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                <#= op #>();
+                <#= op #>(m_SavedValue0);
                 break;
         }
     }
 <#+
 }
 
-private void GenZeropageYIndexed(string op)
+private void WriteZeropageXIndexed(string op)
+{
+#>
+    private void <#= op #>_zeropage_xindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(m_SavedValue0);
+                m_CurrentOpCodeCycle = 3;
+                break;
+            default:
+                m_Bus.Write(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X), <#= op #>());
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+<#+
+}
+
+private void ReadZeropageYIndexed(string op)
 {
 #>
     private void <#= op #>_zeropage_yindexed()
@@ -155,14 +227,39 @@ private void GenZeropageYIndexed(string op)
             default:
                 m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.Y));
                 m_CurrentOpCodeCycle = 0;
-                <#= op #>();
+                <#= op #>(m_SavedValue0);
                 break;
         }
     }
 <#+
 }
 
-private void GenAbsolute(string op)
+private void WriteZeropageYIndexed(string op)
+{
+#>
+    private void <#= op #>_zeropage_yindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(m_SavedValue0);
+                m_CurrentOpCodeCycle = 3;
+                break;
+            default:
+                m_Bus.Write(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.Y), <#= op #>());
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+<#+
+}
+
+private void ReadAbsolute(string op)
 {
 #>
     private void <#= op #>_absolute()
@@ -182,14 +279,40 @@ private void GenAbsolute(string op)
             default:
                 m_SavedValue0 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_CurrentOpCodeCycle = 0;
-                <#= op #>();
+                <#= op #>(m_SavedValue0);
                 break;
         }
     }
 <#+
 }
 
-private void GenAbsoluteXIndexed(string op)
+private void WriteAbsolute(string op)
+{
+#>
+    private void <#= op #>_absolute()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            default:
+                m_Bus.Write(GetAbsolute(m_SavedValue0, m_SavedValue1), <#= op #>());
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+<#+
+}
+
+private void ReadAbsoluteXIndexed(string op)
 {
 #>
     private void <#= op #>_absolute_xindexed()
@@ -216,20 +339,50 @@ private void GenAbsoluteXIndexed(string op)
                 {
                     m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
                     m_CurrentOpCodeCycle = 0;
-                    <#= op #>();
+                    <#= op #>(m_SavedValue0);
                 }
                 break;
             default:
                 m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
                 m_CurrentOpCodeCycle = 0;
-                <#= op #>();
+                <#= op #>(m_SavedValue0);
                 break;
         }
     }
 <#+
 }
 
-private void GenAbsoluteYIndexed(string op)
+private void WriteAbsoluteXIndexed(string op)
+{
+#>
+    private void <#= op #>_absolute_xindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                _ = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
+                m_CurrentOpCodeCycle = 4;
+                break;
+            default:
+                m_Bus.Write(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X), <#= op #>());
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+<#+
+}
+
+private void ReadAbsoluteYIndexed(string op)
 {
 #>
     private void <#= op #>_absolute_yindexed()
@@ -256,20 +409,50 @@ private void GenAbsoluteYIndexed(string op)
                 {
                     m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                     m_CurrentOpCodeCycle = 0;
-                    <#= op #>();
+                    <#= op #>(m_SavedValue0);
                 }
                 break;
             default:
                 m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                 m_CurrentOpCodeCycle = 0;
-                <#= op #>();
+                <#= op #>(m_SavedValue0);
                 break;
         }
     }
 <#+
 }
 
-private void GenIndirectXIndexed(string op)
+private void WriteAbsoluteYIndexed(string op)
+{
+#>
+    private void <#= op #>_absolute_yindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                _ = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                m_CurrentOpCodeCycle = 4;
+                break;
+            default:
+                m_Bus.Write(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y), <#= op #>());
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+<#+
+}
+
+private void ReadIndirectXIndexed(string op)
 {
 #>
     private void <#= op #>_indirect_xindexed()
@@ -296,14 +479,47 @@ private void GenIndirectXIndexed(string op)
             case 5:
                 m_SavedValue0 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_CurrentOpCodeCycle = 0;
-                <#= op #>();
+                <#= op #>(m_SavedValue0);
                 break;
         }
     }
 <#+
 }
 
-private void GenIndirectYIndexed(string op)
+private void WriteIndirectXIndexed(string op)
+{
+#>
+    private void <#= op #>_indirect_xindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(m_SavedValue1);
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue1, m_Registers.X));
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                m_SavedValue1 = m_Bus.Read(GetZeropageIndexedAdd1NoCarry(m_SavedValue1, m_Registers.X));
+                m_CurrentOpCodeCycle = 5;
+                break;
+            case 5:
+                m_Bus.Write(GetAbsolute(m_SavedValue0, m_SavedValue1), <#= op #>());
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }
+<#+
+}
+
+private void ReadIndirectYIndexed(string op)
 {
 #>
     private void <#= op #>_indirect_yindexed()
@@ -333,13 +549,46 @@ private void GenIndirectYIndexed(string op)
                 {
                     m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                     m_CurrentOpCodeCycle = 0;
-                    <#= op #>();
+                    <#= op #>(m_SavedValue0);
                 }
                 break;
             default:
                 m_SavedValue0 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
                 m_CurrentOpCodeCycle = 0;
-                <#= op #>();
+                <#= op #>(m_SavedValue0);
+                break;
+        }
+    }
+<#+
+}
+
+private void WriteIndirectYIndexed(string op)
+{
+#>
+    private void <#= op #>_indirect_yindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_SavedValue0 = m_Bus.Read(m_SavedValue1);
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_SavedValue1 = m_Bus.Read(GetAdd1NoCarry(m_SavedValue1));
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                _ = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
+                m_CurrentOpCodeCycle = 5;
+                break;
+            default:
+                m_Bus.Write(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y), <#= op #>());
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }

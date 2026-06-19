@@ -4,9 +4,9 @@
       "commandName": "Project",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest ADC": {
+    "Sharptari.CpuTest ADC SBC": {
       "commandName": "Project",
-      "commandLineArgs": "69.json 65.json 75.json 6d.json 7d.json 79.json 61.json 71.json",
+      "commandLineArgs": "69.json 65.json 75.json 6d.json 7d.json 79.json 61.json 71.json e9.json e5.json f5.json ed.json fd.json f9.json e1.json f1.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
     "Sharptari.CpuTest AND": {
@@ -17,6 +17,11 @@
     "Sharptari.CpuTest LDA LDX LDY": {
       "commandName": "Project",
       "commandLineArgs": "a9.json a5.json b5.json ad.json bd.json b9.json a1.json b1.json a2.json a6.json b6.json ae.json be.json a0.json a4.json b4.json ac.json bc.json",
+      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
+    },
+    "Sharptari.CpuTest STA STX STY": {
+      "commandName": "Project",
+      "commandLineArgs": "85.json 95.json 8d.json 9d.json 99.json 81.json 91.json 86.json 96.json 8e.json 84.json 94.json 8c.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
     "Sharptari.CpuTest NOP": {
