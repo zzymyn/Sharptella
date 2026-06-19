@@ -32,6 +32,9 @@ public sealed partial class Mos6502Cpu
 <# ReadIndirectXIndexed("AND"); #>
 <# ReadIndirectYIndexed("AND"); #>
 
+<# ReadZeropage("BIT"); #>
+<# ReadAbsolute("BIT"); #>
+
 <# Accumulator("ASL"); #>
 <# ReadWriteZeropage("ASL"); #>
 <# ReadWriteZeropageXIndexed("ASL"); #>

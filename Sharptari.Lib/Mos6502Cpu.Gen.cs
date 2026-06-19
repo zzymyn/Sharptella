@@ -404,6 +404,44 @@ public sealed partial class Mos6502Cpu
         }
     }
 
+    private void BIT_zeropage()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            default:
+                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
+                m_CurrentOpCodeCycle = 0;
+                BIT(m_SavedValue2);
+                break;
+        }
+    }
+    private void BIT_absolute()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                m_CurrentOpCodeCycle = 3;
+                break;
+            default:
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_CurrentOpCodeCycle = 0;
+                BIT(m_SavedValue2);
+                break;
+        }
+    }
+
     private void ASL_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);

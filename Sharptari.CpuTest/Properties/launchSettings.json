@@ -9,9 +9,9 @@
       "commandLineArgs": "69.json 65.json 75.json 6d.json 7d.json 79.json 61.json 71.json e9.json e5.json f5.json ed.json fd.json f9.json e1.json f1.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest AND": {
+    "Sharptari.CpuTest AND BIT": {
       "commandName": "Project",
-      "commandLineArgs": "29.json 25.json 35.json 2D.json 3D.json 39.json 21.json 31.json",
+      "commandLineArgs": "29.json 25.json 35.json 2D.json 3D.json 39.json 21.json 31.json 24.json 2c.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
     "Sharptari.CpuTest ASL": {

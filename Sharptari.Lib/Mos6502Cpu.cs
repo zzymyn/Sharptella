@@ -108,6 +108,13 @@ public sealed partial class Mos6502Cpu
                     ASL_absolute_xindexed();
                     break;
 
+                case 0x24:
+                    BIT_zeropage();
+                    break;
+                case 0x2c:
+                    BIT_absolute();
+                    break;
+
                 case 0xa9:
                     LDA_immediate();
                     break;
@@ -364,6 +371,14 @@ public sealed partial class Mos6502Cpu
         m_Registers.PZero = CheckZero(result);
         m_Registers.PNegative = CheckNegative(result);
         return result;
+    }
+
+    private void BIT(byte arg)
+    {
+        byte result = (byte)(m_Registers.A & arg);
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = (arg & 0x80) != 0;
+        m_Registers.POverflow = (arg & 0x40) != 0;
     }
 
     private void LDA(byte arg)
