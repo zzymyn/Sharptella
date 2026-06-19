@@ -74,9 +74,9 @@
       "commandLineArgs": "02.json 12.json 22.json 32.json 42.json 52.json 62.json 72.json 92.json b2.json d2.json f2.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest SLO": {
+    "Sharptari.CpuTest ILLEGALS": {
       "commandName": "Project",
-      "commandLineArgs": "07.json 17.json 0f.json 1f.json 1b.json 03.json 13.json",
+      "commandLineArgs": "07.json 17.json 0f.json 1f.json 1b.json 03.json 13.json 4b.json 0b.json 2b.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     }
   }

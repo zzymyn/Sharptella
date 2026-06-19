@@ -67,6 +67,15 @@ public sealed partial class Mos6502Cpu
                     ADC_indirect_yindexed();
                     break;
 
+                case 0x4b:
+                    ALR_immediate();
+                    break;
+
+                case 0x0b:
+                case 0x2b:
+                    ANC_immediate();
+                    break;
+
                 case 0x29:
                     AND_immediate();
                     break;
@@ -682,6 +691,18 @@ public sealed partial class Mos6502Cpu
             m_Registers.PNegative = CheckNegative(result);
             m_Registers.POverflow = overflow;
         }
+    }
+
+    private void ALR(byte arg)
+    {
+        AND(arg);
+        LSR();
+    }
+
+    private void ANC(byte arg)
+    {
+        AND(arg);
+        m_Registers.PCarry = m_Registers.PNegative;
     }
 
     private void AND(byte arg)

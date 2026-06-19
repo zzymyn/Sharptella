@@ -11,13 +11,27 @@ namespace Sharptari.CpuTest;
 
 internal class Program
 {
+    private static readonly HashSet<string> UnstableOpcodes =
+    [
+        // Highly Unstable Group
+        "8b", // ANE / XAA (Immediate)
+        "ab", // LXA / ATX (Immediate)
+
+        // "Sometimes Unstable" Group
+        "93", // SHA / AHX (Indirect, Y)
+        "9f", // SHA / AHX (Absolute, Y)
+        "9e", // SHX / SXA (Absolute, Y)
+        "9c", // SHY / SYA (Absolute, X)
+        "9b", // TAS / SHS (Absolute, Y)
+    ];
+
     private static async Task Main(string[] args)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
 
         var testFiles = ResolveFilePaths(args);
 
-        var testResults = new Dictionary<string, bool>();
+        var failedTests = new HashSet<string>();
 
         await foreach (var (name, tests) in LoadAllTests(testFiles))
         {
@@ -48,15 +62,18 @@ internal class Program
                     }
                 });
 
-            if (successCount != totalCount)
+            if (UnstableOpcodes.Contains(name))
+            {
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
+            else if (successCount != totalCount)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                testResults.Add(name, false);
+                failedTests.Add(name);
             }
             else
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                testResults.Add(name, true);
             }
             Console.WriteLine($"{successCount}/{totalCount} tests passed.");
             Console.ResetColor();
@@ -66,12 +83,11 @@ internal class Program
         Console.WriteLine($"Tests ran in {sw.Elapsed.TotalSeconds:F2} seconds.");
         Console.WriteLine();
 
-        var failedTests = testResults.Where(kv => !kv.Value).Select(kv => kv.Key).ToList();
         if (failedTests.Count > 0)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
             Console.Write("Failed tests:");
-            foreach (var testName in failedTests)
+            Console.ForegroundColor = ConsoleColor.Red;
+            foreach (var testName in failedTests.Order())
             {
                 Console.Write($" {testName}");
             }
