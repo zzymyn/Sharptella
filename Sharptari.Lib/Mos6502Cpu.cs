@@ -300,6 +300,22 @@ public sealed partial class Mos6502Cpu
                     LDY_absolute_xindexed();
                     break;
 
+                case 0x4a:
+                    LSR_impl();
+                    break;
+                case 0x46:
+                    LSR_zeropage();
+                    break;
+                case 0x56:
+                    LSR_zeropage_xindexed();
+                    break;
+                case 0x4e:
+                    LSR_absolute();
+                    break;
+                case 0x5e:
+                    LSR_absolute_xindexed();
+                    break;
+
                 case 0xea:
                 case 0x1a:
                 case 0x3a:
@@ -341,6 +357,63 @@ public sealed partial class Mos6502Cpu
                     NOP_absolute_xindexed();
                     break;
 
+                case 0x09:
+                    ORA_immediate();
+                    break;
+                case 0x05:
+                    ORA_zeropage();
+                    break;
+                case 0x15:
+                    ORA_zeropage_xindexed();
+                    break;
+                case 0x0d:
+                    ORA_absolute();
+                    break;
+                case 0x1d:
+                    ORA_absolute_xindexed();
+                    break;
+                case 0x19:
+                    ORA_absolute_yindexed();
+                    break;
+                case 0x01:
+                    ORA_indirect_xindexed();
+                    break;
+                case 0x11:
+                    ORA_indirect_yindexed();
+                    break;
+
+                case 0x2a:
+                    ROL_impl();
+                    break;
+                case 0x26:
+                    ROL_zeropage();
+                    break;
+                case 0x36:
+                    ROL_zeropage_xindexed();
+                    break;
+                case 0x2e:
+                    ROL_absolute();
+                    break;
+                case 0x3e:
+                    ROL_absolute_xindexed();
+                    break;
+
+                case 0x6a:
+                    ROR_impl();
+                    break;
+                case 0x66:
+                    ROR_zeropage();
+                    break;
+                case 0x76:
+                    ROR_zeropage_xindexed();
+                    break;
+                case 0x6e:
+                    ROR_absolute();
+                    break;
+                case 0x7e:
+                    ROR_absolute_xindexed();
+                    break;
+
                 case 0xe9:
                     SBC_immediate();
                     break;
@@ -364,6 +437,18 @@ public sealed partial class Mos6502Cpu
                     break;
                 case 0xf1:
                     SBC_indirect_yindexed();
+                    break;
+
+                case 0x38:
+                    SEC_impl();
+                    break;
+
+                case 0xf8:
+                    SED_impl();
+                    break;
+
+                case 0x78:
+                    SEI_impl();
                     break;
 
                 case 0x85:
@@ -406,6 +491,25 @@ public sealed partial class Mos6502Cpu
                     break;
                 case 0x8c:
                     STY_absolute();
+                    break;
+
+                case 0xaa:
+                    TAX_impl();
+                    break;
+                case 0xa8:
+                    TAY_impl();
+                    break;
+                case 0xba:
+                    TSX_impl();
+                    break;
+                case 0x8a:
+                    TXA_impl();
+                    break;
+                case 0x9a:
+                    TXS_impl();
+                    break;
+                case 0x98:
+                    TYA_impl();
                     break;
 
                 default:
@@ -641,6 +745,27 @@ public sealed partial class Mos6502Cpu
         m_Registers.PNegative = CheckNegative(arg);
     }
 
+    private void LSR()
+    {
+        byte arg = m_Registers.A;
+        byte result = (byte)(arg >> 1);
+        bool carryOut = (arg & 0x01) != 0;
+        m_Registers.A = result;
+        m_Registers.PCarry = carryOut;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = false;
+    }
+
+    private byte LSR(byte arg)
+    {
+        byte result = (byte)(arg >> 1);
+        bool carryOut = (arg & 0x01) != 0;
+        m_Registers.PCarry = carryOut;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = false;
+        return result;
+    }
+
     private static void NOP()
     {
         // nothing
@@ -649,6 +774,56 @@ public sealed partial class Mos6502Cpu
     private static void NOP(byte _)
     {
         // nothing
+    }
+
+    private void ORA(byte arg)
+    {
+        byte result = (byte)(m_Registers.A | arg);
+        m_Registers.A = result;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private void ROL()
+    {
+        byte arg = m_Registers.A;
+        byte result = (byte)((arg << 1) | (m_Registers.PCarry ? 1 : 0));
+        bool carryOut = (arg & 0x80) != 0;
+        m_Registers.A = result;
+        m_Registers.PCarry = carryOut;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private byte ROL(byte arg)
+    {
+        byte result = (byte)((arg << 1) | (m_Registers.PCarry ? 1 : 0));
+        bool carryOut = (arg & 0x80) != 0;
+        m_Registers.PCarry = carryOut;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+        return result;
+    }
+
+    private void ROR()
+    {
+        byte arg = m_Registers.A;
+        byte result = (byte)((arg >> 1) | (m_Registers.PCarry ? 0x80 : 0));
+        bool carryOut = (arg & 0x01) != 0;
+        m_Registers.A = result;
+        m_Registers.PCarry = carryOut;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private byte ROR(byte arg)
+    {
+        byte result = (byte)((arg >> 1) | (m_Registers.PCarry ? 0x80 : 0));
+        bool carryOut = (arg & 0x01) != 0;
+        m_Registers.PCarry = carryOut;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+        return result;
     }
 
     private void SBC(byte arg)
@@ -705,6 +880,21 @@ public sealed partial class Mos6502Cpu
         }
     }
 
+    private void SEC()
+    {
+        m_Registers.PCarry = true;
+    }
+
+    private void SED()
+    {
+        m_Registers.PDecimal = true;
+    }
+
+    private void SEI()
+    {
+        m_Registers.PInterruptDisable = true;
+    }
+
     private byte STA()
     {
         return m_Registers.A;
@@ -718,6 +908,51 @@ public sealed partial class Mos6502Cpu
     private byte STY()
     {
         return m_Registers.Y;
+    }
+
+    private void TAX()
+    {
+        byte result = m_Registers.A;
+        m_Registers.X = result;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private void TAY()
+    {
+        byte result = m_Registers.A;
+        m_Registers.Y = result;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private void TSX()
+    {
+        byte result = m_Registers.S;
+        m_Registers.X = result;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private void TXA()
+    {
+        byte result = m_Registers.X;
+        m_Registers.A = result;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
+    }
+
+    private void TXS()
+    {
+        m_Registers.S = m_Registers.X;
+    }
+
+    private void TYA()
+    {
+        byte result = m_Registers.Y;
+        m_Registers.A = result;
+        m_Registers.PZero = CheckZero(result);
+        m_Registers.PNegative = CheckNegative(result);
     }
 
     private static bool CheckOverflow(byte a, byte b, byte result)

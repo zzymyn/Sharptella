@@ -114,12 +114,39 @@ public sealed partial class Mos6502Cpu
 <# ReadAbsolute("LDY"); #>
 <# ReadAbsoluteXIndexed("LDY"); #>
 
+<# Accumulator("LSR"); #>
+<# ReadWriteZeropage("LSR"); #>
+<# ReadWriteZeropageXIndexed("LSR"); #>
+<# ReadWriteAbsolute("LSR"); #>
+<# ReadWriteAbsoluteXIndexed("LSR"); #>
+
 <# Impl("NOP"); #>
 <# ReadImmediate("NOP"); #>
 <# ReadZeropage("NOP"); #>
 <# ReadZeropageXIndexed("NOP"); #>
 <# ReadAbsolute("NOP"); #>
 <# ReadAbsoluteXIndexed("NOP"); #>
+
+<# ReadImmediate("ORA"); #>
+<# ReadZeropage("ORA"); #>
+<# ReadZeropageXIndexed("ORA"); #>
+<# ReadAbsolute("ORA"); #>
+<# ReadAbsoluteXIndexed("ORA"); #>
+<# ReadAbsoluteYIndexed("ORA"); #>
+<# ReadIndirectXIndexed("ORA"); #>
+<# ReadIndirectYIndexed("ORA"); #>
+
+<# Accumulator("ROL"); #>
+<# ReadWriteZeropage("ROL"); #>
+<# ReadWriteZeropageXIndexed("ROL"); #>
+<# ReadWriteAbsolute("ROL"); #>
+<# ReadWriteAbsoluteXIndexed("ROL"); #>
+
+<# Accumulator("ROR"); #>
+<# ReadWriteZeropage("ROR"); #>
+<# ReadWriteZeropageXIndexed("ROR"); #>
+<# ReadWriteAbsolute("ROR"); #>
+<# ReadWriteAbsoluteXIndexed("ROR"); #>
 
 <# ReadImmediate("SBC"); #>
 <# ReadZeropage("SBC"); #>
@@ -129,6 +156,12 @@ public sealed partial class Mos6502Cpu
 <# ReadAbsoluteYIndexed("SBC"); #>
 <# ReadIndirectXIndexed("SBC"); #>
 <# ReadIndirectYIndexed("SBC"); #>
+
+<# Impl("SEC"); #>
+
+<# Impl("SED"); #>
+
+<# Impl("SEI"); #>
 
 <# WriteZeropage("STA"); #>
 <# WriteZeropageXIndexed("STA"); #>
@@ -145,6 +178,18 @@ public sealed partial class Mos6502Cpu
 <# WriteZeropage("STY"); #>
 <# WriteZeropageXIndexed("STY"); #>
 <# WriteAbsolute("STY"); #>
+
+<# Impl("TAX"); #>
+
+<# Impl("TAY"); #>
+
+<# Impl("TSX"); #>
+
+<# Impl("TXA"); #>
+
+<# Impl("TXS"); #>
+
+<# Impl("TYA"); #>
 
 }
 <#+
