@@ -71,7 +71,12 @@
     },
     "Sharptari.CpuTest JAM": {
       "commandName": "Project",
-      "commandLineArgs": "02.json 12.json 22.json 32.json 42.json 52.json 62.json 72.json 92.json b2.json d2.json f2",
+      "commandLineArgs": "02.json 12.json 22.json 32.json 42.json 52.json 62.json 72.json 92.json b2.json d2.json f2.json",
+      "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
+    },
+    "Sharptari.CpuTest SLO": {
+      "commandName": "Project",
+      "commandLineArgs": "07.json 17.json 0f.json 1f.json 1b.json 03.json 13.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     }
   }

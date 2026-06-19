@@ -538,6 +538,28 @@ public sealed partial class Mos6502Cpu
                     SEI_impl();
                     break;
 
+                case 0x07:
+                    SLO_zeropage();
+                    break;
+                case 0x17:
+                    SLO_zeropage_xindexed();
+                    break;
+                case 0x0f:
+                    SLO_absolute();
+                    break;
+                case 0x1f:
+                    SLO_absolute_xindexed();
+                    break;
+                case 0x1b:
+                    SLO_absolute_yindexed();
+                    break;
+                case 0x03:
+                    SLO_indirect_xindexed();
+                    break;
+                case 0x13:
+                    SLO_indirect_yindexed();
+                    break;
+
                 case 0x85:
                     STA_zeropage();
                     break;
@@ -1293,6 +1315,13 @@ public sealed partial class Mos6502Cpu
     private void SEI()
     {
         m_Registers.PInterruptDisable = true;
+    }
+
+    private byte SLO(byte arg)
+    {
+        arg = ASL(arg);
+        ORA(arg);
+        return arg;
     }
 
     private byte STA()

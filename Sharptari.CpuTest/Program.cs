@@ -17,6 +17,8 @@ internal class Program
 
         var testFiles = ResolveFilePaths(args);
 
+        var testResults = new Dictionary<string, bool>();
+
         await foreach (var (name, tests) in LoadAllTests(testFiles))
         {
             Console.Write($"Running {name}: ");
@@ -49,17 +51,37 @@ internal class Program
             if (successCount != totalCount)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
+                testResults.Add(name, false);
             }
             else
             {
                 Console.ForegroundColor = ConsoleColor.Green;
+                testResults.Add(name, true);
             }
             Console.WriteLine($"{successCount}/{totalCount} tests passed.");
             Console.ResetColor();
         }
 
         sw.Stop();
-        Console.WriteLine($"All tests completed in {sw.Elapsed.TotalSeconds:F2} seconds.");
+        Console.WriteLine($"Tests ran in {sw.Elapsed.TotalSeconds:F2} seconds.");
+        Console.WriteLine();
+
+        var failedTests = testResults.Where(kv => !kv.Value).Select(kv => kv.Key).ToList();
+        if (failedTests.Count > 0)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("Failed tests:");
+            foreach (var testName in failedTests)
+            {
+                Console.Write($" {testName}");
+            }
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("All tests passed successfully!");
+        }
+        Console.ResetColor();
     }
 
     private static bool RunTest(TestData test)
