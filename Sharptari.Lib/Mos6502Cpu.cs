@@ -541,6 +541,28 @@ public sealed partial class Mos6502Cpu
                     PLP_impl();
                     break;
 
+                case 0x27:
+                    RLA_zeropage();
+                    break;
+                case 0x37:
+                    RLA_zeropage_xindexed();
+                    break;
+                case 0x2f:
+                    RLA_absolute();
+                    break;
+                case 0x3f:
+                    RLA_absolute_xindexed();
+                    break;
+                case 0x3b:
+                    RLA_absolute_yindexed();
+                    break;
+                case 0x23:
+                    RLA_indirect_xindexed();
+                    break;
+                case 0x33:
+                    RLA_indirect_yindexed();
+                    break;
+
                 case 0x2a:
                     ROL_impl();
                     break;
@@ -1317,6 +1339,13 @@ public sealed partial class Mos6502Cpu
                 m_Registers.WriteP(m_SavedValue2);
                 break;
         }
+    }
+
+    private byte RLA(byte arg)
+    {
+        byte rol = ROL(arg);
+        AND(rol);
+        return rol;
     }
 
     private void ROL()
