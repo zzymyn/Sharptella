@@ -279,6 +279,21 @@ public sealed partial class Mos6502Cpu
                     INY_impl();
                     break;
 
+                case 0x02:
+                case 0x12:
+                case 0x22:
+                case 0x32:
+                case 0x42:
+                case 0x52:
+                case 0x62:
+                case 0x72:
+                case 0x92:
+                case 0xb2:
+                case 0xd2:
+                case 0xf2:
+                    JAM_impl();
+                    break;
+
                 case 0x4c:
                     JMP_absolute();
                     break;
@@ -873,6 +888,27 @@ public sealed partial class Mos6502Cpu
         m_Registers.Y = (byte)(m_Registers.Y + 1);
         m_Registers.PZero = CheckZero(m_Registers.Y);
         m_Registers.PNegative = CheckNegative(m_Registers.Y);
+    }
+
+    private void JAM_impl()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                _ = m_Bus.Read(m_Registers.PC);
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+            default:
+                _ = m_Bus.Read(0xFFFF);
+                ++m_CurrentOpCodeCycle;
+                break;
+            case 3:
+            case 4:
+                _ = m_Bus.Read(0xFFFE);
+                ++m_CurrentOpCodeCycle;
+                break;
+        }
     }
 
     private void JMP_absolute()

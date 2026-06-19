@@ -10,7 +10,7 @@ using Sharptari.Lib;
 namespace Sharptari.CpuTest;
 
 internal class Program
-{    
+{
     private static async Task Main(string[] args)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
@@ -95,10 +95,14 @@ internal class Program
 
         var cpu = new Mos6502Cpu(bus, initialResigers);
 
+        // limit to 10 steps because JAM instructions can cause infinite loops
+        // and if the test is correct it should reach the next opcode within 10 steps at most
+        var stepCount = 0;
         do
         {
             cpu.Step();
-        } while (!cpu.IsAtOpCodeStart);
+            ++stepCount;
+        } while (!cpu.IsAtOpCodeStart && stepCount <= 10);
 
         var finalRegisters = cpu.Registers;
 
