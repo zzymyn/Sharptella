@@ -595,6 +595,28 @@ public sealed partial class Mos6502Cpu
                     ROR_absolute_xindexed();
                     break;
 
+                case 0x67:
+                    RRA_zeropage();
+                    break;
+                case 0x77:
+                    RRA_zeropage_xindexed();
+                    break;
+                case 0x6f:
+                    RRA_absolute();
+                    break;
+                case 0x7f:
+                    RRA_absolute_xindexed();
+                    break;
+                case 0x7b:
+                    RRA_absolute_yindexed();
+                    break;
+                case 0x63:
+                    RRA_indirect_xindexed();
+                    break;
+                case 0x73:
+                    RRA_indirect_yindexed();
+                    break;
+
                 case 0x40:
                     RTI_impl();
                     break;
@@ -1388,6 +1410,13 @@ public sealed partial class Mos6502Cpu
         m_Registers.PZero = CheckZero(result);
         m_Registers.PNegative = CheckNegative(result);
         return result;
+    }
+
+    private byte RRA(byte arg)
+    {
+        byte ror = ROR(arg);
+        ADC(ror);
+        return ror;
     }
 
     private void RTI_impl()
