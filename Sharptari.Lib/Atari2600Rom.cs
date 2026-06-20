@@ -19,6 +19,16 @@ public sealed class Atari2600Rom
         m_DataMask = (ushort)(data.Length - 1);
     }
 
+    public void Reboot()
+    {
+        // ROM doesn't have any internal state, so do nothing.
+    }
+
+    public void Step()
+    {
+        // ROM doesn't have any internal state, so do nothing.
+    }
+
     public int TryRead(ushort address)
     {
         address &= m_DataMask;

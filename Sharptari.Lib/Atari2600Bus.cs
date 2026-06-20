@@ -28,6 +28,13 @@ public sealed class Atari2600Bus
         m_Riot = riot;
     }
 
+    public void Reboot()
+    {
+        m_Rom.Reboot();
+        m_Riot.Reboot();
+        m_BusValue = 0;
+    }
+
     public void Step()
     {
 #if DEBUG
@@ -37,6 +44,9 @@ public sealed class Atari2600Bus
         }
         m_HasDoneSomethingThisStep = false;
 #endif
+
+        m_Rom.Step();
+        m_Riot.Step();
     }
 
     public byte Read(ushort address)

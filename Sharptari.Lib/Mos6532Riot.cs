@@ -16,7 +16,41 @@ public sealed class Mos6532Riot
     private const ushort RamSelectV = 0b0000_0000_1000_0000;
     private const ushort RamMask = 0b0000_0000_0111_1111;
 
+    private const byte FlagTimerMask = 0b1000_0000;
+
     private readonly byte[] m_Ram = new byte[128];
+
+    private byte m_Timer;
+    private ushort m_Prescaler;
+    private ushort m_PrescalerMask;
+    private bool m_FlagTimer;
+    private bool m_FlagTimerThisStep;
+
+    public void Reboot()
+    {
+        m_Timer = 255;
+        m_Prescaler = 0;
+        m_PrescalerMask = 1023;
+        m_FlagTimer = false;
+        m_FlagTimerThisStep = false;
+    }
+
+    public void Step()
+    {
+        m_FlagTimerThisStep = false;
+
+        m_Prescaler = (ushort)((m_Prescaler - 1) & m_PrescalerMask);
+
+        if (m_FlagTimer || m_Prescaler == m_PrescalerMask)
+        {
+            --m_Timer;
+            if (m_Timer == byte.MaxValue)
+            {
+                m_FlagTimer = true;
+                m_FlagTimerThisStep = true;
+            }
+        }
+    }
 
     public int TryRead(ushort address)
     {
@@ -36,10 +70,21 @@ public sealed class Mos6532Riot
                     return 0x00; // SWBCNT
                 case 0x04:
                 case 0x06:
-                    return 0x00; // INTIM
+                    // INTIM
+                    // bug/quirk: if the flag timer was set this step, it doesn't get reset on read here:
+                    m_FlagTimer = m_FlagTimerThisStep;
+                    return m_Timer;
                 case 0x05:
                 case 0x07:
-                    return 0x00; // INSTAT
+                    // TIMINT
+                    {
+                        byte result = 0;
+                        if (m_FlagTimer)
+                        {
+                            result |= FlagTimerMask;
+                        }
+                        return result;
+                    }
             }
         }
         else if ((address & RamSelectM) == RamSelectV)
@@ -68,13 +113,21 @@ public sealed class Mos6532Riot
                 case 0x03:
                     break; // SWBCNT
                 case 0x04:
-                    break; // TIM1T
+                    // 0
+                    StartTimer(value, 0);
+                    break;
                 case 0x05:
-                    break; // TIM8T
+                    // 7
+                    StartTimer(value, 7);
+                    break;
                 case 0x06:
-                    break; // TIM64T
+                    // 63
+                    StartTimer(value, 63);
+                    break;
                 case 0x07:
-                    break; // TIM1024T
+                    // 1023
+                    StartTimer(value, 1023);
+                    break;
             }
         }
         else if ((address & RamSelectM) == RamSelectV)
@@ -82,5 +135,15 @@ public sealed class Mos6532Riot
             address &= RamMask;
             m_Ram[address] = value;
         }
+    }
+
+    private void StartTimer(byte value, ushort prescalerMask)
+    {
+        m_Timer = value;
+        m_Prescaler = 0;
+        m_PrescalerMask = prescalerMask;
+
+        // bug/quirk: if the flag timer was set this step, it doesn't get reset on read here:
+        m_FlagTimer = m_FlagTimerThisStep;
     }
 }

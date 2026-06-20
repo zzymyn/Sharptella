@@ -15,6 +15,13 @@ public sealed class Mos6502TestBus
 
     public List<LogItem> Log => m_Log;
 
+    public void Reboot()
+    {
+        m_HasDoneSomethingThisStep = false;
+        Array.Clear(m_Ram);
+        m_Log.Clear();
+    }
+
     public void Step()
     {
         if (!m_HasDoneSomethingThisStep)

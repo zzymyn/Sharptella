@@ -36,6 +36,7 @@ public sealed partial class Mos6502Cpu<BusT>
     {
         m_CurrentOpCode = 0x100;
         m_CurrentOpCodeCycle = 1;
+        m_Bus.Reboot();
     }
 
     public void Step()
