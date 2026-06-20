@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -811,10 +812,12 @@ public sealed partial class Mos6502Cpu<BusT>
         switch (m_CurrentOpCodeCycle)
         {
             case 1:
+                _ = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.PInterruptDisable = true;
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
+                _ = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1027,6 +1030,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace("BRK");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1200,6 +1204,7 @@ public sealed partial class Mos6502Cpu<BusT>
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
+                Trace("JAM");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1226,6 +1231,7 @@ public sealed partial class Mos6502Cpu<BusT>
                 break;
             default:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                Trace($"JMP ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
                 m_CurrentOpCodeCycle = 0;
                 break;
@@ -1244,6 +1250,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"JMP (${m_SavedValue0:X2}{m_SavedValue1:X2})");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1285,6 +1292,7 @@ public sealed partial class Mos6502Cpu<BusT>
             default:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
+                Trace($"JSR ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 0;
                 break;
         }
@@ -1374,6 +1382,7 @@ public sealed partial class Mos6502Cpu<BusT>
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
+                Trace("PHA");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
@@ -1390,6 +1399,7 @@ public sealed partial class Mos6502Cpu<BusT>
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
+                Trace("PHP");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
@@ -1406,6 +1416,7 @@ public sealed partial class Mos6502Cpu<BusT>
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
+                Trace("PLA");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1429,6 +1440,7 @@ public sealed partial class Mos6502Cpu<BusT>
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
+                Trace("PLP");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1506,6 +1518,7 @@ public sealed partial class Mos6502Cpu<BusT>
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
+                Trace("RTI");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1537,6 +1550,7 @@ public sealed partial class Mos6502Cpu<BusT>
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
+                Trace("RTS");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1792,5 +1806,13 @@ public sealed partial class Mos6502Cpu<BusT>
     private static ushort GetStackAddress(byte offset)
     {
         return (ushort)(0x100 | offset);
+    }
+
+    [Conditional("DEBUG")]
+    private void Trace(string message)
+    {
+#if DEBUG
+        Console.WriteLine(message);
+#endif
     }
 }

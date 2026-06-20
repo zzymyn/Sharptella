@@ -12,8 +12,9 @@ public sealed partial class Mos6502Cpu<BusT>
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"ADC #${m_SavedValue2:X2}");
         ADC(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
     private void ADC_zeropage()
     {
@@ -22,12 +23,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ADC ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 ADC(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -38,6 +40,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ADC ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -63,12 +66,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ADC ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 ADC(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -84,6 +88,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ADC ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -95,14 +100,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                    m_CurrentOpCodeCycle = 0;
                     ADC(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                m_CurrentOpCodeCycle = 0;
                 ADC(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -118,6 +123,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ADC ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -129,14 +135,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     ADC(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 ADC(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -147,6 +153,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ADC (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -163,8 +170,8 @@ public sealed partial class Mos6502Cpu<BusT>
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 ADC(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -175,6 +182,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ADC (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -194,14 +202,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     ADC(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 ADC(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -210,24 +218,27 @@ public sealed partial class Mos6502Cpu<BusT>
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"ALR #${m_SavedValue2:X2}");
         ALR(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void ANC_immediate()
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"ANC #${m_SavedValue2:X2}");
         ANC(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void AND_immediate()
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"AND #${m_SavedValue2:X2}");
         AND(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
     private void AND_zeropage()
     {
@@ -236,12 +247,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"AND ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 AND(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -252,6 +264,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"AND ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -277,12 +290,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"AND ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 AND(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -298,6 +312,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"AND ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -309,14 +324,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                    m_CurrentOpCodeCycle = 0;
                     AND(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                m_CurrentOpCodeCycle = 0;
                 AND(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -332,6 +347,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"AND ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -343,14 +359,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     AND(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 AND(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -361,6 +377,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"AND (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -377,8 +394,8 @@ public sealed partial class Mos6502Cpu<BusT>
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 AND(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -389,6 +406,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"AND (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -408,14 +426,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     AND(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 AND(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -423,8 +441,9 @@ public sealed partial class Mos6502Cpu<BusT>
     private void ASL_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"ASL A");
         ASL();
+        m_CurrentOpCodeCycle = 0;
     }
     private void ASL_zeropage()
     {
@@ -433,6 +452,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ASL ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -456,6 +476,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ASL ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -488,6 +509,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ASL ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -516,6 +538,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ASL ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -541,8 +564,9 @@ public sealed partial class Mos6502Cpu<BusT>
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"ARR #${m_SavedValue2:X2}");
         ARR(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void BCC_relative()
@@ -552,6 +576,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"BCC ${m_SavedValue0:X2}");
 
                 if (BCC())
                 {
@@ -594,6 +619,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"BCS ${m_SavedValue0:X2}");
 
                 if (BCS())
                 {
@@ -636,6 +662,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"BEQ ${m_SavedValue0:X2}");
 
                 if (BEQ())
                 {
@@ -678,12 +705,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"BIT ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 BIT(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -699,12 +727,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"BIT ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 BIT(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -716,6 +745,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"BMI ${m_SavedValue0:X2}");
 
                 if (BMI())
                 {
@@ -758,6 +788,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"BNE ${m_SavedValue0:X2}");
 
                 if (BNE())
                 {
@@ -800,6 +831,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"BPL ${m_SavedValue0:X2}");
 
                 if (BPL())
                 {
@@ -842,6 +874,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"BVC ${m_SavedValue0:X2}");
 
                 if (BVC())
                 {
@@ -884,6 +917,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"BVS ${m_SavedValue0:X2}");
 
                 if (BVS())
                 {
@@ -922,37 +956,42 @@ public sealed partial class Mos6502Cpu<BusT>
     private void CLC_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"CLC");
         CLC();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void CLD_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"CLD");
         CLD();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void CLI_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"CLI");
         CLI();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void CLV_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"CLV");
         CLV();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void CMP_immediate()
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"CMP #${m_SavedValue2:X2}");
         CMP(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
     private void CMP_zeropage()
     {
@@ -961,12 +1000,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"CMP ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 CMP(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -977,6 +1017,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"CMP ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1002,12 +1043,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"CMP ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 CMP(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1023,6 +1065,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"CMP ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1034,14 +1077,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                    m_CurrentOpCodeCycle = 0;
                     CMP(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                m_CurrentOpCodeCycle = 0;
                 CMP(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1057,6 +1100,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"CMP ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1068,14 +1112,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     CMP(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 CMP(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1086,6 +1130,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"CMP (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1102,8 +1147,8 @@ public sealed partial class Mos6502Cpu<BusT>
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 CMP(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1114,6 +1159,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"CMP (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1133,14 +1179,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     CMP(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 CMP(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1149,8 +1195,9 @@ public sealed partial class Mos6502Cpu<BusT>
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"CPX #${m_SavedValue2:X2}");
         CPX(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
     private void CPX_zeropage()
     {
@@ -1159,12 +1206,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"CPX ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 CPX(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1180,12 +1228,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"CPX ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 CPX(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1194,8 +1243,9 @@ public sealed partial class Mos6502Cpu<BusT>
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"CPY #${m_SavedValue2:X2}");
         CPY(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
     private void CPY_zeropage()
     {
@@ -1204,12 +1254,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"CPY ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 CPY(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1225,12 +1276,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"CPY ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 CPY(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1242,6 +1294,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"DCP ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1265,6 +1318,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"DCP ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1297,6 +1351,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"DCP ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1325,6 +1380,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"DCP ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1357,6 +1413,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"DCP ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1384,6 +1441,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"DCP (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1419,6 +1477,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"DCP (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1455,6 +1514,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"DEC ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1478,6 +1538,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"DEC ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1510,6 +1571,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"DEC ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1538,6 +1600,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"DEC ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1562,23 +1625,26 @@ public sealed partial class Mos6502Cpu<BusT>
     private void DEX_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"DEX");
         DEX();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void DEY_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"DEY");
         DEY();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void EOR_immediate()
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"EOR #${m_SavedValue2:X2}");
         EOR(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
     private void EOR_zeropage()
     {
@@ -1587,12 +1653,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"EOR ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 EOR(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1603,6 +1670,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"EOR ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1628,12 +1696,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"EOR ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 EOR(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1649,6 +1718,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"EOR ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1660,14 +1730,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                    m_CurrentOpCodeCycle = 0;
                     EOR(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                m_CurrentOpCodeCycle = 0;
                 EOR(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1683,6 +1753,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"EOR ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1694,14 +1765,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     EOR(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 EOR(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1712,6 +1783,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"EOR (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1728,8 +1800,8 @@ public sealed partial class Mos6502Cpu<BusT>
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 EOR(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1740,6 +1812,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"EOR (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1759,14 +1832,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     EOR(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 EOR(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -1778,6 +1851,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"INC ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1801,6 +1875,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"INC ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1833,6 +1908,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"INC ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1861,6 +1937,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"INC ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1885,15 +1962,17 @@ public sealed partial class Mos6502Cpu<BusT>
     private void INX_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"INX");
         INX();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void INY_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"INY");
         INY();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void ISC_zeropage()
@@ -1903,6 +1982,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ISC ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1926,6 +2006,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ISC ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -1958,6 +2039,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ISC ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -1986,6 +2068,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ISC ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -2018,6 +2101,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ISC ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -2045,6 +2129,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ISC (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2080,6 +2165,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ISC (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2121,6 +2207,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LAS ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -2132,14 +2219,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     LAS(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 LAS(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2151,12 +2238,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LAX ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 LAX(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2167,6 +2255,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LAX ${m_SavedValue0:X2},Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2175,8 +2264,8 @@ public sealed partial class Mos6502Cpu<BusT>
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 LAX(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2192,12 +2281,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LAX ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 LAX(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2213,6 +2303,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LAX ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -2224,14 +2315,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     LAX(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 LAX(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2242,6 +2333,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LAX (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2258,8 +2350,8 @@ public sealed partial class Mos6502Cpu<BusT>
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 LAX(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2270,6 +2362,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LAX (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2289,14 +2382,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     LAX(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 LAX(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2305,8 +2398,9 @@ public sealed partial class Mos6502Cpu<BusT>
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"LDA #${m_SavedValue2:X2}");
         LDA(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
     private void LDA_zeropage()
     {
@@ -2315,12 +2409,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDA ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 LDA(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2331,6 +2426,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDA ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2356,12 +2452,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDA ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 LDA(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2377,6 +2474,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDA ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -2388,14 +2486,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                    m_CurrentOpCodeCycle = 0;
                     LDA(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                m_CurrentOpCodeCycle = 0;
                 LDA(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2411,6 +2509,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDA ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -2422,14 +2521,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     LDA(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 LDA(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2440,6 +2539,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDA (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2456,8 +2556,8 @@ public sealed partial class Mos6502Cpu<BusT>
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 LDA(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2468,6 +2568,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDA (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2487,14 +2588,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     LDA(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 LDA(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2503,8 +2604,9 @@ public sealed partial class Mos6502Cpu<BusT>
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"LDX #${m_SavedValue2:X2}");
         LDX(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
     private void LDX_zeropage()
     {
@@ -2513,12 +2615,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDX ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 LDX(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2529,6 +2632,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDX ${m_SavedValue0:X2},Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2537,8 +2641,8 @@ public sealed partial class Mos6502Cpu<BusT>
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 LDX(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2554,12 +2658,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDX ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 LDX(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2575,6 +2680,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDX ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -2586,14 +2692,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     LDX(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 LDX(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2602,8 +2708,9 @@ public sealed partial class Mos6502Cpu<BusT>
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"LDY #${m_SavedValue2:X2}");
         LDY(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
     private void LDY_zeropage()
     {
@@ -2612,12 +2719,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDY ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 LDY(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2628,6 +2736,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDY ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2653,12 +2762,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDY ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 LDY(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2674,6 +2784,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LDY ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -2685,14 +2796,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                    m_CurrentOpCodeCycle = 0;
                     LDY(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                m_CurrentOpCodeCycle = 0;
                 LDY(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2700,8 +2811,9 @@ public sealed partial class Mos6502Cpu<BusT>
     private void LSR_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"LSR A");
         LSR();
+        m_CurrentOpCodeCycle = 0;
     }
     private void LSR_zeropage()
     {
@@ -2710,6 +2822,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LSR ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2733,6 +2846,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LSR ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2765,6 +2879,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LSR ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -2793,6 +2908,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"LSR ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -2817,15 +2933,17 @@ public sealed partial class Mos6502Cpu<BusT>
     private void NOP_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"NOP");
         NOP();
+        m_CurrentOpCodeCycle = 0;
     }
     private void NOP_immediate()
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"NOP #${m_SavedValue2:X2}");
         NOP(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
     private void NOP_zeropage()
     {
@@ -2834,12 +2952,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"NOP ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 NOP(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2850,6 +2969,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"NOP ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2875,12 +2995,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"NOP ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 NOP(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2896,6 +3017,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"NOP ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -2907,14 +3029,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                    m_CurrentOpCodeCycle = 0;
                     NOP(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                m_CurrentOpCodeCycle = 0;
                 NOP(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2923,8 +3045,9 @@ public sealed partial class Mos6502Cpu<BusT>
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"ORA #${m_SavedValue2:X2}");
         ORA(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
     private void ORA_zeropage()
     {
@@ -2933,12 +3056,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ORA ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 ORA(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2949,6 +3073,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ORA ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -2974,12 +3099,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ORA ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 ORA(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -2995,6 +3121,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ORA ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3006,14 +3133,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                    m_CurrentOpCodeCycle = 0;
                     ORA(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                m_CurrentOpCodeCycle = 0;
                 ORA(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -3029,6 +3156,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ORA ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3040,14 +3168,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     ORA(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 ORA(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -3058,6 +3186,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ORA (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3074,8 +3203,8 @@ public sealed partial class Mos6502Cpu<BusT>
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 ORA(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -3086,6 +3215,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ORA (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3105,14 +3235,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     ORA(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 ORA(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -3124,6 +3254,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RLA ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3147,6 +3278,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RLA ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3179,6 +3311,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RLA ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3207,6 +3340,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RLA ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3239,6 +3373,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RLA ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3266,6 +3401,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RLA (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3301,6 +3437,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RLA (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3333,8 +3470,9 @@ public sealed partial class Mos6502Cpu<BusT>
     private void ROL_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"ROL A");
         ROL();
+        m_CurrentOpCodeCycle = 0;
     }
     private void ROL_zeropage()
     {
@@ -3343,6 +3481,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ROL ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3366,6 +3505,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ROL ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3398,6 +3538,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ROL ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3426,6 +3567,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ROL ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3450,8 +3592,9 @@ public sealed partial class Mos6502Cpu<BusT>
     private void ROR_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"ROR A");
         ROR();
+        m_CurrentOpCodeCycle = 0;
     }
     private void ROR_zeropage()
     {
@@ -3460,6 +3603,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ROR ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3483,6 +3627,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ROR ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3515,6 +3660,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ROR ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3543,6 +3689,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"ROR ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3571,6 +3718,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RRA ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3594,6 +3742,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RRA ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3626,6 +3775,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RRA ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3654,6 +3804,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RRA ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3686,6 +3837,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RRA ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3713,6 +3865,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RRA (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3748,6 +3901,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"RRA (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3784,6 +3938,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SAX ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
@@ -3799,6 +3954,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SAX ${m_SavedValue0:X2},Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3823,6 +3979,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SAX ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
@@ -3838,6 +3995,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SAX (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3863,16 +4021,18 @@ public sealed partial class Mos6502Cpu<BusT>
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"SBX #${m_SavedValue2:X2}");
         SBX(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void SBC_immediate()
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;
-        m_CurrentOpCodeCycle = 0;
+        Trace($"SBC #${m_SavedValue2:X2}");
         SBC(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
     }
     private void SBC_zeropage()
     {
@@ -3881,12 +4041,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SBC ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
                 SBC(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -3897,6 +4058,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SBC ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -3922,12 +4084,13 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SBC ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 SBC(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -3943,6 +4106,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SBC ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3954,14 +4118,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                    m_CurrentOpCodeCycle = 0;
                     SBC(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.X));
-                m_CurrentOpCodeCycle = 0;
                 SBC(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -3977,6 +4141,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SBC ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -3988,14 +4153,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     SBC(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 SBC(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -4006,6 +4171,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SBC (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4022,8 +4188,8 @@ public sealed partial class Mos6502Cpu<BusT>
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                m_CurrentOpCodeCycle = 0;
                 SBC(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -4034,6 +4200,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SBC (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4053,14 +4220,14 @@ public sealed partial class Mos6502Cpu<BusT>
                 else
                 {
                     m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexedNoCarry(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                    m_CurrentOpCodeCycle = 0;
                     SBC(m_SavedValue2);
+                    m_CurrentOpCodeCycle = 0;
                 }
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsoluteIndexed(m_SavedValue0, m_SavedValue1, m_Registers.Y));
-                m_CurrentOpCodeCycle = 0;
                 SBC(m_SavedValue2);
+                m_CurrentOpCodeCycle = 0;
                 break;
         }
     }
@@ -4068,22 +4235,25 @@ public sealed partial class Mos6502Cpu<BusT>
     private void SEC_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"SEC");
         SEC();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void SED_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"SED");
         SED();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void SEI_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"SEI");
         SEI();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void SLO_zeropage()
@@ -4093,6 +4263,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SLO ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4116,6 +4287,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SLO ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4148,6 +4320,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SLO ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -4176,6 +4349,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SLO ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -4208,6 +4382,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SLO ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -4235,6 +4410,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SLO (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4270,6 +4446,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SLO (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4306,6 +4483,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SRE ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4329,6 +4507,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SRE ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4361,6 +4540,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SRE ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -4389,6 +4569,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SRE ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -4421,6 +4602,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SRE ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -4448,6 +4630,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SRE (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4483,6 +4666,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"SRE (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4519,6 +4703,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"STA ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
@@ -4534,6 +4719,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"STA ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4558,6 +4744,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"STA ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
@@ -4578,6 +4765,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"STA ${m_SavedValue0:X2}{m_SavedValue1:X2},X");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -4602,6 +4790,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"STA ${m_SavedValue0:X2}{m_SavedValue1:X2},Y");
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
@@ -4621,6 +4810,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"STA (${m_SavedValue1:X2},X)");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4648,6 +4838,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"STA (${m_SavedValue1:X2}),Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4676,6 +4867,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"STX ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
@@ -4691,6 +4883,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"STX ${m_SavedValue0:X2},Y");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4715,6 +4908,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"STX ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
@@ -4731,6 +4925,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"STY ${m_SavedValue0:X2}");
                 m_CurrentOpCodeCycle = 2;
                 break;
             default:
@@ -4746,6 +4941,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"STY ${m_SavedValue0:X2},X");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
@@ -4770,6 +4966,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
+                Trace($"STY ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_CurrentOpCodeCycle = 3;
                 break;
             default:
@@ -4782,43 +4979,49 @@ public sealed partial class Mos6502Cpu<BusT>
     private void TAX_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"TAX");
         TAX();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void TAY_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"TAY");
         TAY();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void TSX_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"TSX");
         TSX();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void TXA_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"TXA");
         TXA();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void TXS_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"TXS");
         TXS();
+        m_CurrentOpCodeCycle = 0;
     }
 
     private void TYA_impl()
     {
         _ = m_Bus.Read(m_Registers.PC);
-        m_CurrentOpCodeCycle = 0;
+        Trace($"TYA");
         TYA();
+        m_CurrentOpCodeCycle = 0;
     }
 
 }

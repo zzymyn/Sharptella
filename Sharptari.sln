@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharptari.Lib", "Sharptari.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharptari.CpuTest", "Sharptari.CpuTest\Sharptari.CpuTest.csproj", "{FD41B227-1C6E-4309-846F-7180A8450934}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharptari.Cli", "Sharptari.Cli\Sharptari.Cli.csproj", "{51979E80-FB22-4BC0-AEA6-79EEC7C28137}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

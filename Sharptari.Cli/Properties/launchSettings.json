@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Sharptari.Cli": {
+      "commandName": "Project",
+      "workingDirectory": "$(SolutionDir)",
+      "commandLineArgs": "\"/home/ivan/Downloads/pitfall_cce/Pitfall (CCE).bin\""
+    }
+  }
+}
