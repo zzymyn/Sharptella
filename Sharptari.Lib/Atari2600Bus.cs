@@ -9,15 +9,23 @@ namespace Sharptari.Lib;
 public sealed class Atari2600Bus
     : IMos6502Bus
 {
+    private const ushort RomSelectM = 0b0001_0000_0000_0000;
+    private const ushort RomSelectV = 0b0001_0000_0000_0000;
+
+    private const ushort RiotSelectM = 0b0001_0000_1000_0000;
+    private const ushort RiotSelectV = 0b0000_0000_1000_0000;
+
     private readonly Atari2600Rom m_Rom;
+    private readonly Mos6532Riot m_Riot;
     private byte m_BusValue;
 #if DEBUG
     private bool m_HasDoneSomethingThisStep;
 #endif
 
-    public Atari2600Bus(Atari2600Rom rom)
+    public Atari2600Bus(Atari2600Rom rom, Mos6532Riot riot)
     {
         m_Rom = rom;
+        m_Riot = riot;
     }
 
     public void Step()
@@ -40,13 +48,21 @@ public sealed class Atari2600Bus
         }
         m_HasDoneSomethingThisStep = true;
 #endif
-        address &= 0x1FFF;
 
-        if ((address & 0x1000) != 0)
+        int readValue = -1;
+
+        if ((address & RomSelectM) == RomSelectV)
         {
-            // we're in the ROM area:
-            address &= 0x0FFF;
-            m_BusValue = m_Rom.TryRead(address);
+            readValue = m_Rom.TryRead(address);
+        }
+        else if ((address & RiotSelectM) == RiotSelectV)
+        {
+            readValue = m_Riot.TryRead(address);
+        }
+
+        if (readValue >= 0)
+        {
+            m_BusValue = (byte)readValue;
         }
 
         return m_BusValue;
@@ -65,5 +81,14 @@ public sealed class Atari2600Bus
         // writing always updates the bus value:
 
         m_BusValue = value;
+
+        if ((address & RomSelectM) == RomSelectV)
+        {
+            m_Rom.TryWrite(address, value);
+        }
+        else if ((address & RiotSelectM) == RiotSelectV)
+        {
+            m_Riot.TryWrite(address, value);
+        }
     }
 }

@@ -1,23 +1,32 @@
+using System;
+using System.Numerics;
+
 namespace Sharptari.Lib;
 
 public sealed class Atari2600Rom
 {
     private readonly byte[] m_Data;
+    private readonly ushort m_DataMask;
 
     public Atari2600Rom(byte[] data)
     {
+        if (!BitOperations.IsPow2(data.Length))
+        {
+            throw new ArgumentException("The ROM size must be a power of two.", nameof(data));
+        }
+
         m_Data = data;
+        m_DataMask = (ushort)(data.Length - 1);
     }
 
-    public byte TryRead(ushort address)
+    public int TryRead(ushort address)
     {
-        if (address < m_Data.Length)
-        {
-            return m_Data[address];
-        }
-        else
-        {
-            return 0;
-        }
+        address &= m_DataMask;
+        return m_Data[address];
+    }
+
+    public void TryWrite(ushort address, byte value)
+    {
+        // ROM is read-only, so do nothing.
     }
 }
