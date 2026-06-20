@@ -13,6 +13,7 @@ public sealed partial class Mos6502Cpu<BusT>
     private readonly BusT m_Bus;
     private Mos6502Registers m_Registers;
 
+    private ushort m_CurrentOpCodeAddress;
     private int m_CurrentOpCode;
     private int m_CurrentOpCodeCycle;
 
@@ -41,6 +42,7 @@ public sealed partial class Mos6502Cpu<BusT>
     {
         if (m_CurrentOpCodeCycle == 0)
         {
+            m_CurrentOpCodeAddress = m_Registers.PC;
             m_CurrentOpCode = m_Bus.Read(m_Registers.PC);
             ++m_Registers.PC;
 
@@ -813,6 +815,7 @@ public sealed partial class Mos6502Cpu<BusT>
         {
             case 1:
                 _ = m_Bus.Read(GetStackAddress(m_Registers.S));
+                Trace("BOOT");
                 m_Registers.PInterruptDisable = true;
                 m_CurrentOpCodeCycle = 2;
                 break;
@@ -1812,7 +1815,7 @@ public sealed partial class Mos6502Cpu<BusT>
     private void Trace(string message)
     {
 #if DEBUG
-        Console.WriteLine(message);
+        Console.WriteLine($"{m_CurrentOpCodeAddress:X4}: {message}");
 #endif
     }
 }
