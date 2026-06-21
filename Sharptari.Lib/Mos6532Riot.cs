@@ -166,12 +166,14 @@ public sealed class Mos6532Riot
 
     private void StartTimer(byte value, ushort prescalerMask)
     {
+        bool timerWillUnderflowThisStep = TimerWillUnderflowThisStep();
+
         m_Timer = value;
         m_Prescaler = 0;
         m_PrescalerMask = prescalerMask;
 
-        // bug/quirk: if the flag timer will underflow this step, it doesn't get reset on read here:
-        m_FlagTimer = TimerWillUnderflowThisStep();
+        // bug/quirk: if the flag timer would have underflowed this step, it doesn't get reset on read here:
+        m_FlagTimer = timerWillUnderflowThisStep;
     }
 
     private bool TimerWillUnderflowThisStep()
