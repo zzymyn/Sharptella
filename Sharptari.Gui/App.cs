@@ -48,7 +48,7 @@ internal unsafe sealed class App
 
         m_Texture = m_Sdl.CreateTexture(
             m_Renderer,
-            (uint)PixelFormatEnum.Abgr8888,
+            (uint)PixelFormatEnum.Xbgr8888,
             (int)TextureAccess.Streaming,
             160,
             192
