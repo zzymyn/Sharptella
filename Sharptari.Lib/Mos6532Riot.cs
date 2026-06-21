@@ -24,7 +24,6 @@ public sealed class Mos6532Riot
     private ushort m_Prescaler;
     private ushort m_PrescalerMask;
     private bool m_FlagTimer;
-    private bool m_FlagTimerThisStep;
 
     public void Reboot()
     {
@@ -32,13 +31,10 @@ public sealed class Mos6532Riot
         m_Prescaler = 0;
         m_PrescalerMask = 1023;
         m_FlagTimer = false;
-        m_FlagTimerThisStep = false;
     }
 
     public void Step()
     {
-        m_FlagTimerThisStep = false;
-
         m_Prescaler = (ushort)((m_Prescaler - 1) & m_PrescalerMask);
 
         if (m_FlagTimer || m_Prescaler == m_PrescalerMask)
@@ -47,7 +43,6 @@ public sealed class Mos6532Riot
             if (m_Timer == byte.MaxValue)
             {
                 m_FlagTimer = true;
-                m_FlagTimerThisStep = true;
             }
         }
     }
@@ -71,8 +66,8 @@ public sealed class Mos6532Riot
                 case 0x04:
                 case 0x06:
                     // INTIM
-                    // bug/quirk: if the flag timer was set this step, it doesn't get reset on read here:
-                    m_FlagTimer = m_FlagTimerThisStep;
+                    // bug/quirk: if the flag timer will underflow this step, it doesn't get reset on read here:
+                    m_FlagTimer = TimerWillUnderflowThisStep();
                     return m_Timer;
                 case 0x05:
                 case 0x07:
@@ -143,7 +138,12 @@ public sealed class Mos6532Riot
         m_Prescaler = 0;
         m_PrescalerMask = prescalerMask;
 
-        // bug/quirk: if the flag timer was set this step, it doesn't get reset on read here:
-        m_FlagTimer = m_FlagTimerThisStep;
+        // bug/quirk: if the flag timer will underflow this step, it doesn't get reset on read here:
+        m_FlagTimer = TimerWillUnderflowThisStep();
+    }
+
+    private bool TimerWillUnderflowThisStep()
+    {
+        return m_Timer == 0 && (m_FlagTimer || m_Prescaler == 0);
     }
 }
