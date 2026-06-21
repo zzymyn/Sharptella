@@ -20,21 +20,21 @@ public sealed class Atari2600Bus
 
     private readonly Atari2600Rom m_Rom;
     private readonly Mos6532Riot m_Riot;
+    private readonly Atari2600Tia m_Tia;
     private byte m_BusValue;
 #if DEBUG
     private bool m_HasDoneSomethingThisStep;
 #endif
 
-    public Atari2600Bus(Atari2600Rom rom, Mos6532Riot riot)
+    public Atari2600Bus(Atari2600Rom rom, Mos6532Riot riot, Atari2600Tia tia)
     {
         m_Rom = rom;
         m_Riot = riot;
+        m_Tia = tia;
     }
 
     public void Reboot()
     {
-        m_Rom.Reboot();
-        m_Riot.Reboot();
         m_BusValue = 0;
     }
 
@@ -47,9 +47,6 @@ public sealed class Atari2600Bus
         }
         m_HasDoneSomethingThisStep = false;
 #endif
-
-        m_Rom.Step();
-        m_Riot.Step();
     }
 
     public byte Read(ushort address)
@@ -74,7 +71,7 @@ public sealed class Atari2600Bus
         }
         else if ((address & TiaSelectM) == TiaSelectV)
         {
-            // TODO: implement TIA reads
+            readValue = m_Tia.TryRead(address);
         }
 
         if (readValue >= 0)
@@ -109,7 +106,7 @@ public sealed class Atari2600Bus
         }
         else if ((address & TiaSelectM) == TiaSelectV)
         {
-            // TODO: implement TIA writes
+            m_Tia.TryWrite(address, value);
         }
     }
 }

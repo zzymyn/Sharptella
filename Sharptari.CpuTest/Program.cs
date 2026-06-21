@@ -142,6 +142,7 @@ internal class Program
         do
         {
             cpu.Step();
+            bus.Step();
             ++stepCount;
         } while (!cpu.IsAtOpCodeStart && stepCount <= 10);
 

@@ -19,15 +19,12 @@ internal class Program
             var romPath = args[0];
             var romBytes = await File.ReadAllBytesAsync(romPath);
 
-            var rom = new Atari2600Rom(romBytes);
-            var riot = new Mos6532Riot();
-            var bus = new Atari2600Bus(rom, riot);
-            var cpu = new Mos6502Cpu<Atari2600Bus>(bus);
+            var atari2600 = new Atari2600(romBytes);
 
-            cpu.Reboot();
+            atari2600.Reboot();
             while (true)
             {
-                cpu.Step();
+                atari2600.Step();
             }
         }
         catch (Exception ex)

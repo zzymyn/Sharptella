@@ -50,9 +50,6 @@ public sealed partial class Mos6502Cpu<BusT>
         // Possible accuracy improvement: figure out exactly what the CPU would hold on the bus when halted,
         // and use that instead of just reading the PC.
         _ = m_Bus.Read(m_Registers.PC);
-
-        // even when halted, the bus is still stepped, mainly to allow the RIOT timer to keep running:
-        m_Bus.Step();
     }
 
     public void Step()
@@ -827,8 +824,6 @@ public sealed partial class Mos6502Cpu<BusT>
                     break;
             }
         }
-
-        m_Bus.Step();
     }
 
     private void BOOT()
@@ -838,19 +833,30 @@ public sealed partial class Mos6502Cpu<BusT>
         switch (m_CurrentOpCodeCycle)
         {
             case 1:
-                _ = m_Bus.Read(GetStackAddress(m_Registers.S));
-                Trace("BOOT");
+                // how many of these do we actually need to do?
+                m_Registers.A = 0;
+                m_Registers.X = 0;
+                m_Registers.Y = 0;
+                m_Registers.S = 0;
+                m_Registers.PNegative = false;
+                m_Registers.POverflow = false;
+                m_Registers.PZero = false;
+                m_Registers.PCarry = false;
+                m_Registers.PDecimal = false;
                 m_Registers.PInterruptDisable = true;
+                _ = m_Bus.Read(m_Registers.PC);
+                Trace("BOOT");
                 m_CurrentOpCodeCycle = 2;
                 break;
             case 2:
-                _ = m_Bus.Read(GetStackAddress(m_Registers.S));
+                _ = m_Bus.Read(m_Registers.PC);
                 m_CurrentOpCodeCycle = 3;
                 break;
             case 3:
             case 4:
             case 5:
                 _ = m_Bus.Read(GetStackAddress(m_Registers.S));
+                --m_Registers.S;
                 ++m_CurrentOpCodeCycle;
                 break;
             case 6:
@@ -860,7 +866,6 @@ public sealed partial class Mos6502Cpu<BusT>
             case 7:
                 m_SavedValue1 = m_Bus.Read(0xFFFD);
                 m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
-                m_Registers.PInterruptDisable = false;
                 m_CurrentOpCodeCycle = 0;
                 break;
         }
