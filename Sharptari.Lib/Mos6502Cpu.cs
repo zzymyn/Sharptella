@@ -10,6 +10,9 @@ namespace Sharptari.Lib;
 public sealed partial class Mos6502Cpu<BusT>
     where BusT : IMos6502Bus
 {
+    // Not a real 6502 opcode, just a pseudo-opcode to represent the CPU booting up and reading the reset vector:
+    private const int OpCodeBOOT = 0x100;
+
     private readonly BusT m_Bus;
     private Mos6502Registers m_Registers;
 
@@ -34,15 +37,29 @@ public sealed partial class Mos6502Cpu<BusT>
 
     public void Reboot()
     {
-        m_CurrentOpCode = 0x100;
+        m_CurrentOpCode = OpCodeBOOT;
         m_CurrentOpCodeCycle = 1;
         m_Bus.Reboot();
+    }
+
+    public void StepHalted()
+    {
+        // CPU has to hold something on the bus, even when halted, so just read the current PC repeatedly,
+        // should be ok because CPU is usually only halted after writing WSYNC to the TIA, and the next
+        // cycle will be reading the next instruction.
+        // Possible accuracy improvement: figure out exactly what the CPU would hold on the bus when halted,
+        // and use that instead of just reading the PC.
+        _ = m_Bus.Read(m_Registers.PC);
+
+        // even when halted, the bus is still stepped, mainly to allow the RIOT timer to keep running:
+        m_Bus.Step();
     }
 
     public void Step()
     {
         if (m_CurrentOpCodeCycle == 0)
         {
+            // The first cycle of an opcode is always reading the opcode byte from the current PC:
             m_CurrentOpCodeAddress = m_Registers.PC;
             m_CurrentOpCode = m_Bus.Read(m_Registers.PC);
             ++m_Registers.PC;
@@ -53,7 +70,7 @@ public sealed partial class Mos6502Cpu<BusT>
         {
             switch (m_CurrentOpCode)
             {
-                case 0x100:
+                case OpCodeBOOT:
                     BOOT();
                     break;
 
@@ -801,7 +818,11 @@ public sealed partial class Mos6502Cpu<BusT>
                     break;
 
                 default:
+                    // We're explicitly not handling the unstable opcodes, just NOPing instead.
+                    // Possible accuracy improvement: at least run for the same number of cycles
+                    // as the unstable opcode would have, to improve timing accuracy?
                     _ = m_Bus.Read(m_Registers.PC);
+                    Trace($"UNKNOWN ${m_CurrentOpCode:X2}");
                     m_CurrentOpCodeCycle = 0;
                     break;
             }
@@ -812,6 +833,8 @@ public sealed partial class Mos6502Cpu<BusT>
 
     private void BOOT()
     {
+        // TODO: This isn't exactly correct yet, need to verify the exact sequence of reads and writes that the CPU does on boot
+        // and make sure this matches that.
         switch (m_CurrentOpCodeCycle)
         {
             case 1:

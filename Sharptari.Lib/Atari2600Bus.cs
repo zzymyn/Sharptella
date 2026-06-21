@@ -15,6 +15,9 @@ public sealed class Atari2600Bus
     private const ushort RiotSelectM = 0b0001_0000_1000_0000;
     private const ushort RiotSelectV = 0b0000_0000_1000_0000;
 
+    private const ushort TiaSelectM = 0b0001_0000_1000_0000;
+    private const ushort TiaSelectV = 0b0000_0000_0000_0000;
+
     private readonly Atari2600Rom m_Rom;
     private readonly Mos6532Riot m_Riot;
     private byte m_BusValue;
@@ -69,6 +72,10 @@ public sealed class Atari2600Bus
         {
             readValue = m_Riot.TryRead(address);
         }
+        else if ((address & TiaSelectM) == TiaSelectV)
+        {
+            // TODO: implement TIA reads
+        }
 
         if (readValue >= 0)
         {
@@ -99,6 +106,10 @@ public sealed class Atari2600Bus
         else if ((address & RiotSelectM) == RiotSelectV)
         {
             m_Riot.TryWrite(address, value);
+        }
+        else if ((address & TiaSelectM) == TiaSelectV)
+        {
+            // TODO: implement TIA writes
         }
     }
 }
