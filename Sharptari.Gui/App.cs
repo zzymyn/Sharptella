@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Sharptari.Lib;
 using Silk.NET.Maths;
 using Silk.NET.SDL;
@@ -12,6 +13,7 @@ internal unsafe sealed class App
     private const int HBlankLength = 68;
     private const int InitialScanlineCount = 262;
     private const float PixelAspectRatio = 12.0f / 7.0f;
+    private const long CpuSpeed = 1193181;
 
     private readonly SdlAtariInput m_AtariInput;
     private readonly Atari2600 m_Atari2600;
@@ -28,12 +30,12 @@ internal unsafe sealed class App
 
         m_Sdl = Sdl.GetApi();
 
-        if (m_Sdl.Init(Sdl.InitVideo) != 0)
+        if (m_Sdl.Init(Sdl.InitVideo | Sdl.InitTimer) != 0)
         {
             throw new Exception($"Could not initialize SDL: {m_Sdl.GetErrorS()}");
         }
 
-        m_Window = new (
+        m_Window = new(
             m_Sdl,
             "Sharptari",
             Sdl.WindowposCentered,
@@ -63,26 +65,68 @@ internal unsafe sealed class App
     {
         ColorAbgr8888[] frameBuffer = new ColorAbgr8888[ScanlineLength * InitialScanlineCount];
 
-        bool running = true;
         Event ev = new();
 
-        while (running)
+        double realElapsedTime = 0.0;
+        double cpuElapsedTime = 0.0;
+
+        var perfFreq = 1.0 / m_Sdl.GetPerformanceFrequency();
+        var prevTime = m_Sdl.GetPerformanceCounter();
+
+        while (true)
         {
-            // Process window events:
-            while (m_Sdl.PollEvent(&ev) != 0)
+            do
             {
-                if (ev.Type == (uint)EventType.Quit)
+                // Process window events:
+                while (m_Sdl.PollEvent(&ev) != 0)
                 {
-                    running = false;
+                    switch ((EventType)ev.Type)
+                    {
+                        case EventType.Quit:
+                            return;
+                        case EventType.Keydown:
+                            m_AtariInput.ProcessKeyboardEvent(ev);
+                            if (ev.Key.Keysym.Scancode == Scancode.ScancodeEscape)
+                            {
+                                return;
+                            }
+                            break;
+                        case EventType.Keyup:
+                            m_AtariInput.ProcessKeyboardEvent(ev);
+                            break;
+                    }
                 }
-                else if (ev.Type == (uint)EventType.Keydown || ev.Type == (uint)EventType.Keyup)
+
+                var nowTime = m_Sdl.GetPerformanceCounter();
+                realElapsedTime += (nowTime - prevTime) * perfFreq;
+                prevTime = nowTime;
+
+                double timeRemaining = cpuElapsedTime - realElapsedTime;
+                if (timeRemaining > 0.2)
                 {
-                    m_AtariInput.ProcessKeyboardEvent(ev);
+                    // If we're more than 200ms ahead, something weird has happened (no frame rendered for a long time)
+                    // just reset the timers to avoid a long sleep:
+                    realElapsedTime = cpuElapsedTime;
+                    Console.WriteLine($"Warning: Emulation is more than 200ms ahead of real time. Resetting timers.");
+                }
+                else if (timeRemaining > 0.005)
+                {
+                    uint sleepTime = (uint)(timeRemaining * 1000) - 2;
+                    m_Sdl.Delay(sleepTime);
+                }
+                else if (timeRemaining <= -0.1)
+                {
+                    // If we're more than 100ms behind, (user dragged the window around perhaps?)
+                    // just reset the timers to avoid a fast-forward:
+                    realElapsedTime = cpuElapsedTime;
+                    Console.WriteLine($"Warning: Emulation is more than 100ms behind real time. Resetting timers.");
                 }
             }
+            while (realElapsedTime < cpuElapsedTime);
 
             // Process one frame of emulation:
-            m_Atari2600.StepFrame(ref frameBuffer, out int frameBufferLength);
+            int cpuSteps = m_Atari2600.StepFrame(ref frameBuffer, out int frameBufferLength);
+            cpuElapsedTime += (double)cpuSteps / CpuSpeed;
 
             // copy the frame buffer to texture:
             int frameBufferHeight = frameBufferLength / ScanlineLength;

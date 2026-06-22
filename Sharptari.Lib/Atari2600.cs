@@ -57,11 +57,14 @@ public sealed class Atari2600
         m_Tia.Step();
     }
 
-    public void StepFrame(ref ColorAbgr8888[] buffer, out int bufferLength)
+    public int StepFrame(ref ColorAbgr8888[] buffer, out int bufferLength)
     {
+        int steps = 0;
+
         while (!m_Tia.HasFrameReady)
         {
             Step();
+            ++steps;
         }
 
         var pixels = m_Tia.FramePixels;
@@ -79,5 +82,7 @@ public sealed class Atari2600
         }
 
         bufferLength = pixels.Count;
+
+        return steps;
     }
 }
