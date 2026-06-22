@@ -26,24 +26,27 @@ public sealed class Atari2600Tia
     private int m_CurrentScanline = 0;
     private int m_CurrentScanlineCycle = 0;
 
-    private int m_CurrentBallX = 0;
-
     private bool m_WSync = false;
     private bool m_VBlank = false;
     private bool m_VSync = false;
     private bool m_HMoved = false;
-    private ColorAbgr8888 m_Player0Color = ColorAbgr8888.Black;
-    private ColorAbgr8888 m_Player1Color = ColorAbgr8888.Black;
     private ColorAbgr8888 m_PlayfieldColor = ColorAbgr8888.Black;
     private ColorAbgr8888 m_BackgroundColor = ColorAbgr8888.Black;
+
     private bool m_PlayfieldReflect = false;
     private bool m_PlayfieldScoreMode = false;
     private bool m_PlayfieldPriority = false;
-    private byte m_BallSize = 0;
     private bool[] m_Playfield = new bool[20];
-    private bool m_EnableBall;
-    private byte m_HorzontalMotionBall;
+
+    private bool m_EnableBallCurr;
+    private bool m_EnableBallPrev;
+    private int m_BallSize;
+    private int m_HorzontalMotionBall;
     private bool m_VerticalDelayBall;
+    private int m_CurrentBallX;
+
+    private PlayerMissile m_PlayerMissile0;
+    private PlayerMissile m_PlayerMissile1;
 
     public bool WSync => m_WSync;
     public bool HasFrameReady => m_HasFrameReady;
@@ -89,44 +92,32 @@ public sealed class Atari2600Tia
             {
                 m_CurrentScalinePixels[i] = m_BackgroundColor;
 
-                var playfieldIndex = (i - HBlankLength) / 4;
-                var playfieldColor = m_PlayfieldColor;
-                if (m_PlayfieldScoreMode)
+                if (!m_PlayfieldPriority)
                 {
-                    playfieldColor = m_Player0Color;
+                    DrawPlayfield(i);
+                    DrawBall(i);
                 }
 
-                if (playfieldIndex >= 20)
+                if (m_PlayerMissile0.EnableMissile)
                 {
-                    playfieldIndex -= 20;
-                    if (m_PlayfieldReflect)
-                    {
-                        playfieldIndex = 19 - playfieldIndex;
-                    }
-
-                    if (m_PlayfieldScoreMode)
-                    {
-                        playfieldColor = m_Player1Color;
-                    }
+                    m_CurrentScalinePixels[i] = new(255, 0, 0, 255);
                 }
 
-
-                if (m_Playfield[playfieldIndex])
+                if (m_PlayerMissile1.EnableMissile)
                 {
-                    m_CurrentScalinePixels[i] = playfieldColor;
+                    m_CurrentScalinePixels[i] = new(255, 0, 0, 255);
                 }
 
-                if (m_EnableBall)
+                if (m_PlayfieldPriority)
                 {
-                    int ballWidth = (1 << m_BallSize);
-                    if (m_CurrentBallX < ballWidth)
-                    {
-                        m_CurrentScalinePixels[i] = m_PlayfieldColor;
-                    }
+                    DrawPlayfield(i);
+                    DrawBall(i);
                 }
             }
 
             m_CurrentBallX = (m_CurrentBallX + 1) % 160;
+            m_PlayerMissile0.StepX();
+            m_PlayerMissile1.StepX();
         }
 
         ++m_CurrentScanlineCycle;
@@ -140,6 +131,47 @@ public sealed class Atari2600Tia
             ++m_CurrentScanline;
             m_WSync = false;
             m_HMoved = false;
+        }
+    }
+
+    private void DrawPlayfield(int i)
+    {
+        var playfieldIndex = (i - HBlankLength) / 4;
+        var playfieldColor = m_PlayfieldColor;
+        if (m_PlayfieldScoreMode)
+        {
+            playfieldColor = m_PlayerMissile0.Color;
+        }
+
+        if (playfieldIndex >= 20)
+        {
+            playfieldIndex -= 20;
+            if (m_PlayfieldReflect)
+            {
+                playfieldIndex = 19 - playfieldIndex;
+            }
+
+            if (m_PlayfieldScoreMode)
+            {
+                playfieldColor = m_PlayerMissile1.Color;
+            }
+        }
+
+        if (m_Playfield[playfieldIndex])
+        {
+            m_CurrentScalinePixels[i] = playfieldColor;
+        }
+    }
+
+    private void DrawBall(int i)
+    {
+        if (m_VerticalDelayBall ? m_EnableBallPrev : m_EnableBallCurr)
+        {
+            int ballWidth = 1 << m_BallSize;
+            if (m_CurrentBallX < ballWidth)
+            {
+                m_CurrentScalinePixels[i] = m_PlayfieldColor;
+            }
         }
     }
 
@@ -222,17 +254,19 @@ public sealed class Atari2600Tia
                 break;
             case 0x04:
                 // NUSIZ0
+                m_PlayerMissile0.SetNusiz(value);
                 break;
             case 0x05:
                 // NUSIZ1
+                m_PlayerMissile0.SetNusiz(value);
                 break;
             case 0x06:
                 // COLUP0
-                m_Player0Color = YiqToColorLut[value];
+                m_PlayerMissile0.Color = YiqToColorLut[value];
                 break;
             case 0x07:
                 // COLUP1
-                m_Player1Color = YiqToColorLut[value];
+                m_PlayerMissile1.Color = YiqToColorLut[value];
                 break;
             case 0x08:
                 // COLUPF
@@ -247,13 +281,15 @@ public sealed class Atari2600Tia
                 m_PlayfieldReflect = (value & 0b0000_0001) != 0;
                 m_PlayfieldScoreMode = (value & 0b0000_0010) != 0;
                 m_PlayfieldPriority = (value & 0b0000_0100) != 0;
-                m_BallSize = (byte)((value & 0b0011_0000) >> 4);
+                m_BallSize = (value & 0b0011_0000) >> 4;
                 break;
             case 0x0b:
                 // REFP0
+                m_PlayerMissile0.Reflect = (value & 0b0000_1000) != 0;
                 break;
             case 0x0c:
                 // REFP1
+                m_PlayerMissile1.Reflect = (value & 0b0000_1000) != 0;
                 break;
             case 0x0d:
                 // PF0
@@ -286,15 +322,19 @@ public sealed class Atari2600Tia
                 break;
             case 0x10:
                 // RESP0
+                m_PlayerMissile0.CurrentX = 155;
                 break;
             case 0x11:
                 // RESP1
+                m_PlayerMissile1.CurrentX = 155;
                 break;
             case 0x12:
                 // RESM0
+                m_PlayerMissile0.CurrentMissileX = 155;
                 break;
             case 0x13:
                 // RESM1
+                m_PlayerMissile1.CurrentMissileX = 155;
                 break;
             case 0x14:
                 // RESBL
@@ -320,41 +360,54 @@ public sealed class Atari2600Tia
                 break;
             case 0x1b:
                 // GRP0
+                m_PlayerMissile0.BitmapCurr = value;
+                m_PlayerMissile1.BitmapPrev = m_PlayerMissile1.BitmapCurr;
                 break;
             case 0x1c:
                 // GRP1
+                m_PlayerMissile1.BitmapCurr = value;
+                m_PlayerMissile0.BitmapPrev = m_PlayerMissile1.BitmapCurr;
+                m_EnableBallPrev = m_EnableBallCurr;
                 break;
             case 0x1d:
                 // ENAM0
+                m_PlayerMissile0.EnableMissile = (value & 0b0000_0010) != 0;
                 break;
             case 0x1e:
                 // ENAM1
+                m_PlayerMissile1.EnableMissile = (value & 0b0000_0010) != 0;
                 break;
             case 0x1f:
                 // ENABL
-                m_EnableBall = (value & 0b0000_0010) != 0;
+                m_EnableBallCurr = (value & 0b0000_0010) != 0;
                 break;
             case 0x20:
                 // HMP0
+                m_PlayerMissile0.HorzontalMotion = (value & 0b1111_0000) >> 4;
                 break;
             case 0x21:
                 // HMP1
+                m_PlayerMissile1.HorzontalMotion = (value & 0b1111_0000) >> 4;
                 break;
             case 0x22:
                 // HMM0
+                m_PlayerMissile0.HorzontalMotionMissile = (value & 0b1111_0000) >> 4;
                 break;
             case 0x23:
                 // HMM1
+                m_PlayerMissile1.HorzontalMotionMissile = (value & 0b1111_0000) >> 4;
                 break;
             case 0x24:
                 // HMBL
-                m_HorzontalMotionBall = (byte)((value & 0b1111_0000) >> 4);
+                m_HorzontalMotionBall = (value & 0b1111_0000) >> 4;
                 break;
             case 0x25:
                 // VDELP0
+                m_PlayerMissile0.VerticalDelay = (value & 0b0000_0001) != 0;
                 break;
             case 0x26:
                 // VDELP1
+                m_PlayerMissile1.VerticalDelay = (value & 0b0000_0001) != 0;
                 break;
             case 0x27:
                 // VDELBL
@@ -362,18 +415,28 @@ public sealed class Atari2600Tia
                 break;
             case 0x28:
                 // RESMP0
+                m_PlayerMissile0.MissileLocked = (value & 0b0000_0010) != 0;
                 break;
             case 0x29:
                 // RESMP1
+                m_PlayerMissile1.MissileLocked = (value & 0b0000_0010) != 0;
                 break;
             case 0x2a:
                 // HMOVE
                 m_CurrentBallX = ApplyHMove(m_CurrentBallX, m_HorzontalMotionBall);
+                m_PlayerMissile0.CurrentX = ApplyHMove(m_PlayerMissile0.CurrentX, m_PlayerMissile0.HorzontalMotion);
+                m_PlayerMissile1.CurrentX = ApplyHMove(m_PlayerMissile1.CurrentX, m_PlayerMissile1.HorzontalMotion);
+                m_PlayerMissile0.CurrentMissileX = ApplyHMove(m_PlayerMissile0.CurrentMissileX, m_PlayerMissile0.HorzontalMotionMissile);
+                m_PlayerMissile1.CurrentMissileX = ApplyHMove(m_PlayerMissile1.CurrentMissileX, m_PlayerMissile1.HorzontalMotionMissile);
                 m_HMoved = true;
                 break;
             case 0x2b:
                 // HMCLR
                 m_HorzontalMotionBall = 0;
+                m_PlayerMissile0.HorzontalMotion = 0;
+                m_PlayerMissile1.HorzontalMotion = 0;
+                m_PlayerMissile0.HorzontalMotionMissile = 0;
+                m_PlayerMissile1.HorzontalMotionMissile = 0;
                 break;
             case 0x2c:
                 // CXCLR
@@ -422,7 +485,7 @@ public sealed class Atari2600Tia
         // TODO
     }
 
-    private static int ApplyHMove(int x, byte hmove)
+    private static int ApplyHMove(int x, int hmove)
     {
         if (hmove >= 8)
         {
@@ -431,6 +494,88 @@ public sealed class Atari2600Tia
         else
         {
             return (x + hmove) % 160;
+        }
+    }
+
+    private struct PlayerMissile
+    {
+        public ColorAbgr8888 Color;
+        public byte BitmapCurr;
+        public byte BitmapPrev;
+        public bool Reflect;
+        public int Copies;
+        public int Spacing;
+        public int Size;
+        public int HorzontalMotion;
+        public bool VerticalDelay;
+        public int CurrentX;
+
+        public bool EnableMissile;
+        public int MissileSize;
+        public bool MissileLocked;
+        public int HorzontalMotionMissile;
+        public int CurrentMissileX;
+
+        public void SetNusiz(byte value)
+        {
+            switch (value & 0b0000_0111)
+            {
+                case 0:
+                    Copies = 1;
+                    Spacing = 16;
+                    Size = 0;
+                    break;
+                case 1:
+                    Copies = 2;
+                    Spacing = 16;
+                    Size = 0;
+                    break;
+                case 2:
+                    Copies = 2;
+                    Spacing = 32;
+                    Size = 0;
+                    break;
+                case 3:
+                    Copies = 3;
+                    Spacing = 16;
+                    Size = 0;
+                    break;
+                case 4:
+                    Copies = 2;
+                    Spacing = 64;
+                    Size = 0;
+                    break;
+                case 5:
+                    Copies = 1;
+                    Spacing = 16;
+                    Size = 1;
+                    break;
+                case 6:
+                    Copies = 3;
+                    Spacing = 32;
+                    Size = 0;
+                    break;
+                case 7:
+                    Copies = 1;
+                    Spacing = 16;
+                    Size = 2;
+                    break;
+            }
+
+            MissileSize = (value & 0b0011_0000) >> 4;
+        }
+
+        public void StepX()
+        {
+            CurrentX = (CurrentX + 1) % 160;
+            if (MissileLocked)
+            {
+                CurrentMissileX = CurrentX;
+            }
+            else
+            {
+                CurrentMissileX = (CurrentMissileX + 1) % 160;
+            }
         }
     }
 
