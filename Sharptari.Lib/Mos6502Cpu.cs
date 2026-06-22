@@ -1844,7 +1844,7 @@ public sealed partial class Mos6502Cpu<BusT>
     private void Trace(string message)
     {
 #if DEBUG
-        Console.WriteLine($"{m_CurrentOpCodeAddress:X4}: {message}");
+        //Console.WriteLine($"{m_CurrentOpCodeAddress:X4}: {message}");
 #endif
     }
 }

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,7 +36,15 @@ public sealed class Atari2600
 
     public void Step()
     {
-        m_Cpu.Step();
+        if (m_Tia.WSync)
+        {
+            m_Cpu.StepHalted();
+        }
+        else
+        {
+            m_Cpu.Step();
+        }
+
         m_Bus.Step();
         m_Rom.Step();
         m_Riot.Step();
@@ -43,5 +53,29 @@ public sealed class Atari2600
         m_Tia.Step();
         m_Tia.Step();
         m_Tia.Step();
+    }
+
+    public void StepFrame(ref ColorAbgr8888[] buffer, out int bufferLength)
+    {
+        while (!m_Tia.HasFrameReady)
+        {
+            Step();
+        }
+
+        var pixels = m_Tia.FramePixels;
+        m_Tia.ClearFrameReady();
+
+        if (buffer == null || pixels.Count > buffer.Length)
+        {
+            buffer = new ColorAbgr8888[pixels.Count];
+        }
+
+        // Copy the pixels to the screen bytes:
+        for (int i = 0; i < pixels.Count; i++)
+        {
+            buffer[i] = pixels[i];
+        }
+
+        bufferLength = pixels.Count;
     }
 }
