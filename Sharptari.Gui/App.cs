@@ -145,6 +145,8 @@ internal unsafe sealed class App
                     maxY = Math.Max(maxY, y);
                 }
             }
+            minY = Math.Max(minY, 0);
+            maxY = Math.Min(maxY + 8, frameBufferLength / ScanlineLength - 1);
 
             // copy the frame buffer to texture:
             int frameBufferHeight = frameBufferLength / ScanlineLength;
