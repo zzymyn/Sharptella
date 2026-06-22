@@ -109,7 +109,7 @@ public sealed class Atari2600Tia
             || m_CurrentScanlineCycle < HBlankLength
             || m_HMoved && m_CurrentScanlineCycle < HBlankLengthHMoved)
         {
-            m_CurrentScanlinePixels[i] = ColorAbgr8888.Black;
+            m_CurrentScanlinePixels[i] = ColorAbgr8888.Zero;
         }
         else
         {

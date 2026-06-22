@@ -13,6 +13,7 @@ public struct ColorAbgr8888
     public byte B;
     public byte A;
 
+    public static readonly ColorAbgr8888 Zero = new(0, 0, 0, 0);
     public static readonly ColorAbgr8888 Black = new(0, 0, 0, 255);
     public static readonly ColorAbgr8888 Magenta = new(255, 0, 255, 255);
 

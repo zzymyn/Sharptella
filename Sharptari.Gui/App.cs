@@ -128,6 +128,24 @@ internal unsafe sealed class App
             int cpuSteps = m_Atari2600.StepFrame(ref frameBuffer, out int frameBufferLength);
             cpuElapsedTime += (double)cpuSteps / CpuSpeed;
 
+            int minX = ScanlineLength - 1;
+            int maxX = 0;
+            int minY = frameBufferLength / ScanlineLength - 1;
+            int maxY = 0;
+            for (int i = 0; i < frameBufferLength; ++i)
+            {
+                var pixel = frameBuffer[i];
+                if (pixel.A != 0)
+                {
+                    int x = i % ScanlineLength;
+                    int y = i / ScanlineLength;
+                    minX = Math.Min(minX, x);
+                    maxX = Math.Max(maxX, x);
+                    minY = Math.Min(minY, y);
+                    maxY = Math.Max(maxY, y);
+                }
+            }
+
             // copy the frame buffer to texture:
             int frameBufferHeight = frameBufferLength / ScanlineLength;
 
@@ -154,11 +172,11 @@ internal unsafe sealed class App
             float rAspect = (float)rWidth / rHeight;
 
             // Render your texture (srcrect and dstrect set to null fills the window)
-            Rectangle<int> srcRect = new(0, 0, ScanlineLength, frameBufferHeight);
+            Rectangle<int> srcRect = new(HBlankLength, minY, ScanlineLength - HBlankLength, maxY - minY + 1);
             Rectangle<int> dstRect = default;
 
             // fit 4:3 into dstRect while maintaining aspect ratio
-            float targetAspect = PixelAspectRatio * ScanlineLength / frameBufferHeight;
+            float targetAspect = PixelAspectRatio * (ScanlineLength - HBlankLength) / (maxY - minY + 1);
             if (rAspect > targetAspect)
             {
                 var w = (int)(rHeight * targetAspect);
