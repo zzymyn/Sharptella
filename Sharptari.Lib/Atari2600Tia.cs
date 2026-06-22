@@ -98,15 +98,8 @@ public sealed class Atari2600Tia
                     DrawBall(i);
                 }
 
-                if (m_PlayerMissile0.EnableMissile)
-                {
-                    m_CurrentScalinePixels[i] = new(255, 0, 0, 255);
-                }
-
-                if (m_PlayerMissile1.EnableMissile)
-                {
-                    m_CurrentScalinePixels[i] = new(255, 0, 0, 255);
-                }
+                DrawPlayer(in m_PlayerMissile0, i);
+                DrawPlayer(in m_PlayerMissile1, i);
 
                 if (m_PlayfieldPriority)
                 {
@@ -163,9 +156,50 @@ public sealed class Atari2600Tia
         }
     }
 
+    private void DrawPlayer(in PlayerMissile pm, int i)
+    {
+        byte bitmap = pm.VerticalDelay ? pm.BitmapPrev : pm.BitmapCurr;
+
+        if (bitmap != 0)
+        {
+            int copy = pm.CurrentX / pm.Spacing;
+            int pixel = (pm.CurrentX / pm.Size) % pm.Spacing;
+
+            if (pixel < 8 && copy < pm.Copies)
+            {
+                if (pm.Reflect)
+                {
+                    if ((bitmap & (0b0000_0001 << pixel)) != 0)
+                    {
+                        m_CurrentScalinePixels[i] = pm.Color;
+                    }
+                }
+                else
+                {
+                    if ((bitmap & (0b1000_0000 >> pixel)) != 0)
+                    {
+                        m_CurrentScalinePixels[i] = pm.Color;
+                    }
+                }
+            }
+        }
+
+        if (pm.EnableMissile)
+        {
+            int copy = pm.CurrentMissileX / pm.Spacing;
+            int pixel = pm.CurrentMissileX % pm.Spacing;
+
+            if (pixel < pm.MissileSize && copy < pm.Copies)
+            {
+                m_CurrentScalinePixels[i] = pm.Color;
+            }
+        }
+    }
+
     private void DrawBall(int i)
     {
-        if (m_VerticalDelayBall ? m_EnableBallPrev : m_EnableBallCurr)
+        var drawBall = m_VerticalDelayBall ? m_EnableBallPrev : m_EnableBallCurr;
+        if (drawBall)
         {
             int ballWidth = 1 << m_BallSize;
             if (m_CurrentBallX < ballWidth)
@@ -258,7 +292,7 @@ public sealed class Atari2600Tia
                 break;
             case 0x05:
                 // NUSIZ1
-                m_PlayerMissile0.SetNusiz(value);
+                m_PlayerMissile1.SetNusiz(value);
                 break;
             case 0x06:
                 // COLUP0
@@ -366,7 +400,7 @@ public sealed class Atari2600Tia
             case 0x1c:
                 // GRP1
                 m_PlayerMissile1.BitmapCurr = value;
-                m_PlayerMissile0.BitmapPrev = m_PlayerMissile1.BitmapCurr;
+                m_PlayerMissile0.BitmapPrev = m_PlayerMissile0.BitmapCurr;
                 m_EnableBallPrev = m_EnableBallCurr;
                 break;
             case 0x1d:
@@ -523,46 +557,46 @@ public sealed class Atari2600Tia
                 case 0:
                     Copies = 1;
                     Spacing = 16;
-                    Size = 0;
+                    Size = 1;
                     break;
                 case 1:
                     Copies = 2;
                     Spacing = 16;
-                    Size = 0;
+                    Size = 1;
                     break;
                 case 2:
                     Copies = 2;
                     Spacing = 32;
-                    Size = 0;
+                    Size = 1;
                     break;
                 case 3:
                     Copies = 3;
                     Spacing = 16;
-                    Size = 0;
+                    Size = 1;
                     break;
                 case 4:
                     Copies = 2;
                     Spacing = 64;
-                    Size = 0;
+                    Size = 1;
                     break;
                 case 5:
                     Copies = 1;
                     Spacing = 16;
-                    Size = 1;
+                    Size = 2;
                     break;
                 case 6:
                     Copies = 3;
                     Spacing = 32;
-                    Size = 0;
+                    Size = 1;
                     break;
                 case 7:
                     Copies = 1;
                     Spacing = 16;
-                    Size = 2;
+                    Size = 4;
                     break;
             }
 
-            MissileSize = (value & 0b0011_0000) >> 4;
+            MissileSize = 1 << ((value & 0b0011_0000) >> 4);
         }
 
         public void StepX()
