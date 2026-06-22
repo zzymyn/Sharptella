@@ -14,9 +14,7 @@ internal static class Program
             var romPath = args[0];
             var romBytes = await File.ReadAllBytesAsync(romPath);
 
-            var atari2600 = new Atari2600(romBytes);
-
-            using var app = new App(atari2600);
+            using var app = new App(romBytes);
             app.Run();
         }
         catch (Exception ex)

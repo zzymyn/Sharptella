@@ -20,6 +20,8 @@ public sealed class Mos6532Riot
 
     private readonly byte[] m_Ram = new byte[128];
 
+    private readonly IAtariInput m_Input;
+
     // TODO: read controller inputs for SWCHA:
     private byte m_SWCHA = 0b1111_1111;
     private byte m_ORA;
@@ -34,6 +36,11 @@ public sealed class Mos6532Riot
     private ushort m_Prescaler;
     private ushort m_PrescalerMask;
     private bool m_FlagTimer;
+
+    public Mos6532Riot(IAtariInput input)
+    {
+        m_Input = input;
+    }
 
     public void Reboot()
     {
@@ -76,6 +83,39 @@ public sealed class Mos6532Riot
                     // SWCHA
                     // m_SWCHA being zero will always pull to 0, even if SWACNT is 1:
                     // simplify: (m_SWCHA & ~m_SWACNT) | (m_SWCHA & m_ORA & m_SWACNT)
+                    m_SWCHA = 0b1111_1111;
+                    if (m_Input.Player1Up)
+                    {
+                        m_SWCHA &= 0b1111_1110;
+                    }
+                    if (m_Input.Player1Down)
+                    {
+                        m_SWCHA &= 0b1111_1101;
+                    }
+                    if (m_Input.Player1Left)
+                    {
+                        m_SWCHA &= 0b1111_1011;
+                    }
+                    if (m_Input.Player1Right)
+                    {
+                        m_SWCHA &= 0b1111_0111;
+                    }
+                    if (m_Input.Player0Up)
+                    {
+                        m_SWCHA &= 0b1110_1111;
+                    }
+                    if (m_Input.Player0Down)
+                    {
+                        m_SWCHA &= 0b1101_1111;
+                    }
+                    if (m_Input.Player0Left)
+                    {
+                        m_SWCHA &= 0b1011_1111;
+                    }
+                    if (m_Input.Player0Right)
+                    {
+                        m_SWCHA &= 0b0111_1111;
+                    }
                     return 0xFF & m_SWCHA & (~m_SWACNT | m_ORA);
                 case 0x01:
                     // SWACNT
@@ -83,6 +123,27 @@ public sealed class Mos6532Riot
                 case 0x02:
                     // SWCHB
                     // Simple mux between SWCHB and ORB based on SWBCNT:
+                    m_SWCHB = 0b1111_1111;
+                    if (m_Input.GameResetSwitch)
+                    {
+                        m_SWCHB &= 0b1111_1110;
+                    }
+                    if (m_Input.GameSelectSwitch)
+                    {
+                        m_SWCHB &= 0b1111_1101;
+                    }
+                    if (m_Input.TvTypeSwitch)
+                    {
+                        m_SWCHB &= 0b1111_0111;
+                    }
+                    if (m_Input.PlayerDifficultySwitchA)
+                    {
+                        m_SWCHB &= 0b1011_1111;
+                    }
+                    if (m_Input.PlayerDifficultySwitchB)
+                    {
+                        m_SWCHB &= 0b0111_1111;
+                    }
                     return 0xFF & ((m_SWBCNT & m_ORB) | (~m_SWBCNT & m_SWCHB));
                 case 0x03:
                     // SWBCNT

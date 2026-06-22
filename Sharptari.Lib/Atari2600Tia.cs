@@ -19,10 +19,12 @@ public sealed class Atari2600Tia
 
     private static readonly ColorAbgr8888[] YiqToColorLut = new ColorAbgr8888[256];
 
+    private readonly IAtariInput m_Input;
+
     private bool m_HasFrameReady = false;
     private List<ColorAbgr8888> m_GeneratedPixels = [];
     private List<ColorAbgr8888> m_PrevGeneratedPixels = [];
-    private readonly ColorAbgr8888[] m_CurrentScalinePixels = new ColorAbgr8888[ScanlineLength];
+    private readonly ColorAbgr8888[] m_CurrentScanlinePixels = new ColorAbgr8888[ScanlineLength];
     private int m_CurrentScanline = 0;
     private int m_CurrentScanlineCycle = 0;
 
@@ -48,6 +50,26 @@ public sealed class Atari2600Tia
     private PlayerMissile m_PlayerMissile0;
     private PlayerMissile m_PlayerMissile1;
 
+    private bool m_CxM0P0;
+    private bool m_CxM0P1;
+    private bool m_CxM1P0;
+    private bool m_CxM1P1;
+    private bool m_CxP0PF;
+    private bool m_CxP0BL;
+    private bool m_CxP1PF;
+    private bool m_CxP1BL;
+    private bool m_CxM0PF;
+    private bool m_CxM0BL;
+    private bool m_CxM1PF;
+    private bool m_CxM1BL;
+    private bool m_CxBLPF;
+    private bool m_CxP0P1;
+    private bool m_CxM0M1;
+
+    private bool m_LatchesEnabled;
+    private bool m_P0Latch;
+    private bool m_P1Latch;
+
     public bool WSync => m_WSync;
     public bool HasFrameReady => m_HasFrameReady;
     public IReadOnlyList<ColorAbgr8888> FramePixels => m_PrevGeneratedPixels;
@@ -58,6 +80,11 @@ public sealed class Atari2600Tia
         {
             YiqToColorLut[i] = DecodeYiq((byte)i);
         }
+    }
+
+    public Atari2600Tia(IAtariInput atariInput)
+    {
+        m_Input = atariInput;
     }
 
     public void ClearFrameReady()
@@ -78,36 +105,61 @@ public sealed class Atari2600Tia
     {
         int i = m_CurrentScanlineCycle;
 
-        if (m_VBlank || m_CurrentScanlineCycle < HBlankLength)
+        if (m_VBlank
+            || m_CurrentScanlineCycle < HBlankLength
+            || m_HMoved && m_CurrentScanlineCycle < HBlankLengthHMoved)
         {
-            m_CurrentScalinePixels[i] = ColorAbgr8888.Black;
+            m_CurrentScanlinePixels[i] = ColorAbgr8888.Black;
         }
         else
         {
-            if (m_HMoved && m_CurrentScanlineCycle < HBlankLengthHMoved)
+            m_CurrentScanlinePixels[i] = m_BackgroundColor;
+
+            bool drewPF;
+            bool drewBL;
+            bool drewP0;
+            bool drewP1;
+            bool drewM0;
+            bool drewM1;
+
+            if (m_PlayfieldPriority)
             {
-                m_CurrentScalinePixels[i] = ColorAbgr8888.Black;
+                drewM1 = DrawMissile(in m_PlayerMissile1, i);
+                drewP1 = DrawPlayer(in m_PlayerMissile1, i);
+                drewM0 = DrawMissile(in m_PlayerMissile0, i);
+                drewP0 = DrawPlayer(in m_PlayerMissile0, i);
+                drewPF = DrawPlayfield(i);
+                drewBL = DrawBall(i);
             }
             else
             {
-                m_CurrentScalinePixels[i] = m_BackgroundColor;
-
-                if (!m_PlayfieldPriority)
-                {
-                    DrawPlayfield(i);
-                    DrawBall(i);
-                }
-
-                DrawPlayer(in m_PlayerMissile0, i);
-                DrawPlayer(in m_PlayerMissile1, i);
-
-                if (m_PlayfieldPriority)
-                {
-                    DrawPlayfield(i);
-                    DrawBall(i);
-                }
+                drewPF = DrawPlayfield(i);
+                drewBL = DrawBall(i);
+                drewM1 = DrawMissile(in m_PlayerMissile1, i);
+                drewP1 = DrawPlayer(in m_PlayerMissile1, i);
+                drewM0 = DrawMissile(in m_PlayerMissile0, i);
+                drewP0 = DrawPlayer(in m_PlayerMissile0, i);
             }
 
+            m_CxM0P0 |= drewM0 && drewP0;
+            m_CxM0P1 |= drewM0 && drewP1;
+            m_CxM1P0 |= drewM1 && drewP0;
+            m_CxM1P1 |= drewM1 && drewP1;
+            m_CxP0PF |= drewP0 && drewPF;
+            m_CxP0BL |= drewP0 && drewBL;
+            m_CxP1PF |= drewP1 && drewPF;
+            m_CxP1BL |= drewP1 && drewBL;
+            m_CxM0PF |= drewM0 && drewPF;
+            m_CxM0BL |= drewM0 && drewBL;
+            m_CxM1PF |= drewM1 && drewPF;
+            m_CxM1BL |= drewM1 && drewBL;
+            m_CxBLPF |= drewBL && drewPF;
+            m_CxP0P1 |= drewP0 && drewP1;
+            m_CxM0M1 |= drewM0 && drewM1;
+        }
+
+        if (m_CurrentScanlineCycle >= HBlankLength)
+        {
             m_CurrentBallX = (m_CurrentBallX + 1) % 160;
             m_PlayerMissile0.StepX();
             m_PlayerMissile1.StepX();
@@ -118,16 +170,22 @@ public sealed class Atari2600Tia
         {
             if (m_CurrentScanline < MaxScanlineCount)
             {
-                m_GeneratedPixels.AddRange(m_CurrentScalinePixels);
+                m_GeneratedPixels.AddRange(m_CurrentScanlinePixels);
             }
             m_CurrentScanlineCycle = 0;
             ++m_CurrentScanline;
             m_WSync = false;
             m_HMoved = false;
         }
+
+        if (m_LatchesEnabled)
+        {
+            m_P0Latch |= m_Input.Player0Button;
+            m_P1Latch |= m_Input.Player1Button;
+        }
     }
 
-    private void DrawPlayfield(int i)
+    private bool DrawPlayfield(int i)
     {
         var playfieldIndex = (i - HBlankLength) / 4;
         var playfieldColor = m_PlayfieldColor;
@@ -152,11 +210,14 @@ public sealed class Atari2600Tia
 
         if (m_Playfield[playfieldIndex])
         {
-            m_CurrentScalinePixels[i] = playfieldColor;
+            m_CurrentScanlinePixels[i] = playfieldColor;
+            return true;
         }
+
+        return false;
     }
 
-    private void DrawPlayer(in PlayerMissile pm, int i)
+    private bool DrawPlayer(in PlayerMissile pm, int i)
     {
         byte bitmap = pm.VerticalDelay ? pm.BitmapPrev : pm.BitmapCurr;
 
@@ -171,42 +232,54 @@ public sealed class Atari2600Tia
                 {
                     if ((bitmap & (0b0000_0001 << pixel)) != 0)
                     {
-                        m_CurrentScalinePixels[i] = pm.Color;
+                        m_CurrentScanlinePixels[i] = pm.Color;
+                        return true;
                     }
                 }
                 else
                 {
                     if ((bitmap & (0b1000_0000 >> pixel)) != 0)
                     {
-                        m_CurrentScalinePixels[i] = pm.Color;
+                        m_CurrentScanlinePixels[i] = pm.Color;
+                        return true;
                     }
                 }
             }
         }
 
-        if (pm.EnableMissile)
+        return false;
+    }
+
+    private bool DrawMissile(in PlayerMissile pm, int i)
+    {
+        if (pm.EnableMissile && !pm.MissileLocked)
         {
             int copy = pm.CurrentMissileX / pm.Spacing;
             int pixel = pm.CurrentMissileX % pm.Spacing;
 
             if (pixel < pm.MissileSize && copy < pm.Copies)
             {
-                m_CurrentScalinePixels[i] = pm.Color;
+                m_CurrentScanlinePixels[i] = pm.Color;
+                return true;
             }
         }
+
+        return false;
     }
 
-    private void DrawBall(int i)
+    private bool DrawBall(int i)
     {
         var drawBall = m_VerticalDelayBall ? m_EnableBallPrev : m_EnableBallCurr;
         if (drawBall)
         {
-            int ballWidth = 1 << m_BallSize;
-            if (m_CurrentBallX < ballWidth)
+            if (m_CurrentBallX < m_BallSize)
             {
-                m_CurrentScalinePixels[i] = m_PlayfieldColor;
+                m_CurrentScanlinePixels[i] = m_PlayfieldColor;
+                return true;
             }
         }
+
+        return false;
     }
 
     public int TryRead(ushort address)
@@ -217,46 +290,60 @@ public sealed class Atari2600Tia
         {
             case 0x00:
                 // CXM0P
-                break;
+                return GetCx(m_CxM0P1, m_CxM0P0);
             case 0x01:
                 // CXM1P
-                break;
+                return GetCx(m_CxM1P1, m_CxM1P0);
             case 0x02:
                 // CXP0FB
-                break;
+                return GetCx(m_CxP0PF, m_CxP0BL);
             case 0x03:
                 // CXP1FB
-                break;
+                return GetCx(m_CxP1PF, m_CxP1BL);
             case 0x04:
                 // CXM0FB
-                break;
+                return GetCx(m_CxM0PF, m_CxM0BL);
             case 0x05:
                 // CXM1FB
-                break;
+                return GetCx(m_CxM1PF, m_CxM1BL);
             case 0x06:
                 // CXBLPF
-                break;
+                return GetCx(m_CxBLPF, false);
             case 0x07:
                 // CXPPMM
-                break;
+                return GetCx(m_CxP0P1, m_CxM0M1);
             case 0x08:
                 // INPT0
-                break;
+                return 0x80;
             case 0x09:
                 // INPT1
-                break;
+                return 0x80;
             case 0x0a:
                 // INPT2
-                break;
+                return 0x80;
             case 0x0b:
                 // INPT3
-                break;
+                return 0x80;
             case 0x0c:
                 // INPT4
-                break;
+                if (m_LatchesEnabled)
+                {
+                    return m_P0Latch ? 0b0000_0000 : 0b1000_0000;
+                }
+                else
+                {
+                    return m_Input.Player0Button ? 0b0000_0000 : 0b1000_0000;
+                }
             case 0x0d:
                 // INPT5
-                break;
+                if (m_LatchesEnabled)
+                {
+                    return m_P1Latch ? 0b0000_0000 : 0b1000_0000;
+                }
+                else
+                {
+                    return m_Input.Player1Button ? 0b0000_0000 : 0b1000_0000;
+                }
         }
 
         return -1;
@@ -315,7 +402,7 @@ public sealed class Atari2600Tia
                 m_PlayfieldReflect = (value & 0b0000_0001) != 0;
                 m_PlayfieldScoreMode = (value & 0b0000_0010) != 0;
                 m_PlayfieldPriority = (value & 0b0000_0100) != 0;
-                m_BallSize = (value & 0b0011_0000) >> 4;
+                m_BallSize = 1 << ((value & 0b0011_0000) >> 4);
                 break;
             case 0x0b:
                 // REFP0
@@ -356,11 +443,11 @@ public sealed class Atari2600Tia
                 break;
             case 0x10:
                 // RESP0
-                m_PlayerMissile0.CurrentX = 155;
+                m_PlayerMissile0.CurrentX = 154;
                 break;
             case 0x11:
                 // RESP1
-                m_PlayerMissile1.CurrentX = 155;
+                m_PlayerMissile1.CurrentX = 154;
                 break;
             case 0x12:
                 // RESM0
@@ -474,6 +561,21 @@ public sealed class Atari2600Tia
                 break;
             case 0x2c:
                 // CXCLR
+                m_CxM0P0 = false;
+                m_CxM0P1 = false;
+                m_CxM1P0 = false;
+                m_CxM1P1 = false;
+                m_CxP0PF = false;
+                m_CxP0BL = false;
+                m_CxP1PF = false;
+                m_CxP1BL = false;
+                m_CxM0PF = false;
+                m_CxM0BL = false;
+                m_CxM1PF = false;
+                m_CxM1BL = false;
+                m_CxBLPF = false;
+                m_CxP0P1 = false;
+                m_CxM0M1 = false;
                 break;
         }
     }
@@ -485,12 +587,12 @@ public sealed class Atari2600Tia
 
         if (oldVSync != m_VSync)
         {
-            Console.WriteLine($"VSYNC: {m_VSync} @ scanline {m_CurrentScanline}");
+            //Console.WriteLine($"VSYNC: {m_VSync} @ scanline {m_CurrentScanline}");
         }
 
         if (m_VSync && !oldVSync)
         {
-            Console.WriteLine($"Frame ready with {m_CurrentScanline} scanlines");
+            //Console.WriteLine($"Frame ready with {m_CurrentScanline} scanlines");
             m_HasFrameReady = true;
             (m_GeneratedPixels, m_PrevGeneratedPixels) = (m_PrevGeneratedPixels, m_GeneratedPixels);
             m_GeneratedPixels.Clear();
@@ -505,13 +607,18 @@ public sealed class Atari2600Tia
 
         if (oldVBlank != m_VBlank)
         {
-            Console.WriteLine($"VBLANK: {m_VBlank} @ scanline {m_CurrentScanline}");
+            //Console.WriteLine($"VBLANK: {m_VBlank} @ scanline {m_CurrentScanline}");
         }
     }
 
     private void SetTriggerButtonLatches(bool value)
     {
-        // TODO
+        m_LatchesEnabled = value;
+        if (!m_LatchesEnabled)
+        {
+            m_P0Latch = false;
+            m_P1Latch = false;
+        }
     }
 
     private void SetPaddleCapacitorDumpToGround(bool value)
@@ -529,6 +636,20 @@ public sealed class Atari2600Tia
         {
             return (x + hmove) % 160;
         }
+    }
+
+    private static byte GetCx(bool b7, bool b6)
+    {
+        byte result = 0;
+        if (b7)
+        {
+            result |= 0b1000_0000;
+        }
+        if (b6)
+        {
+            result |= 0b0100_0000;
+        }
+        return result;
     }
 
     private struct PlayerMissile
@@ -556,7 +677,7 @@ public sealed class Atari2600Tia
             {
                 case 0:
                     Copies = 1;
-                    Spacing = 16;
+                    Spacing = 64;
                     Size = 1;
                     break;
                 case 1:
@@ -581,7 +702,7 @@ public sealed class Atari2600Tia
                     break;
                 case 5:
                     Copies = 1;
-                    Spacing = 16;
+                    Spacing = 64;
                     Size = 2;
                     break;
                 case 6:
@@ -591,7 +712,7 @@ public sealed class Atari2600Tia
                     break;
                 case 7:
                     Copies = 1;
-                    Spacing = 16;
+                    Spacing = 64;
                     Size = 4;
                     break;
             }
@@ -604,7 +725,7 @@ public sealed class Atari2600Tia
             CurrentX = (CurrentX + 1) % 160;
             if (MissileLocked)
             {
-                CurrentMissileX = CurrentX;
+                CurrentMissileX = (CurrentX + 4) % 160;
             }
             else
             {

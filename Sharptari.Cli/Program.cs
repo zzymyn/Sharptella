@@ -18,8 +18,9 @@ internal class Program
             Console.WriteLine("Sharptari - An Atari 2600 Emulator written in C#");
             var romPath = args[0];
             var romBytes = await File.ReadAllBytesAsync(romPath);
+            var input = new DummyAtariInput();
 
-            var atari2600 = new Atari2600(romBytes);
+            var atari2600 = new Atari2600(romBytes, input);
 
             atari2600.Reboot();
             while (true)

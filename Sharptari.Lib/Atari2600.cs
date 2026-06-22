@@ -11,16 +11,18 @@ namespace Sharptari.Lib;
 public sealed class Atari2600
 {
     private readonly Atari2600Rom m_Rom;
+    private readonly IAtariInput m_Input;
     private readonly Mos6532Riot m_Riot;
     private readonly Atari2600Tia m_Tia;
     private readonly Atari2600Bus m_Bus;
     private readonly Mos6502Cpu<Atari2600Bus> m_Cpu;
 
-    public Atari2600(byte[] romBytes)
+    public Atari2600(byte[] romBytes, IAtariInput input)
     {
         m_Rom = new Atari2600Rom(romBytes);
-        m_Riot = new Mos6532Riot();
-        m_Tia = new Atari2600Tia();
+        m_Input = input;
+        m_Riot = new Mos6532Riot(m_Input);
+        m_Tia = new Atari2600Tia(m_Input);
         m_Bus = new Atari2600Bus(m_Rom, m_Riot, m_Tia);
         m_Cpu = new Mos6502Cpu<Atari2600Bus>(m_Bus);
     }

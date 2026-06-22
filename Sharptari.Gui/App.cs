@@ -13,15 +13,17 @@ internal unsafe sealed class App
     private const int InitialScanlineCount = 262;
     private const float PixelAspectRatio = 12.0f / 7.0f;
 
+    private readonly SdlAtariInput m_AtariInput;
     private readonly Atari2600 m_Atari2600;
     private readonly Sdl m_Sdl;
-    private readonly Window* m_Window;
-    private readonly Renderer* m_Renderer;
+    private SdlWindow m_Window;
+    private SdlRenderer m_Renderer;
     private SdlTexture m_Texture;
 
-    public App(Atari2600 atari2600)
+    public App(byte[] romBytes)
     {
-        m_Atari2600 = atari2600;
+        m_AtariInput = new SdlAtariInput();
+        m_Atari2600 = new Atari2600(romBytes, m_AtariInput);
         m_Atari2600.Reboot();
 
         m_Sdl = Sdl.GetApi();
@@ -31,44 +33,29 @@ internal unsafe sealed class App
             throw new Exception($"Could not initialize SDL: {m_Sdl.GetErrorS()}");
         }
 
-        m_Window = m_Sdl.CreateWindow(
+        m_Window = new (
+            m_Sdl,
             "Sharptari",
             Sdl.WindowposCentered,
             Sdl.WindowposCentered,
             1920,
             1080,
-            (uint)(WindowFlags.Shown | WindowFlags.Resizable | WindowFlags.AllowHighdpi)
+            WindowFlags.Shown | WindowFlags.Resizable | WindowFlags.AllowHighdpi
         );
 
-        if (m_Window == null)
-        {
-            throw new Exception($"Could not create window: {m_Sdl.GetErrorS()}");
-        }
-
-        m_Renderer = m_Sdl.CreateRenderer(
-            m_Window,
+        m_Renderer = new(m_Sdl,
+            m_Window.Ptr,
             -1,
-            (uint)(RendererFlags.Accelerated | RendererFlags.Presentvsync)
-        );
-        if (m_Renderer == null)
-        {
-            throw new Exception($"Could not create renderer: {m_Sdl.GetErrorS()}");
-        }
+            RendererFlags.Accelerated);
 
-        m_Texture = new(m_Sdl, m_Renderer, PixelFormatEnum.Xbgr8888, TextureAccess.Streaming, ScanlineLength, InitialScanlineCount);
+        m_Texture = new(m_Sdl, m_Renderer.Ptr, PixelFormatEnum.Xbgr8888, TextureAccess.Streaming, ScanlineLength, InitialScanlineCount);
     }
 
     public void Dispose()
     {
         m_Texture.Dispose();
-        if (m_Renderer != null)
-        {
-            m_Sdl.DestroyRenderer(m_Renderer);
-        }
-        if (m_Window != null)
-        {
-            m_Sdl.DestroyWindow(m_Window);
-        }
+        m_Renderer.Dispose();
+        m_Window.Dispose();
         m_Sdl.Quit();
     }
 
@@ -88,6 +75,10 @@ internal unsafe sealed class App
                 {
                     running = false;
                 }
+                else if (ev.Type == (uint)EventType.Keydown || ev.Type == (uint)EventType.Keyup)
+                {
+                    m_AtariInput.ProcessKeyboardEvent(ev);
+                }
             }
 
             // Process one frame of emulation:
@@ -99,7 +90,7 @@ internal unsafe sealed class App
             if (frameBufferHeight > m_Texture.Height)
             {
                 m_Texture.Dispose();
-                m_Texture = new(m_Sdl, m_Renderer, PixelFormatEnum.Xbgr8888, TextureAccess.Streaming, ScanlineLength, frameBufferHeight);
+                m_Texture = new(m_Sdl, m_Renderer.Ptr, PixelFormatEnum.Xbgr8888, TextureAccess.Streaming, ScanlineLength, frameBufferHeight);
             }
 
             fixed (ColorAbgr8888* pixelDataPtr = frameBuffer)
@@ -109,13 +100,13 @@ internal unsafe sealed class App
             }
 
             // Clear the screen (e.g., to dark blue)
-            m_Sdl.SetRenderDrawColor(m_Renderer, 20, 40, 80, 255);
-            m_Sdl.RenderClear(m_Renderer);
+            m_Sdl.SetRenderDrawColor(m_Renderer.Ptr, 20, 40, 80, 255);
+            m_Sdl.RenderClear(m_Renderer.Ptr);
 
             // Get the size of the renderer output:
             int rWidth = 0;
             int rHeight = 0;
-            m_Sdl.GetRendererOutputSize(m_Renderer, ref rWidth, ref rHeight);
+            m_Sdl.GetRendererOutputSize(m_Renderer.Ptr, ref rWidth, ref rHeight);
             float rAspect = (float)rWidth / rHeight;
 
             // Render your texture (srcrect and dstrect set to null fills the window)
@@ -141,56 +132,10 @@ internal unsafe sealed class App
                 dstRect.Origin.Y = (rHeight - h) / 2;
             }
 
-            m_Sdl.RenderCopy(m_Renderer, m_Texture.Ptr, in srcRect, in dstRect);
+            m_Sdl.RenderCopy(m_Renderer.Ptr, m_Texture.Ptr, in srcRect, in dstRect);
 
             // Present to the screen
-            m_Sdl.RenderPresent(m_Renderer);
-        }
-    }
-}
-
-internal sealed unsafe class SdlTexture
-    : IDisposable
-{
-    private readonly Sdl m_Sdl;
-    private Texture* m_Texture;
-    private readonly PixelFormatEnum m_PixelFormat;
-    private readonly TextureAccess m_TextureAccess;
-    private readonly int m_Width;
-    private readonly int m_Height;
-
-    public Texture* Ptr => m_Texture;
-    public PixelFormatEnum PixelFormat => m_PixelFormat;
-    public TextureAccess TextureAccess => m_TextureAccess;
-    public int Width => m_Width;
-    public int Height => m_Height;
-
-    public SdlTexture(Sdl sdl, Renderer* renderer, PixelFormatEnum pixelFormat, TextureAccess textureAccess, int width, int height)
-    {
-        m_Sdl = sdl;
-        m_Texture = m_Sdl.CreateTexture(
-            renderer,
-            (uint)pixelFormat,
-            (int)TextureAccess.Streaming,
-            width,
-            height
-        );
-        if (m_Texture == null)
-        {
-            throw new Exception($"Could not create texture: {m_Sdl.GetErrorS()}");
-        }
-        m_PixelFormat = pixelFormat;
-        m_TextureAccess = textureAccess;
-        m_Width = width;
-        m_Height = height;
-    }
-
-    public void Dispose()
-    {
-        if (m_Texture != null)
-        {
-            m_Sdl.DestroyTexture(m_Texture);
-            m_Texture = null;
+            m_Sdl.RenderPresent(m_Renderer.Ptr);
         }
     }
 }
