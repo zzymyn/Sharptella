@@ -210,6 +210,49 @@ internal sealed class SilkAtariInput
         }
     }
 
+    private void OnGamepadThumbstickMoved(IGamepad gamepad, Thumbstick thumbstick)
+    {
+        if (thumbstick.Index == 0)
+        {
+            if (thumbstick.X < -0.3f)
+            {
+                m_Player0Left.Set(gamepad, 1, true);
+
+            }
+            else
+            {
+                m_Player0Left.Set(gamepad, 1, false);
+            }
+
+            if (thumbstick.X > 0.3f)
+            {
+                m_Player0Right.Set(gamepad, 1, true);
+            }
+            else
+            {
+                m_Player0Right.Set(gamepad, 1, false);
+            }
+
+            if (thumbstick.Y < -0.3f)
+            {
+                m_Player0Up.Set(gamepad, 1, true);
+            }
+            else
+            {
+                m_Player0Up.Set(gamepad, 1, false);
+            }
+
+            if (thumbstick.Y > 0.3f)
+            {
+                m_Player0Down.Set(gamepad, 1, true);
+            }
+            else
+            {
+                m_Player0Down.Set(gamepad, 1, false);
+            }
+        }
+    }
+
     private void OnConnectionChanged(IInputDevice device, bool connected)
     {
         if (connected)
@@ -223,6 +266,7 @@ internal sealed class SilkAtariInput
             {
                 gamepad.ButtonDown += OnGamepadButtonDown;
                 gamepad.ButtonUp += OnGamepadButtonUp;
+                gamepad.ThumbstickMoved += OnGamepadThumbstickMoved;
             }
         }
         else
@@ -236,6 +280,7 @@ internal sealed class SilkAtariInput
             {
                 gamepad.ButtonDown -= OnGamepadButtonDown;
                 gamepad.ButtonUp -= OnGamepadButtonUp;
+                gamepad.ThumbstickMoved -= OnGamepadThumbstickMoved;
             }
 
             m_Player0Up.Clear(device);
