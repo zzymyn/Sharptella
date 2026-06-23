@@ -30,7 +30,7 @@ internal unsafe sealed class App
     private ImGuiController? m_ImguiController;
 
     private byte[]? m_RomBytes;
-    private DummyAtariInput? m_AtariInput;
+    private SilkAtariInput? m_AtariInput;
     private Atari2600? m_Atari2600;
 
     private uint m_MainTex;
@@ -65,6 +65,9 @@ internal unsafe sealed class App
 
     public void LoadRom(string filePath)
     {
+        if (m_AtariInput == null)
+            return;
+
         try
         {
             m_RomBytes = File.ReadAllBytes(filePath);
@@ -76,7 +79,7 @@ internal unsafe sealed class App
 
         if (m_RomBytes != null)
         {
-            m_Atari2600 = new Atari2600(m_RomBytes, m_AtariInput ?? new DummyAtariInput());
+            m_Atari2600 = new Atari2600(m_RomBytes, m_AtariInput);
             m_Atari2600.Reboot();
             m_CpuElapsedTime = TimeSpan.Zero;
             m_RealElapsedTime = TimeSpan.Zero;
@@ -97,7 +100,9 @@ internal unsafe sealed class App
             throw new NullReferenceException(nameof(m_Window));
 
         m_Gl = m_Window.CreateOpenGL();
+
         m_InputContext = m_Window.CreateInput();
+
         m_ImguiController = new ImGuiController(m_Gl, m_Window, m_InputContext);
 
         // create a texture:
@@ -110,11 +115,13 @@ internal unsafe sealed class App
         m_Gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba8, ScanlineLength, MaxScanlineCount, 0, PixelFormat.Rgba, PixelType.UnsignedByte, null);
         m_Gl.BindTexture(TextureTarget.Texture2D, 0);
 
-        m_AtariInput = new DummyAtariInput();
+        m_AtariInput = new SilkAtariInput(m_InputContext);
     }
 
     private void OnWindowUnload()
     {
+        m_AtariInput?.Dispose();
+        m_AtariInput = null;
         m_ImguiController?.Dispose();
         m_ImguiController = null;
         m_InputContext?.Dispose();
