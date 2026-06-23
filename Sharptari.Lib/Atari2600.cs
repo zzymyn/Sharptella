@@ -10,6 +10,8 @@ namespace Sharptari.Lib;
 
 public sealed class Atari2600
 {
+    private const long CpuSpeed = 1193181;
+
     private readonly Atari2600Rom m_Rom;
     private readonly IAtariInput m_Input;
     private readonly Mos6532Riot m_Riot;
@@ -57,32 +59,35 @@ public sealed class Atari2600
         m_Tia.Step();
     }
 
-    public int StepFrame(ref ColorAbgr8888[] buffer, out int bufferLength)
+    public TimeSpan StepFrame(ColorAbgr8888[] buffer)
     {
         int steps = 0;
 
-        while (!m_Tia.HasFrameReady)
+        // 50000 is a reasonable upper bound on how many steps it should take to get a frame ready
+        // if we hit that, just give up and leave the buffer alone
+
+        while (!m_Tia.HasFrameReady && steps < 50000)
         {
             Step();
             ++steps;
         }
 
-        var pixels = m_Tia.FramePixels;
-        m_Tia.ClearFrameReady();
-
-        if (buffer == null || pixels.Count > buffer.Length)
+        if (m_Tia.HasFrameReady)
         {
-            buffer = new ColorAbgr8888[pixels.Count];
+            var pixels = m_Tia.FramePixels;
+            m_Tia.ClearFrameReady();
+
+            int i = 0;
+            int iMax = Math.Min(buffer.Length, pixels.Count);
+
+            // Copy the pixels to the screen bytes:
+            for (i = 0; i < iMax; i++)
+            {
+                buffer[i] = pixels[i];
+            }
+            Array.Clear(buffer, i, buffer.Length - i);
         }
 
-        // Copy the pixels to the screen bytes:
-        for (int i = 0; i < pixels.Count; i++)
-        {
-            buffer[i] = pixels[i];
-        }
-
-        bufferLength = pixels.Count;
-
-        return steps;
+        return TimeSpan.FromSeconds((double)steps / CpuSpeed);
     }
 }

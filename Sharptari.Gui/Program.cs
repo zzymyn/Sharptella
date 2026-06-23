@@ -1,7 +1,11 @@
-﻿using System;
-using System.IO;
+﻿using System.Drawing;
+using Silk.NET.Windowing;
+using Silk.NET.Input;
+using Silk.NET.OpenGL;
+using Silk.NET.OpenGL.Extensions.ImGui;
 using System.Threading.Tasks;
-using Sharptari.Lib;
+using System.IO;
+using System;
 
 namespace Sharptari.Gui;
 
@@ -11,10 +15,13 @@ internal static class Program
     {
         try
         {
-            var romPath = args[0];
-            var romBytes = await File.ReadAllBytesAsync(romPath);
+            using var app = new App();
 
-            using var app = new App(romBytes);
+            if (args.Length == 1)
+            {
+                app.LoadRom(args[0]);
+            }
+
             app.Run();
         }
         catch (Exception ex)
