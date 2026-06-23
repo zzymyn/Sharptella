@@ -23,7 +23,6 @@ public sealed class Atari2600Tia
 
     private bool m_HasFrameReady = false;
     private readonly ColorAbgr8888[] m_GeneratedPixels = new ColorAbgr8888[ScanlineLength * MaxScanlineCount];
-    private readonly ColorAbgr8888[] m_CurrentScanlinePixels = new ColorAbgr8888[ScanlineLength];
     private int m_CurrentScanline = 0;
     private int m_CurrentScanlineCycle = 0;
 
@@ -103,16 +102,18 @@ public sealed class Atari2600Tia
     public void Step()
     {
         int i = m_CurrentScanlineCycle;
+        var sl0 = Math.Min(m_CurrentScanline, MaxScanlineCount - 1) * ScanlineLength;
+        var currentScanline = m_GeneratedPixels.AsSpan(sl0, ScanlineLength);
 
         if (m_VBlank
             || m_CurrentScanlineCycle < HBlankLength
             || m_HMoved && m_CurrentScanlineCycle < HBlankLengthHMoved)
         {
-            m_CurrentScanlinePixels[i] = ColorAbgr8888.Zero;
+            currentScanline[i] = ColorAbgr8888.Zero;
         }
         else
         {
-            m_CurrentScanlinePixels[i] = m_BackgroundColor;
+            currentScanline[i] = m_BackgroundColor;
 
             bool drewPF;
             bool drewBL;
@@ -123,21 +124,21 @@ public sealed class Atari2600Tia
 
             if (m_PlayfieldPriority)
             {
-                drewM1 = DrawMissile(in m_PlayerMissile1, i);
-                drewP1 = DrawPlayer(in m_PlayerMissile1, i);
-                drewM0 = DrawMissile(in m_PlayerMissile0, i);
-                drewP0 = DrawPlayer(in m_PlayerMissile0, i);
-                drewPF = DrawPlayfield(i);
-                drewBL = DrawBall(i);
+                drewM1 = DrawMissile(in m_PlayerMissile1, currentScanline, i);
+                drewP1 = DrawPlayer(in m_PlayerMissile1, currentScanline, i);
+                drewM0 = DrawMissile(in m_PlayerMissile0, currentScanline, i);
+                drewP0 = DrawPlayer(in m_PlayerMissile0, currentScanline, i);
+                drewPF = DrawPlayfield(currentScanline, i);
+                drewBL = DrawBall(currentScanline, i);
             }
             else
             {
-                drewPF = DrawPlayfield(i);
-                drewBL = DrawBall(i);
-                drewM1 = DrawMissile(in m_PlayerMissile1, i);
-                drewP1 = DrawPlayer(in m_PlayerMissile1, i);
-                drewM0 = DrawMissile(in m_PlayerMissile0, i);
-                drewP0 = DrawPlayer(in m_PlayerMissile0, i);
+                drewPF = DrawPlayfield(currentScanline, i);
+                drewBL = DrawBall(currentScanline, i);
+                drewM1 = DrawMissile(in m_PlayerMissile1, currentScanline, i);
+                drewP1 = DrawPlayer(in m_PlayerMissile1, currentScanline, i);
+                drewM0 = DrawMissile(in m_PlayerMissile0, currentScanline, i);
+                drewP0 = DrawPlayer(in m_PlayerMissile0, currentScanline, i);
             }
 
             m_CxM0P0 |= drewM0 && drewP0;
@@ -167,8 +168,6 @@ public sealed class Atari2600Tia
         ++m_CurrentScanlineCycle;
         if (m_CurrentScanlineCycle >= ScanlineLength)
         {
-            var slBegin = Math.Min(m_CurrentScanline, MaxScanlineCount - 1) * ScanlineLength;
-            Array.Copy(m_CurrentScanlinePixels, 0, m_GeneratedPixels, slBegin, ScanlineLength);
             m_CurrentScanlineCycle = 0;
             ++m_CurrentScanline;
             m_WSync = false;
@@ -182,7 +181,7 @@ public sealed class Atari2600Tia
         }
     }
 
-    private bool DrawPlayfield(int i)
+    private bool DrawPlayfield(Span<ColorAbgr8888> currentScanline, int i)
     {
         var playfieldIndex = (i - HBlankLength) / 4;
         var playfieldColor = m_PlayfieldColor;
@@ -207,14 +206,14 @@ public sealed class Atari2600Tia
 
         if (m_Playfield[playfieldIndex])
         {
-            m_CurrentScanlinePixels[i] = playfieldColor;
+            currentScanline[i] = playfieldColor;
             return true;
         }
 
         return false;
     }
 
-    private bool DrawPlayer(in PlayerMissile pm, int i)
+    private bool DrawPlayer(in PlayerMissile pm, Span<ColorAbgr8888> currentScanline, int i)
     {
         byte bitmap = pm.VerticalDelay ? pm.BitmapPrev : pm.BitmapCurr;
 
@@ -229,7 +228,7 @@ public sealed class Atari2600Tia
                 {
                     if ((bitmap & (0b0000_0001 << pixel)) != 0)
                     {
-                        m_CurrentScanlinePixels[i] = pm.Color;
+                        currentScanline[i] = pm.Color;
                         return true;
                     }
                 }
@@ -237,7 +236,7 @@ public sealed class Atari2600Tia
                 {
                     if ((bitmap & (0b1000_0000 >> pixel)) != 0)
                     {
-                        m_CurrentScanlinePixels[i] = pm.Color;
+                        currentScanline[i] = pm.Color;
                         return true;
                     }
                 }
@@ -247,7 +246,7 @@ public sealed class Atari2600Tia
         return false;
     }
 
-    private bool DrawMissile(in PlayerMissile pm, int i)
+    private bool DrawMissile(in PlayerMissile pm, Span<ColorAbgr8888> currentScanline, int i)
     {
         if (pm.EnableMissile && !pm.MissileLocked)
         {
@@ -256,7 +255,7 @@ public sealed class Atari2600Tia
 
             if (pixel < pm.MissileSize && copy < pm.Copies)
             {
-                m_CurrentScanlinePixels[i] = pm.Color;
+                currentScanline[i] = pm.Color;
                 return true;
             }
         }
@@ -264,14 +263,14 @@ public sealed class Atari2600Tia
         return false;
     }
 
-    private bool DrawBall(int i)
+    private bool DrawBall(Span<ColorAbgr8888> currentScanline, int i)
     {
         var drawBall = m_VerticalDelayBall ? m_EnableBallPrev : m_EnableBallCurr;
         if (drawBall)
         {
             if (m_CurrentBallX < m_BallSize)
             {
-                m_CurrentScanlinePixels[i] = m_PlayfieldColor;
+                currentScanline[i] = m_PlayfieldColor;
                 return true;
             }
         }

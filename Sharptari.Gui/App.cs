@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Numerics;
+using System.Text;
 using System.Threading;
 using ImGuiNET;
 using Sharptari.Lib;
@@ -39,6 +40,8 @@ internal unsafe sealed class App
     private Vector2 m_FrameBufferUV1;
     private TimeSpan m_CpuElapsedTime;
     private TimeSpan m_RealElapsedTime;
+
+    private bool m_ViewMemory;
 
     public App()
     {
@@ -206,15 +209,13 @@ internal unsafe sealed class App
         {
             if (ImGui.BeginMenu("File"))
             {
-                ImGui.BeginDisabled(m_Atari2600 == null);
-                if (ImGui.MenuItem("Unload ROM"))
+                if (ImGui.MenuItem("Unload ROM", m_Atari2600 != null))
                 {
                     m_Atari2600 = null;
                     m_RomBytes = null;
                     m_CpuElapsedTime = TimeSpan.Zero;
                     m_RealElapsedTime = TimeSpan.Zero;
                 }
-                ImGui.EndDisabled();
 
                 ImGui.Separator();
 
@@ -223,6 +224,11 @@ internal unsafe sealed class App
                     m_QuitRequested = true;
                 }
 
+                ImGui.EndMenu();
+            }
+            if (ImGui.BeginMenu("Debug"))
+            {
+                ImGui.MenuItem("View Memory", "", ref m_ViewMemory);
                 ImGui.EndMenu();
             }
             ImGui.EndMenuBar();
@@ -252,53 +258,96 @@ internal unsafe sealed class App
             var windowSize = ImGui.GetIO().DisplaySize;
             var dialogPos = new Vector2(0, windowSize.Y);
             ImGui.SetNextWindowPos(dialogPos, ImGuiCond.Always, new Vector2(0, 1.0f));
-            ImGui.Begin("Console Switches",
+            if (ImGui.Begin("Console Switches",
                 ImGuiWindowFlags.NoMove
                 | ImGuiWindowFlags.NoResize
                 | ImGuiWindowFlags.NoCollapse
-                | ImGuiWindowFlags.NoSavedSettings);
+                | ImGuiWindowFlags.NoSavedSettings))
+            {
+                if (ImGui.Button("Reset (F1)"))
+                {
+                    m_Atari2600?.Reboot();
+                }
 
-            if (ImGui.Button("Reset (F1)"))
-            {
-                m_Atari2600?.Reboot();
-            }
+                bool tvBW = m_AtariInput?.TvTypeSwitch == true;
+                if (ImGui.Checkbox("TV Type B/W (F2)", ref tvBW))
+                {
+                    m_AtariInput?.ToggleTvTypeSwitch();
+                }
 
-            bool tvBW = m_AtariInput?.TvTypeSwitch == true;
-            if (ImGui.Checkbox("TV Type B/W (F2)", ref tvBW))
-            {
-                m_AtariInput?.ToggleTvTypeSwitch();
-            }
+                bool player0Hard = m_AtariInput?.PlayerDifficultySwitchA == false;
+                if (ImGui.Checkbox("Player 1 Hard Mode (F3)", ref player0Hard))
+                {
+                    m_AtariInput?.TogglePlayerDifficultySwitchA();
+                }
 
-            bool player0Hard = m_AtariInput?.PlayerDifficultySwitchA == false;
-            if (ImGui.Checkbox("Player 1 Hard Mode (F3)", ref player0Hard))
-            {
-                m_AtariInput?.TogglePlayerDifficultySwitchA();
-            }
+                bool player1Hard = m_AtariInput?.PlayerDifficultySwitchB == false;
+                if (ImGui.Checkbox("Player 2 Hard Mode (F4)", ref player1Hard))
+                {
+                    m_AtariInput?.TogglePlayerDifficultySwitchB();
+                }
 
-            bool player1Hard = m_AtariInput?.PlayerDifficultySwitchB == false;
-            if (ImGui.Checkbox("Player 2 Hard Mode (F4)", ref player1Hard))
-            {
-                m_AtariInput?.TogglePlayerDifficultySwitchB();
-            }
+                if (ImGui.Button("Game Select (F5)"))
+                {
+                    m_AtariInput?.PressGameSelectSwitch();
+                }
+                else
+                {
+                    m_AtariInput?.ReleaseGameSelectSwitch();
+                }
 
-            if (ImGui.Button("Game Select (F5)"))
-            {
-                m_AtariInput?.PressGameSelectSwitch();
+                if (ImGui.Button("Game Reset (F6)"))
+                {
+                    m_AtariInput?.PressGameResetSwitch();
+                }
+                else
+                {
+                    m_AtariInput?.ReleaseGameResetSwitch();
+                }
             }
-            else
-            {
-                m_AtariInput?.ReleaseGameSelectSwitch();
-            }
+            ImGui.End();
+        }
 
-            if (ImGui.Button("Game Reset (F6)"))
+        if (m_ViewMemory)
+        {
+            if (ImGui.Begin("Memory Viewer", ref m_ViewMemory, ImGuiWindowFlags.AlwaysAutoResize))
             {
-                m_AtariInput?.PressGameResetSwitch();
-            }
-            else
-            {
-                m_AtariInput?.ReleaseGameResetSwitch();
-            }
+                if (m_Atari2600 != null)
+                {
+                    var r = m_Atari2600.DebugCpuRegisters;
+                    var pN = r.PNegative ? "1" : "-";
+                    var pV = r.POverflow ? "1" : "-";
+                    var pD = r.PDecimal ? "1" : "-";
+                    var pI = r.PInterruptDisable ? "1" : "-";
+                    var pZ = r.PZero ? "1" : "-";
+                    var pC = r.PCarry ? "1" : "-";
 
+                    ImGui.Text("Registers:");
+                    ImGui.Text($"A    X    Y    S     PC   NVDIZC");
+                    ImGui.Text($"{r.A:X2}   {r.X:X2}   {r.Y:X2}   {r.S:X2}   {r.PC:X4}   {pN}{pV}{pD}{pI}{pZ}{pC}");
+
+                    ImGui.Separator();
+
+                    var debugRam = m_Atari2600.DebugRam;
+
+                    ImGui.Text("RAM:");
+                    var sb = new StringBuilder();
+                    for (int i = 0; i < debugRam.Count; i += 16)
+                    {
+                        sb.Clear();
+                        for (int j = 0; j < 16 && i + j < debugRam.Count; ++j)
+                        {
+                            sb.Append($" {debugRam[i + j]:X2}");
+                        }
+                        ImGui.Text($"{0x80 + i:X2}:{sb}");
+                    }
+                    ImGui.End();
+                }
+                else
+                {
+                    ImGui.Text("No ROM loaded.");
+                }
+            }
             ImGui.End();
         }
 

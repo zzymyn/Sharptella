@@ -19,6 +19,9 @@ public sealed class Atari2600
     private readonly Atari2600Bus m_Bus;
     private readonly Mos6502Cpu<Atari2600Bus> m_Cpu;
 
+    public Mos6502Registers DebugCpuRegisters => m_Cpu.Registers;
+    public IReadOnlyList<byte> DebugRam => m_Riot.DebugRam;
+
     public Atari2600(byte[] romBytes, IAtariInput input)
     {
         m_Rom = new Atari2600Rom(romBytes);

@@ -37,6 +37,8 @@ public sealed class Mos6532Riot
     private ushort m_PrescalerMask;
     private bool m_FlagTimer;
 
+    public IReadOnlyList<byte> DebugRam => m_Ram;
+
     public Mos6532Riot(IAtariInput input)
     {
         m_Input = input;
