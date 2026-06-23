@@ -18,10 +18,8 @@ internal unsafe sealed class App
     : IDisposable
 {
     private const int ScanlineLength = 228;
-    private const int HBlankLength = 68;
     private const int MaxScanlineCount = 512;
     private const float PixelAspectRatio = 12.0f / 7.0f;
-    private const long CpuSpeed = 1193181;
 
     private IWindow? m_Window;
     private bool m_QuitRequested;
@@ -164,6 +162,7 @@ internal unsafe sealed class App
                     m_FrameBufferPos0.Y = Math.Min(m_FrameBufferPos0.Y, y);
                     m_FrameBufferPos1.Y = Math.Max(m_FrameBufferPos1.Y, y);
                 }
+                m_FrameBuffer[i].A = 255;
             }
             m_FrameBufferPos0.Y = Math.Max(m_FrameBufferPos0.Y - 8, 0);
             m_FrameBufferPos1.Y = Math.Min(m_FrameBufferPos1.Y + 8, MaxScanlineCount - 1);

@@ -22,8 +22,7 @@ public sealed class Atari2600Tia
     private readonly IAtariInput m_Input;
 
     private bool m_HasFrameReady = false;
-    private List<ColorAbgr8888> m_GeneratedPixels = [];
-    private List<ColorAbgr8888> m_PrevGeneratedPixels = [];
+    private readonly ColorAbgr8888[] m_GeneratedPixels = new ColorAbgr8888[ScanlineLength * MaxScanlineCount];
     private readonly ColorAbgr8888[] m_CurrentScanlinePixels = new ColorAbgr8888[ScanlineLength];
     private int m_CurrentScanline = 0;
     private int m_CurrentScanlineCycle = 0;
@@ -72,7 +71,7 @@ public sealed class Atari2600Tia
 
     public bool WSync => m_WSync;
     public bool HasFrameReady => m_HasFrameReady;
-    public IReadOnlyList<ColorAbgr8888> FramePixels => m_PrevGeneratedPixels;
+    public IReadOnlyList<ColorAbgr8888> FramePixels => m_GeneratedPixels;
 
     static Atari2600Tia()
     {
@@ -94,7 +93,7 @@ public sealed class Atari2600Tia
 
     public void Reboot()
     {
-        m_GeneratedPixels.Clear();
+        Array.Clear(m_GeneratedPixels, 0, m_GeneratedPixels.Length);
         m_CurrentScanline = 0;
         m_CurrentScanlineCycle = 0;
         m_VBlank = true;
@@ -168,10 +167,8 @@ public sealed class Atari2600Tia
         ++m_CurrentScanlineCycle;
         if (m_CurrentScanlineCycle >= ScanlineLength)
         {
-            if (m_CurrentScanline < MaxScanlineCount)
-            {
-                m_GeneratedPixels.AddRange(m_CurrentScanlinePixels);
-            }
+            var slBegin = Math.Min(m_CurrentScanline, MaxScanlineCount - 1) * ScanlineLength;
+            Array.Copy(m_CurrentScanlinePixels, 0, m_GeneratedPixels, slBegin, ScanlineLength);
             m_CurrentScanlineCycle = 0;
             ++m_CurrentScanline;
             m_WSync = false;
@@ -592,10 +589,13 @@ public sealed class Atari2600Tia
 
         if (m_VSync && !oldVSync)
         {
+            // zero out the rest of the frame buffer:
+            var slBegin = Math.Min(m_CurrentScanline, MaxScanlineCount - 1) * ScanlineLength;
+            Array.Clear(m_GeneratedPixels, slBegin, m_GeneratedPixels.Length - slBegin);
+
             //Console.WriteLine($"Frame ready with {m_CurrentScanline} scanlines");
+
             m_HasFrameReady = true;
-            (m_GeneratedPixels, m_PrevGeneratedPixels) = (m_PrevGeneratedPixels, m_GeneratedPixels);
-            m_GeneratedPixels.Clear();
             m_CurrentScanline = 0;
         }
     }
