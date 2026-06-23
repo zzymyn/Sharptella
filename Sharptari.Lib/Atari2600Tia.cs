@@ -70,6 +70,7 @@ public sealed class Atari2600Tia
 
     public bool WSync => m_WSync;
     public bool HasFrameReady => m_HasFrameReady;
+    public bool IsAtStartOfScanline => m_CurrentScanlineCycle == 0;
     public IReadOnlyList<ColorAbgr8888> FramePixels => m_GeneratedPixels;
 
     static Atari2600Tia()

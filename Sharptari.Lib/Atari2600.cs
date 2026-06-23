@@ -10,7 +10,7 @@ namespace Sharptari.Lib;
 
 public sealed class Atari2600
 {
-    private const long CpuSpeed = 1193181;
+    private const long CpuSpeed = 3579543;
 
     private readonly Atari2600Rom m_Rom;
     private readonly IAtariInput m_Input;
@@ -18,6 +18,7 @@ public sealed class Atari2600
     private readonly Atari2600Tia m_Tia;
     private readonly Atari2600Bus m_Bus;
     private readonly Mos6502Cpu<Atari2600Bus> m_Cpu;
+    private int m_SubClock;
 
     public Mos6502Registers DebugCpuRegisters => m_Cpu.Registers;
     public IReadOnlyList<byte> DebugRam => m_Riot.DebugRam;
@@ -43,54 +44,156 @@ public sealed class Atari2600
 
     public void Step()
     {
-        if (m_Tia.WSync)
+        if (m_SubClock == 0)
         {
-            m_Cpu.StepHalted();
-        }
-        else
-        {
-            m_Cpu.Step();
+            if (m_Tia.WSync)
+            {
+                m_Cpu.StepHalted();
+            }
+            else
+            {
+                m_Cpu.Step();
+            }
+
+            m_Bus.Step();
+            m_Rom.Step();
+            m_Riot.Step();
         }
 
-        m_Bus.Step();
-        m_Rom.Step();
-        m_Riot.Step();
+        // The TIA is stepped every sub clock:
+        m_Tia.Step();
 
-        // The TIA is stepped three times per CPU step:
-        m_Tia.Step();
-        m_Tia.Step();
-        m_Tia.Step();
+        ++m_SubClock;
+        if (m_SubClock == 3)
+        {
+            m_SubClock = 0;
+        }
     }
 
-    public TimeSpan StepFrame(ColorAbgr8888[] buffer)
+    public TimeSpan DebugStep(out bool didStepCpu)
+    {
+        didStepCpu = false;
+
+        if (m_SubClock == 0)
+        {
+            if (m_Tia.WSync)
+            {
+                m_Cpu.StepHalted();
+            }
+            else
+            {
+                m_Cpu.Step();
+                didStepCpu = true;
+            }
+
+            m_Bus.Step();
+            m_Rom.Step();
+            m_Riot.Step();
+        }
+
+        // The TIA is stepped every sub clock:
+        m_Tia.Step();
+
+        ++m_SubClock;
+        if (m_SubClock == 3)
+        {
+            m_SubClock = 0;
+        }
+
+        return TimeSpan.FromSeconds(1.0 / CpuSpeed);
+    }
+
+    public TimeSpan DebugStepCpu()
+    {
+        int steps = 0;
+        bool didStepCpu;
+
+        do
+        {
+            DebugStep(out didStepCpu);
+            ++steps;
+        } while (!didStepCpu);
+
+        return TimeSpan.FromSeconds((double)steps / CpuSpeed);
+    }
+
+    public TimeSpan DebugStepInstruction()
+    {
+        int steps = 0;
+        bool didStepCpu;
+
+        do
+        {
+            DebugStep(out didStepCpu);
+            ++steps;
+        }
+        while (!didStepCpu || !m_Cpu.IsAtOpCodeStart);
+
+        return TimeSpan.FromSeconds((double)steps / CpuSpeed);
+    }
+
+    public TimeSpan DebugStepScanline()
     {
         int steps = 0;
 
-        // 50000 is a reasonable upper bound on how many steps it should take to get a frame ready
+        do
+        {
+            DebugStep(out _);
+            ++steps;
+        }
+        while (!m_Tia.IsAtStartOfScanline);
+
+        return TimeSpan.FromSeconds((double)steps / CpuSpeed);
+    }
+
+    public TimeSpan StepFrame()
+    {
+        int steps = 0;
+
+        // 150000 is a reasonable upper bound on how many steps it should take to get a frame ready
         // if we hit that, just give up and leave the buffer alone
 
-        while (!m_Tia.HasFrameReady && steps < 50000)
+        while (!m_Tia.HasFrameReady && steps < 150000)
         {
             Step();
             ++steps;
         }
 
-        if (m_Tia.HasFrameReady)
-        {
-            var pixels = m_Tia.FramePixels;
-            m_Tia.ClearFrameReady();
-
-            int i = 0;
-            int iMax = Math.Min(buffer.Length, pixels.Count);
-
-            // Copy the pixels to the screen bytes:
-            for (i = 0; i < iMax; i++)
-            {
-                buffer[i] = pixels[i];
-            }
-            Array.Clear(buffer, i, buffer.Length - i);
-        }
+        m_Tia.ClearFrameReady();
 
         return TimeSpan.FromSeconds((double)steps / CpuSpeed);
+    }
+
+    public TimeSpan DebugStepFrame()
+    {
+        int steps = 0;
+
+        // 150000 is a reasonable upper bound on how many steps it should take to get a frame ready
+        // if we hit that, just give up and leave the buffer alone
+
+        while (!m_Tia.HasFrameReady && steps < 150000)
+        {
+            DebugStep(out _);
+            ++steps;
+        }
+
+        m_Tia.ClearFrameReady();
+
+        return TimeSpan.FromSeconds((double)steps / CpuSpeed);
+    }
+
+    public void ReadFrame(ColorAbgr8888[] buffer)
+    {
+        var pixels = m_Tia.FramePixels;
+
+        int i = 0;
+        int iMax = Math.Min(buffer.Length, pixels.Count);
+
+        // Copy the pixels to the screen bytes:
+        for (i = 0; i < iMax; i++)
+        {
+            buffer[i] = pixels[i];
+        }
+        Array.Clear(buffer, i, buffer.Length - i);
     }
 }

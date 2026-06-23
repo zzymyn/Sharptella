@@ -41,7 +41,21 @@ internal unsafe sealed class App
     private TimeSpan m_CpuElapsedTime;
     private TimeSpan m_RealElapsedTime;
 
+    // debugging:
+    private bool m_ViewDebugTools;
+    private bool m_PauseEmulation;
+    private bool m_StepFrameRequested;
+    private bool m_StepScanlineRequested;
+    private bool m_StepInstructionRequested;
+    private bool m_StepCpuRequested;
+    private bool m_StepTiaCycleRequested;
+
+    // memory viewer:
     private bool m_ViewMemory;
+    private Mos6502Registers m_CurrDebugCpuRegisters;
+    private Mos6502Registers m_PrevDebugCpuRegisters;
+    private byte[] m_CurrDebugRam = new byte[128];
+    private byte[] m_PrevDebugRam = new byte[128];
 
     public App()
     {
@@ -141,54 +155,6 @@ internal unsafe sealed class App
 
     private void OnWindowUpdate(double dt)
     {
-        if (m_Gl == null)
-            throw new NullReferenceException(nameof(m_Gl));
-
-        if (m_Atari2600 != null)
-        {
-            // Process one frame of emulation:
-            m_CpuElapsedTime += m_Atari2600.StepFrame(m_FrameBuffer);
-
-            m_FrameBufferPos0.X = ScanlineLength - 1;
-            m_FrameBufferPos1.X = 0;
-            m_FrameBufferPos0.Y = MaxScanlineCount - 1;
-            m_FrameBufferPos1.Y = 0;
-            for (int i = 0; i < m_FrameBuffer.Length; ++i)
-            {
-                var pixel = m_FrameBuffer[i];
-                if (pixel.A != 0)
-                {
-                    int x = i % ScanlineLength;
-                    int y = i / ScanlineLength;
-                    m_FrameBufferPos0.X = Math.Min(m_FrameBufferPos0.X, x);
-                    m_FrameBufferPos1.X = Math.Max(m_FrameBufferPos1.X, x);
-                    m_FrameBufferPos0.Y = Math.Min(m_FrameBufferPos0.Y, y);
-                    m_FrameBufferPos1.Y = Math.Max(m_FrameBufferPos1.Y, y);
-                }
-                m_FrameBuffer[i].A = 255;
-            }
-            m_FrameBufferPos0.Y = Math.Max(m_FrameBufferPos0.Y - 8, 0);
-            m_FrameBufferPos1.Y = Math.Min(m_FrameBufferPos1.Y + 8, MaxScanlineCount - 1);
-
-            m_FrameBufferUV0.X = (m_FrameBufferPos0.X + 0.5f) / ScanlineLength;
-            m_FrameBufferUV0.Y = (m_FrameBufferPos0.Y + 0.5f) / MaxScanlineCount;
-            m_FrameBufferUV1.X = (m_FrameBufferPos1.X - 0.5f) / ScanlineLength;
-            m_FrameBufferUV1.Y = (m_FrameBufferPos1.Y - 0.5f) / MaxScanlineCount;
-
-        }
-        else
-        {
-            m_CpuElapsedTime = m_RealElapsedTime;
-            Array.Clear(m_FrameBuffer, 0, m_FrameBuffer.Length);
-            m_FrameBufferPos0 = default;
-            m_FrameBufferPos1 = default;
-            m_FrameBufferUV0 = default;
-            m_FrameBufferUV1 = default;
-        }
-
-        m_Gl.BindTexture(TextureTarget.Texture2D, m_MainTex);
-        m_Gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, ScanlineLength, MaxScanlineCount, PixelFormat.Rgba, PixelType.UnsignedByte, m_FrameBuffer);
-        m_Gl.BindTexture(TextureTarget.Texture2D, 0);
     }
 
     private void OnWindowRender(double dt)
@@ -202,9 +168,29 @@ internal unsafe sealed class App
 
         m_ImguiController.Update((float)dt);
 
+        DoGui();
+        DoEmu();
+
+        var bg = ImGui.GetBackgroundDrawList();
+
+        var menuHeight = ImGui.GetFrameHeight();
+
+        var windowMin = new Vector2(0, menuHeight);
+        var windowMax = new Vector2(m_Window.Size.X, m_Window.Size.Y);
+
+        var gameSize = new Vector2(PixelAspectRatio * (m_FrameBufferPos1.X - m_FrameBufferPos0.X + 1), m_FrameBufferPos1.Y - m_FrameBufferPos0.Y + 1);
+
+        var (gameMin, gameMax) = Fit(gameSize, windowMin, windowMax);
+
+        bg.AddImage((IntPtr)m_MainTex, gameMin, gameMax, m_FrameBufferUV0, m_FrameBufferUV1);
+
         m_Gl.ClearColor(Color.FromArgb(255, 0, 0, 0));
         m_Gl.Clear((uint)ClearBufferMask.ColorBufferBit);
+        m_ImguiController.Render();
+    }
 
+    private void DoGui()
+    {
         if (ImGui.BeginMainMenuBar())
         {
             if (ImGui.BeginMenu("File"))
@@ -228,6 +214,7 @@ internal unsafe sealed class App
             }
             if (ImGui.BeginMenu("Debug"))
             {
+                ImGui.MenuItem("Debug Tools", "", ref m_ViewDebugTools);
                 ImGui.MenuItem("View Memory", "", ref m_ViewMemory);
                 ImGui.EndMenu();
             }
@@ -308,63 +295,278 @@ internal unsafe sealed class App
             ImGui.End();
         }
 
+        if (m_ViewDebugTools)
+        {
+            if (ImGui.Begin("Debug Tools", ref m_ViewDebugTools, ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                if (ImGui.BeginTable("DebugToolsTable", 6))
+                {
+                    ImGui.TableNextRow();
+
+                    ImGui.TableNextColumn();
+                    if (ImGui.Button(m_PauseEmulation ? "Resume" : "Pause"))
+                    {
+                        m_PauseEmulation = !m_PauseEmulation;
+                    }
+
+                    ImGui.BeginDisabled(!m_PauseEmulation);
+                    ImGui.TableNextColumn();
+                    if (ImGui.Button("Step Frame"))
+                    {
+                        m_StepFrameRequested = true;
+                    }
+                    ImGui.TableNextColumn();
+                    if (ImGui.Button("Step Scanline"))
+                    {
+                        m_StepScanlineRequested = true;
+                    }
+                    ImGui.TableNextColumn();
+                    if (ImGui.Button("Step Instr"))
+                    {
+                        m_StepInstructionRequested = true;
+                    }
+                    ImGui.TableNextColumn();
+                    if (ImGui.Button("Step CPU"))
+                    {
+                        m_StepCpuRequested = true;
+                    }
+                    ImGui.TableNextColumn();
+                    if (ImGui.Button("Step TIA"))
+                    {
+                        m_StepTiaCycleRequested = true;
+                    }
+                    ImGui.EndDisabled();
+
+                    ImGui.EndTable();
+                }
+
+                ImGui.End();
+            }
+        }
+
         if (m_ViewMemory)
         {
             if (ImGui.Begin("Memory Viewer", ref m_ViewMemory, ImGuiWindowFlags.AlwaysAutoResize))
             {
-                if (m_Atari2600 != null)
+                var r = m_CurrDebugCpuRegisters;
+
+                ImGui.Text("Registers:");
+
+                if (ImGui.BeginTable("RegistersTable", 11))
                 {
-                    var r = m_Atari2600.DebugCpuRegisters;
-                    var pN = r.PNegative ? "1" : "-";
-                    var pV = r.POverflow ? "1" : "-";
-                    var pD = r.PDecimal ? "1" : "-";
-                    var pI = r.PInterruptDisable ? "1" : "-";
-                    var pZ = r.PZero ? "1" : "-";
-                    var pC = r.PCarry ? "1" : "-";
+                    ImGui.TableNextRow();
+                    ImGui.TableNextColumn();
+                    ImGui.Text("A");
+                    ImGui.TableNextColumn();
+                    ImGui.Text("X");
+                    ImGui.TableNextColumn();
+                    ImGui.Text("Y");
+                    ImGui.TableNextColumn();
+                    ImGui.Text("S");
+                    ImGui.TableNextColumn();
+                    ImGui.Text("PC");
+                    ImGui.TableNextColumn();
+                    ImGui.Text("N");
+                    ImGui.TableNextColumn();
+                    ImGui.Text("V");
+                    ImGui.TableNextColumn();
+                    ImGui.Text("D");
+                    ImGui.TableNextColumn();
+                    ImGui.Text("I");
+                    ImGui.TableNextColumn();
+                    ImGui.Text("Z");
+                    ImGui.TableNextColumn();
+                    ImGui.Text("C");
 
-                    ImGui.Text("Registers:");
-                    ImGui.Text($"A    X    Y    S     PC   NVDIZC");
-                    ImGui.Text($"{r.A:X2}   {r.X:X2}   {r.Y:X2}   {r.S:X2}   {r.PC:X4}   {pN}{pV}{pD}{pI}{pZ}{pC}");
+                    ImGui.TableNextRow();
+                    ImGui.TableNextColumn();
+                    if (r.A != m_PrevDebugCpuRegisters.A)
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0x7700FF00);
+                    ImGui.Text($"{r.A:X2}");
+                    ImGui.TableNextColumn();
+                    if (r.X != m_PrevDebugCpuRegisters.X)
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0x7700FF00);
+                    ImGui.Text($"{r.X:X2}");
+                    ImGui.TableNextColumn();
+                    if (r.Y != m_PrevDebugCpuRegisters.Y)
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0x7700FF00);
+                    ImGui.Text($"{r.Y:X2}");
+                    ImGui.TableNextColumn();
+                    if (r.S != m_PrevDebugCpuRegisters.S)
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0x7700FF00);
+                    ImGui.Text($"{r.S:X2}");
+                    ImGui.TableNextColumn();
+                    if (r.PC != m_PrevDebugCpuRegisters.PC)
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0x7700FF00);
+                    ImGui.Text($"{r.PC:X4}");
+                    ImGui.TableNextColumn();
+                    if (r.PNegative != m_PrevDebugCpuRegisters.PNegative)
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0x7700FF00);
+                    ImGui.Text(r.PNegative ? "1" : "-");
+                    ImGui.TableNextColumn();
+                    if (r.POverflow != m_PrevDebugCpuRegisters.POverflow)
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0x7700FF00);
+                    ImGui.Text(r.POverflow ? "1" : "-");
+                    ImGui.TableNextColumn();
+                    if (r.PDecimal != m_PrevDebugCpuRegisters.PDecimal)
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0x7700FF00);
+                    ImGui.Text(r.PDecimal ? "1" : "-");
+                    ImGui.TableNextColumn();
+                    if (r.PInterruptDisable != m_PrevDebugCpuRegisters.PInterruptDisable)
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0x7700FF00);
+                    ImGui.Text(r.PInterruptDisable ? "1" : "-");
+                    ImGui.TableNextColumn();
+                    if (r.PZero != m_PrevDebugCpuRegisters.PZero)
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0x7700FF00);
+                    ImGui.Text(r.PZero ? "1" : "-");
+                    ImGui.TableNextColumn();
+                    if (r.PCarry != m_PrevDebugCpuRegisters.PCarry)
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0x7700FF00);
+                    ImGui.Text(r.PCarry ? "1" : "-");
 
-                    ImGui.Separator();
-
-                    var debugRam = m_Atari2600.DebugRam;
-
-                    ImGui.Text("RAM:");
-                    var sb = new StringBuilder();
-                    for (int i = 0; i < debugRam.Count; i += 16)
-                    {
-                        sb.Clear();
-                        for (int j = 0; j < 16 && i + j < debugRam.Count; ++j)
-                        {
-                            sb.Append($" {debugRam[i + j]:X2}");
-                        }
-                        ImGui.Text($"{0x80 + i:X2}:{sb}");
-                    }
-                    ImGui.End();
+                    ImGui.EndTable();
                 }
-                else
+
+                ImGui.Separator();
+
+                ImGui.Text("RAM:");
+                if (ImGui.BeginTable("RAMTable", 17))
                 {
-                    ImGui.Text("No ROM loaded.");
+                    ImGui.TableNextRow();
+                    ImGui.TableNextColumn();
+                    for (int j = 0; j < 16; ++j)
+                    {
+                        ImGui.TableNextColumn();
+                        ImGui.Text($"+{j:X}");
+                    }
+
+                    for (int i = 0; i < m_CurrDebugRam.Length; i += 16)
+                    {
+                        ImGui.TableNextRow();
+
+                        ImGui.TableNextColumn();
+                        ImGui.Text($"{0x80 + i:X2}:");
+
+                        for (int j = 0; j < 16 && i + j < m_CurrDebugRam.Length; ++j)
+                        {
+                            ImGui.TableNextColumn();
+                            if (m_CurrDebugRam[i + j] != m_PrevDebugRam[i + j])
+                                ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0x7700FF00);
+                            ImGui.Text($"{m_CurrDebugRam[i + j]:X2}");
+                        }
+                    }
+
+                    ImGui.EndTable();
                 }
             }
             ImGui.End();
         }
+    }
 
-        var bg = ImGui.GetBackgroundDrawList();
+    private void DoEmu()
+    {
+        if (m_Gl == null)
+            throw new NullReferenceException(nameof(m_Gl));
 
-        var menuHeight = ImGui.GetFrameHeight();
+        if (m_Atari2600 != null)
+        {
+            bool stepped = true;
 
-        var windowMin = new Vector2(0, menuHeight);
-        var windowMax = new Vector2(m_Window.Size.X, m_Window.Size.Y);
+            // Process the emulation:
+            if (!m_ViewDebugTools)
+            {
+                m_CpuElapsedTime += m_Atari2600.StepFrame();
+            }
+            else if (!m_PauseEmulation || m_StepFrameRequested)
+            {
+                m_CpuElapsedTime += m_Atari2600.DebugStepFrame();
+            }
+            else if (m_StepScanlineRequested)
+            {
+                m_CpuElapsedTime += m_Atari2600.DebugStepScanline();
+            }
+            else if (m_StepInstructionRequested)
+            {
+                m_CpuElapsedTime += m_Atari2600.DebugStepInstruction();
+            }
+            else if (m_StepCpuRequested)
+            {
+                m_CpuElapsedTime += m_Atari2600.DebugStepCpu(); 
+            }
+            else if (m_StepTiaCycleRequested)
+            {
+                m_CpuElapsedTime += m_Atari2600.DebugStep(out _);
+            }
+            else
+            {
+                stepped = false;
+            }
 
-        var gameSize = new Vector2(PixelAspectRatio * (m_FrameBufferPos1.X - m_FrameBufferPos0.X + 1), m_FrameBufferPos1.Y - m_FrameBufferPos0.Y + 1);
+            m_Atari2600.ReadFrame(m_FrameBuffer);
 
-        var (gameMin, gameMax) = Fit(gameSize, windowMin, windowMax);
+            m_FrameBufferPos0.X = ScanlineLength - 1;
+            m_FrameBufferPos1.X = 0;
+            m_FrameBufferPos0.Y = MaxScanlineCount - 1;
+            m_FrameBufferPos1.Y = 0;
+            for (int i = 0; i < m_FrameBuffer.Length; ++i)
+            {
+                var pixel = m_FrameBuffer[i];
+                if (pixel.A != 0)
+                {
+                    int x = i % ScanlineLength;
+                    int y = i / ScanlineLength;
+                    m_FrameBufferPos0.X = Math.Min(m_FrameBufferPos0.X, x);
+                    m_FrameBufferPos1.X = Math.Max(m_FrameBufferPos1.X, x);
+                    m_FrameBufferPos0.Y = Math.Min(m_FrameBufferPos0.Y, y);
+                    m_FrameBufferPos1.Y = Math.Max(m_FrameBufferPos1.Y, y);
+                }
+                m_FrameBuffer[i].A = 255;
+            }
+            m_FrameBufferPos0.Y = Math.Max(m_FrameBufferPos0.Y - 8, 0);
+            m_FrameBufferPos1.Y = Math.Min(m_FrameBufferPos1.Y + 8, MaxScanlineCount - 1);
 
-        bg.AddImage((IntPtr)m_MainTex, gameMin, gameMax, m_FrameBufferUV0, m_FrameBufferUV1);
+            m_FrameBufferUV0.X = (m_FrameBufferPos0.X + 0.5f) / ScanlineLength;
+            m_FrameBufferUV0.Y = (m_FrameBufferPos0.Y + 0.5f) / MaxScanlineCount;
+            m_FrameBufferUV1.X = (m_FrameBufferPos1.X - 0.5f) / ScanlineLength;
+            m_FrameBufferUV1.Y = (m_FrameBufferPos1.Y - 0.5f) / MaxScanlineCount;
 
-        m_ImguiController.Render();
+            if (stepped && m_ViewMemory)
+            {
+                m_PrevDebugCpuRegisters = m_CurrDebugCpuRegisters;
+                Array.Copy(m_CurrDebugRam, m_PrevDebugRam, m_CurrDebugRam.Length);
+
+                m_CurrDebugCpuRegisters = m_Atari2600.DebugCpuRegisters;
+                var debugRam = m_Atari2600.DebugRam;
+                for (int i = 0; i < debugRam.Count; ++i)
+                {
+                    m_CurrDebugRam[i] = debugRam[i];
+                }
+            }
+        }
+        else
+        {
+            m_CpuElapsedTime = m_RealElapsedTime;
+            Array.Clear(m_FrameBuffer, 0, m_FrameBuffer.Length);
+            m_FrameBufferPos0 = default;
+            m_FrameBufferPos1 = default;
+            m_FrameBufferUV0 = default;
+            m_FrameBufferUV1 = default;
+        }
+
+        m_Gl.BindTexture(TextureTarget.Texture2D, m_MainTex);
+        m_Gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, ScanlineLength, MaxScanlineCount, PixelFormat.Rgba, PixelType.UnsignedByte, m_FrameBuffer);
+        m_Gl.BindTexture(TextureTarget.Texture2D, 0);
+
+        m_StepFrameRequested = false;
+        m_StepScanlineRequested = false;
+        m_StepInstructionRequested = false;
+        m_StepCpuRequested = false;
+        m_StepTiaCycleRequested = false;
+
+        if (m_ViewDebugTools && m_PauseEmulation)
+        {
+            m_RealElapsedTime = m_CpuElapsedTime;
+        }
     }
 
     private (Vector2 min, Vector2 max) Fit(Vector2 a, Vector2 rMin, Vector2 rMax)
