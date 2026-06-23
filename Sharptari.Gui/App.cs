@@ -105,7 +105,7 @@ internal unsafe sealed class App
 
         m_ImguiController = new ImGuiController(m_Gl, m_Window, m_InputContext);
 
-        // create a texture:
+        // create game view texture:
         m_MainTex = m_Gl.GenTexture();
         m_Gl.BindTexture(TextureTarget.Texture2D, m_MainTex);
         m_Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
@@ -227,6 +227,80 @@ internal unsafe sealed class App
                 ImGui.EndMenu();
             }
             ImGui.EndMenuBar();
+        }
+
+        // centered, modal dialog when no ROM is loaded:
+        if (m_Atari2600 == null)
+        {
+            var windowSize = ImGui.GetIO().DisplaySize;
+            var dialogPos = 0.5f * windowSize;
+            ImGui.SetNextWindowPos(dialogPos, ImGuiCond.Always, new Vector2(0.5f, 0.5f));
+            ImGui.Begin("No ROM Loaded",
+                ImGuiWindowFlags.NoMove
+                | ImGuiWindowFlags.NoResize
+                | ImGuiWindowFlags.NoCollapse
+                | ImGuiWindowFlags.NoMouseInputs
+                | ImGuiWindowFlags.NoFocusOnAppearing
+                | ImGuiWindowFlags.NoTitleBar
+                | ImGuiWindowFlags.NoSavedSettings);
+            ImGui.TextColored(new Vector4(1.0f, 0.0f, 0.0f, 1.0f), "No ROM Loaded");
+            ImGui.Separator();
+            ImGui.Text("Drag and drop a ROM file to load it.");
+            ImGui.End();
+        }
+
+        {
+            var windowSize = ImGui.GetIO().DisplaySize;
+            var dialogPos = new Vector2(0, windowSize.Y);
+            ImGui.SetNextWindowPos(dialogPos, ImGuiCond.Always, new Vector2(0, 1.0f));
+            ImGui.Begin("Console Switches",
+                ImGuiWindowFlags.NoMove
+                | ImGuiWindowFlags.NoResize
+                | ImGuiWindowFlags.NoCollapse
+                | ImGuiWindowFlags.NoSavedSettings);
+
+            if (ImGui.Button("Reset (F1)"))
+            {
+                m_Atari2600?.Reboot();
+            }
+
+            bool tvBW = m_AtariInput?.TvTypeSwitch == true;
+            if (ImGui.Checkbox("TV Type B/W (F2)", ref tvBW))
+            {
+                m_AtariInput?.ToggleTvTypeSwitch();
+            }
+
+            bool player0Hard = m_AtariInput?.PlayerDifficultySwitchA == false;
+            if (ImGui.Checkbox("Player 1 Hard Mode (F3)", ref player0Hard))
+            {
+                m_AtariInput?.TogglePlayerDifficultySwitchA();
+            }
+
+            bool player1Hard = m_AtariInput?.PlayerDifficultySwitchB == false;
+            if (ImGui.Checkbox("Player 2 Hard Mode (F4)", ref player1Hard))
+            {
+                m_AtariInput?.TogglePlayerDifficultySwitchB();
+            }
+
+            if (ImGui.Button("Game Select (F5)"))
+            {
+                m_AtariInput?.PressGameSelectSwitch();
+            }
+            else
+            {
+                m_AtariInput?.ReleaseGameSelectSwitch();
+            }
+
+            if (ImGui.Button("Game Reset (F6)"))
+            {
+                m_AtariInput?.PressGameResetSwitch();
+            }
+            else
+            {
+                m_AtariInput?.ReleaseGameResetSwitch();
+            }
+
+            ImGui.End();
         }
 
         var bg = ImGui.GetBackgroundDrawList();

@@ -72,6 +72,41 @@ internal sealed class SilkAtariInput
         }
     }
 
+    public void ToggleTvTypeSwitch()
+    {
+        m_TvTypeSwitch = !m_TvTypeSwitch;
+    }
+
+    public void TogglePlayerDifficultySwitchA()
+    {
+        m_PlayerDifficultySwitchA = !m_PlayerDifficultySwitchA;
+    }
+
+    public void TogglePlayerDifficultySwitchB()
+    {
+        m_PlayerDifficultySwitchB = !m_PlayerDifficultySwitchB;
+    }
+
+    public void PressGameSelectSwitch()
+    {
+        m_GameSelectSwitch.Set(null, 0, true);
+    }
+
+    public void ReleaseGameSelectSwitch()
+    {
+        m_GameSelectSwitch.Set(null, 0, false);
+    }
+
+    public void PressGameResetSwitch()
+    {
+        m_GameResetSwitch.Set(null, 0, true);
+    }
+
+    public void ReleaseGameResetSwitch()
+    {
+        m_GameResetSwitch.Set(null, 0, false);
+    }
+
     private void KeyboardKeyDown(IKeyboard keyboard, Key key, int arg3)
     {
         KeyboardKey(keyboard, key, true);
@@ -101,14 +136,6 @@ internal sealed class SilkAtariInput
             case Key.Space:
                 m_Player0Button.Set(keyboard, 0, down);
                 break;
-
-            case Key.F12:
-                m_GameResetSwitch.Set(keyboard, 0, down);
-                break;
-            case Key.F11:
-                m_GameSelectSwitch.Set(keyboard, 0, down);
-                break;
-
             case Key.F2:
                 if (down)
                 {
@@ -126,6 +153,12 @@ internal sealed class SilkAtariInput
                 {
                     m_PlayerDifficultySwitchB = !m_PlayerDifficultySwitchB;
                 }
+                break;
+            case Key.F5:
+                m_GameSelectSwitch.Set(keyboard, 0, down);
+                break;
+            case Key.F6:
+                m_GameResetSwitch.Set(keyboard, 0, down);
                 break;
         }
     }
@@ -222,7 +255,7 @@ internal sealed class SilkAtariInput
 
     private readonly struct InputVector
     {
-        private readonly HashSet<(IInputDevice device, int id)> m_Inputs = [];
+        private readonly HashSet<(IInputDevice? device, int id)> m_Inputs = [];
 
         public bool IsActive => m_Inputs.Count > 0;
 
@@ -242,7 +275,7 @@ internal sealed class SilkAtariInput
             }
         }
 
-        public void Set(IInputDevice device, int id, bool down)
+        public void Set(IInputDevice? device, int id, bool down)
         {
             if (down)
             {

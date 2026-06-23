@@ -9,6 +9,10 @@
       "commandName": "Project",
       "commandLineArgs": "test.bin",
       "workingDirectory": "$(SolutionDir)"
+    },
+    "Sharptari.Gui None": {
+      "commandName": "Project",
+      "workingDirectory": "$(SolutionDir)"
     }
   }
 }
