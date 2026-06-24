@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -9,6 +10,7 @@ using ImGuiNET;
 using Sharptari.Lib;
 using Silk.NET.Input;
 using Silk.NET.Maths;
+using Silk.NET.OpenAL;
 using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
@@ -22,11 +24,19 @@ internal unsafe sealed class App
     private const int MaxScanlineCount = 512;
     private const float PixelAspectRatio = 12.0f / 7.0f;
 
+    private const int AudioSampleRate = 31399;
+
     private IWindow? m_Window;
     private bool m_QuitRequested;
     private GL? m_Gl;
     private IInputContext? m_InputContext;
     private ImGuiController? m_ImguiController;
+    private ALContext? m_Alc;
+    private AL? m_Al;
+    private Device* m_AlDevice;
+    private Context* m_AlContext;
+    private readonly List<uint> m_AlBuffers = [];
+    private readonly List<uint> m_FreeAlBuffers = [];
 
     private byte[]? m_RomBytes;
     private SilkAtariInput? m_AtariInput;
@@ -40,6 +50,8 @@ internal unsafe sealed class App
     private Vector2 m_FrameBufferUV1;
     private TimeSpan m_CpuElapsedTime;
     private TimeSpan m_RealElapsedTime;
+
+    private AudioStream[] m_AudioStreams = [new(), new()];
 
     // debugging:
     private bool m_ViewDebugTools;
@@ -120,6 +132,25 @@ internal unsafe sealed class App
 
         m_ImguiController = new ImGuiController(m_Gl, m_Window, m_InputContext);
 
+        m_Alc = ALContext.GetApi();
+        m_Al = AL.GetApi();
+        if (m_Alc != null)
+        {
+            m_AlDevice = m_Alc.OpenDevice("");
+            if (m_AlDevice != null)
+            {
+                m_AlContext = m_Alc.CreateContext(m_AlDevice, null);
+                if (m_AlContext != null)
+                {
+                    m_Alc.MakeContextCurrent(m_AlContext);
+                    foreach (var v in m_AudioStreams)
+                    {
+                        v.AlSource = m_Al.GenSource();
+                    }
+                }
+            }
+        }
+
         // create game view texture:
         m_MainTex = m_Gl.GenTexture();
         m_Gl.BindTexture(TextureTarget.Texture2D, m_MainTex);
@@ -135,6 +166,24 @@ internal unsafe sealed class App
 
     private void OnWindowUnload()
     {
+        foreach (var alBuffer in m_AlBuffers)
+        {
+            m_Al?.DeleteBuffer(alBuffer);
+        }
+        m_AlBuffers.Clear();
+        foreach (var v in m_AudioStreams)
+        {
+            m_Al?.DeleteSource(v.AlSource);
+            v.AlSource = 0;
+        }
+        m_Alc?.DestroyContext(m_AlContext);
+        m_AlContext = null;
+        m_Alc?.CloseDevice(m_AlDevice);
+        m_AlDevice = null;
+        m_Al?.Dispose();
+        m_Al = null;
+        m_Alc?.Dispose();
+        m_Alc = null;
         m_AtariInput?.Dispose();
         m_AtariInput = null;
         m_ImguiController?.Dispose();
@@ -170,6 +219,7 @@ internal unsafe sealed class App
 
         DoGui();
         DoEmu();
+        DoAudio();
 
         var bg = ImGui.GetBackgroundDrawList();
 
@@ -491,7 +541,7 @@ internal unsafe sealed class App
             }
             else if (m_StepCpuRequested)
             {
-                m_CpuElapsedTime += m_Atari2600.DebugStepCpu(); 
+                m_CpuElapsedTime += m_Atari2600.DebugStepCpu();
             }
             else if (m_StepTiaCycleRequested)
             {
@@ -503,6 +553,8 @@ internal unsafe sealed class App
             }
 
             m_Atari2600.ReadFrame(m_FrameBuffer);
+            m_AudioStreams[0].BufferLength = m_Atari2600.ReadAudio0(m_AudioStreams[0].Buffer);
+            m_AudioStreams[1].BufferLength = m_Atari2600.ReadAudio1(m_AudioStreams[1].Buffer);
 
             m_FrameBufferPos0.X = ScanlineLength - 1;
             m_FrameBufferPos1.X = 0;
@@ -567,6 +619,67 @@ internal unsafe sealed class App
         {
             m_RealElapsedTime = m_CpuElapsedTime;
         }
+    }
+
+    private void DoAudio()
+    {
+        if (m_Al == null || m_AlBuffers == null)
+            return;
+
+        foreach (var v in m_AudioStreams)
+        {
+            if (v.AlSource != 0)
+            {
+                m_Al.GetSourceProperty(v.AlSource, GetSourceInteger.BuffersProcessed, out var processed);
+
+                for (var j = 0; j < processed; ++j)
+                {
+                    uint alBuffer = 0;
+                    m_Al.SourceUnqueueBuffers(v.AlSource, 1, &alBuffer);
+                    m_FreeAlBuffers.Add(alBuffer);
+                }
+            }
+
+            if (v.BufferLength > 0)
+            {
+                var alBuffer = GetFreeAlBuffer();
+                if (alBuffer != 0)
+                {
+                    fixed (byte* ptr = v.Buffer)
+                    {
+                        m_Al.BufferData(alBuffer, BufferFormat.Mono8, ptr, v.BufferLength * sizeof(byte), AudioSampleRate);
+                    }
+
+                    m_Al.SourceQueueBuffers(v.AlSource, 1, &alBuffer);
+
+                    m_Al.GetSourceProperty(v.AlSource, GetSourceInteger.SourceState, out var state);
+                    if (state != (int)SourceState.Playing)
+                    {
+                        m_Al.SourcePlay(v.AlSource);
+                    }
+                }
+                v.BufferLength = 0;
+            }
+        }
+    }
+
+    private uint GetFreeAlBuffer()
+    {
+        uint alBuffer;
+
+        if (m_FreeAlBuffers.Count > 0)
+        {
+            alBuffer = m_FreeAlBuffers[0];
+            m_FreeAlBuffers.RemoveAt(0);
+        }
+        else
+        {
+            alBuffer = m_Al!.GenBuffer();
+            m_AlBuffers.Add(alBuffer);
+            Console.WriteLine("Generated new OpenAL buffer. Total buffers: " + m_AlBuffers.Count);
+        }
+
+        return alBuffer;
     }
 
     private (Vector2 min, Vector2 max) Fit(Vector2 a, Vector2 rMin, Vector2 rMax)
@@ -671,5 +784,16 @@ internal unsafe sealed class App
 
         m_Window.DoEvents();
         m_Window.Reset();
+    }
+
+    private class AudioStream
+    {
+        public uint AlSource;
+        public readonly byte[] Buffer = new byte[2 * MaxScanlineCount];
+        public int BufferLength;
+
+        public AudioStream()
+        {
+        }
     }
 }

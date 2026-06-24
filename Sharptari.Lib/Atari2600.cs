@@ -184,16 +184,19 @@ public sealed class Atari2600
 
     public void ReadFrame(ColorAbgr8888[] buffer)
     {
-        var pixels = m_Tia.FramePixels;
+        var pixelCount = m_Tia.CopyPixels(buffer);
+        Array.Clear(buffer, pixelCount, buffer.Length - pixelCount);
+    }
 
-        int i = 0;
-        int iMax = Math.Min(buffer.Length, pixels.Count);
+    public int ReadAudio0(byte[] buffer)
+    {
+        var sampleCount = m_Tia.ReadAudioSamples0(buffer);
+        return sampleCount;
+    }
 
-        // Copy the pixels to the screen bytes:
-        for (i = 0; i < iMax; i++)
-        {
-            buffer[i] = pixels[i];
-        }
-        Array.Clear(buffer, i, buffer.Length - i);
+    public int ReadAudio1(byte[] buffer)
+    {
+        var sampleCount = m_Tia.ReadAudioSamples1(buffer);
+        return sampleCount;
     }
 }

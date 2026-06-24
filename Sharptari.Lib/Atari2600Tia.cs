@@ -67,10 +67,12 @@ public sealed class Atari2600Tia
     private bool m_P0Latch;
     private bool m_P1Latch;
 
+    private AudioChannel m_AudioChannel0 = new();
+    private AudioChannel m_AudioChannel1 = new();
+
     public bool WSync => m_WSync;
     public bool HasFrameReady => m_HasFrameReady;
     public bool IsAtStartOfScanline => m_CurrentScanlineCycle == 0;
-    public IReadOnlyList<ColorAbgr8888> FramePixels => m_GeneratedPixels;
 
     static Atari2600Tia()
     {
@@ -90,6 +92,23 @@ public sealed class Atari2600Tia
         m_HasFrameReady = false;
     }
 
+    public int CopyPixels(Span<ColorAbgr8888> destination)
+    {
+        int count = Math.Min(destination.Length, m_GeneratedPixels.Length);
+        m_GeneratedPixels.AsSpan(0, count).CopyTo(destination);
+        return count;
+    }
+
+    public int ReadAudioSamples0(Span<byte> destination)
+    {
+        return m_AudioChannel0.ReadAudioSamples(destination);
+    }
+
+    public int ReadAudioSamples1(Span<byte> destination)
+    {
+        return m_AudioChannel1.ReadAudioSamples(destination);
+    }
+
     public void Reboot()
     {
         Array.Clear(m_GeneratedPixels, 0, m_GeneratedPixels.Length);
@@ -97,6 +116,8 @@ public sealed class Atari2600Tia
         m_CurrentScanlineCycle = 0;
         m_VBlank = true;
         m_VSync = false;
+        m_AudioChannel0.Reboot();
+        m_AudioChannel1.Reboot();
     }
 
     public void Step()
@@ -163,6 +184,12 @@ public sealed class Atari2600Tia
         m_BallPositionCounter.StepX(hBlank);
         m_PlayerMissile0.StepX(hBlank);
         m_PlayerMissile1.StepX(hBlank);
+
+        if (m_CurrentScanlineCycle == 0 || m_CurrentScanlineCycle == 114)
+        {
+            m_AudioChannel0.Step();
+            m_AudioChannel1.Step();
+        }
 
         ++m_CurrentScanlineCycle;
         if (m_CurrentScanlineCycle >= ScanlineLength)
@@ -458,21 +485,27 @@ public sealed class Atari2600Tia
                 break;
             case 0x15:
                 // AUDC0
+                m_AudioChannel0.Control = value & 0b0000_1111;
                 break;
             case 0x16:
                 // AUDC1
+                m_AudioChannel1.Control = value & 0b0000_1111;
                 break;
             case 0x17:
                 // AUDF0
+                m_AudioChannel0.Frequency = value & 0b0001_1111;
                 break;
             case 0x18:
                 // AUDF1
+                m_AudioChannel1.Frequency = value & 0b0001_1111;
                 break;
             case 0x19:
                 // AUDV0
+                m_AudioChannel0.Volume = value & 0b0000_1111;
                 break;
             case 0x1a:
                 // AUDV1
+                m_AudioChannel1.Volume = value & 0b0000_1111;
                 break;
             case 0x1b:
                 // GRP0
@@ -622,18 +655,6 @@ public sealed class Atari2600Tia
     private void SetPaddleCapacitorDumpToGround(bool value)
     {
         // TODO
-    }
-
-    private static int ApplyHMove(int x, int hmove)
-    {
-        if (hmove >= 8)
-        {
-            return (x + 144 + hmove) % 160;
-        }
-        else
-        {
-            return (x + hmove) % 160;
-        }
     }
 
     private static byte GetCx(bool b7, bool b6)
@@ -817,5 +838,208 @@ public sealed class Atari2600Tia
     private static float Lerp(float a, float b, float t)
     {
         return a + (b - a) * Math.Clamp(t, 0.0f, 1.0f);
+    }
+
+    private struct AudioChannel
+    {
+        public int Control;
+        public int Frequency;
+        public int Volume;
+
+        public readonly byte[] GeneratedAudio = new byte[2 * MaxScanlineCount];
+        public int AudioIndex;
+
+        public int FrequencyCounter;
+        public int ShiftRegister4 = 0b1111;
+        public int ShiftRegister5 = 0b11111;
+        public int DivideBy3Counter;
+        public bool Toggle = false;
+
+        public int CurrentOutput;
+
+        public AudioChannel() { }
+
+        public void Reboot()
+        {
+            Array.Clear(GeneratedAudio, 0, GeneratedAudio.Length);
+            AudioIndex = 0;
+        }
+
+        public int ReadAudioSamples(Span<byte> destination)
+        {
+            int count = Math.Min(destination.Length, AudioIndex);
+            GeneratedAudio.AsSpan(0, count).CopyTo(destination);
+            AudioIndex = 0;
+            return count;
+        }
+
+        public void Step()
+        {
+            --FrequencyCounter;
+            if (FrequencyCounter <= 0)
+            {
+                // Reset counter: AUDF + 1
+                FrequencyCounter = 1 + Frequency;
+                CurrentOutput = StepOutput();
+            }
+
+            if (AudioIndex < GeneratedAudio.Length)
+            {
+                // remap 0-15 volume to 0-255 range for easier audio output:
+                var remappedVolume = (byte)(CurrentOutput * 17);
+                GeneratedAudio[AudioIndex] = remappedVolume;
+                ++AudioIndex;
+            }
+
+            // Prevent lock-up state
+            if (ShiftRegister4 == 0)
+            {
+                ShiftRegister4 = 0b0001;
+            }
+            if (ShiftRegister5 == 0)
+            {
+                ShiftRegister5 = 0b00001;
+            }
+        }
+
+        private int StepOutput()
+        {
+            // 16 different distortion modes selected by AUDC
+            switch (Control & 0b1111)
+            {
+                case 0:
+                case 11:
+                    return Volume;
+
+                case 1:
+                    // Mode 1: 4-bit Poly
+                    ClockPoly4();
+                    bool bit3_m1 = (ShiftRegister4 & 0b1000) != 0;
+                    return bit3_m1 ? Volume : 0;
+
+                case 2:
+                    // Mode 2: P5 clocks P4 (Rumble)
+                    {
+                        //bool oldBit4 = (ShiftRegister5 & 0b10000) != 0;
+                        ClockPoly5();
+                        bool newBit4 = (ShiftRegister5 & 0b1000) != 0;
+
+                        // Clock P4 on the falling edge of P5 bit 4
+                        if (newBit4) ClockPoly4();
+
+                        bool out_m2 = (ShiftRegister4 & 0b1000) != 0;
+                        return out_m2 ? Volume : 0;
+                    }
+
+                case 3:
+                    // Mode 3: P5 feedback modified by P4 (UFO)
+                    {
+                        ClockPoly5(); // Special feedback mode
+                        bool newBit4 = (ShiftRegister5 & 0b10000) != 0;
+
+                        if (newBit4) ClockPoly4();
+
+                        bool out_m3 = (ShiftRegister5 & 0b10000) != 0;
+                        return out_m3 ? Volume : 0;
+                    }
+
+                case 4:
+                case 5:
+                    // Mode 4 & 5: Pure Square Wave (Divide by 2)
+                    Toggle = !Toggle;
+                    return Toggle ? Volume : 0;
+
+                case 6:
+                case 10:
+                    // Mode 6 & 10: Divide by 31 (Pure Lo)
+                    ClockPoly5();
+                    bool bit4_m6 = (ShiftRegister5 & 0b10000) != 0;
+                    return bit4_m6 ? Volume : 0;
+
+                case 7:
+                case 9:
+                    // Mode 7 & 9: 5-bit Poly (Buzzy/Reedy)
+                    ClockPoly5();
+                    bool bit4_m7 = (ShiftRegister5 & 0b10000) != 0;
+                    return bit4_m7 ? Volume : 0;
+
+                case 8:
+                    // Mode 8: 9-bit Poly (White Noise)
+                    ClockPoly9();
+                    bool bit3_m8 = (ShiftRegister4 & 0b1000) != 0;
+                    return bit3_m8 ? Volume : 0;
+
+                case 12:
+                case 13:
+                    // Mode 12 & 13: Pure Med (Divide by 6)
+                    DivideBy3Counter++;
+                    if (DivideBy3Counter >= 3)
+                    {
+                        DivideBy3Counter = 0;
+                        Toggle = !Toggle;
+                    }
+                    return Toggle ? Volume : 0;
+
+                case 14:
+                case 15:
+                    // Mode 14 & 15: Buzzy Med (Divide by 93)
+                    DivideBy3Counter++;
+                    if (DivideBy3Counter >= 3)
+                    {
+                        DivideBy3Counter = 0;
+                        ClockPoly5();
+                    }
+                    bool bit4_m14 = (ShiftRegister5 & 0b10000) != 0;
+                    return bit4_m14 ? Volume : 0;
+            }
+
+            return 0;
+        }
+
+        private void ClockPoly4()
+        {
+            bool bit2 = (ShiftRegister4 & 0b0100) != 0;
+            bool bit3 = (ShiftRegister4 & 0b1000) != 0;
+            int carryIn = (bit2 ^ bit3) ? 0b0001 : 0b0000;
+
+            ShiftRegister4 = ((ShiftRegister4 << 1) | carryIn) & 0b1111;
+        }
+
+        private void ClockPoly5()
+        {
+            // Taps for 5-bit: Bit 2 XOR Bit 4
+            bool bit2 = (ShiftRegister5 & 0b0100) != 0;
+            bool bit4 = (ShiftRegister5 & 0b10000) != 0;
+            int carryIn = (bit2 ^ bit4) ? 0b0001 : 0b0000;
+
+            ShiftRegister5 = ((ShiftRegister5 << 1) | carryIn) & 0b11111;
+        }
+
+        private void ClockPoly5Mode3()
+        {
+            // Taps for 5-bit: Bit 2 XOR Bit 4
+            bool bit2 = (ShiftRegister5 & 0b0100) != 0;
+            bool bit4 = (ShiftRegister5 & 0b10000) != 0;
+            bool p4out = (ShiftRegister4 & 0b1000) != 0;
+            int carryIn = (bit2 ^ bit4 ^ p4out) ? 0b0000 : 0b0001;
+
+            ShiftRegister5 = ((ShiftRegister5 << 1) | carryIn) & 0b11111;
+        }
+
+        private void ClockPoly9()
+        {
+            // 9-bit mode: Taps are bit 4 of P5 and bit 3 of P4
+            bool p5bit4 = (ShiftRegister5 & 0b10000) != 0;
+            bool p4bit3 = (ShiftRegister4 & 0b1000) != 0;
+
+            int feedback = (p5bit4 ^ p4bit3) ? 0b0001 : 0b0000;
+
+            // Shift P5 and push feedback into bit 0
+            int oldP5Bit4 = (ShiftRegister5 & 0b10000) != 0 ? 0b0001 : 0b0000;
+            ShiftRegister5 = ((ShiftRegister5 << 1) | feedback) & 0b11111;
+
+            // Shift P4 and push the bit that "fell off" P5 into bit 0
+            ShiftRegister4 = ((ShiftRegister4 << 1) | oldP5Bit4) & 0b1111;
+        }
     }
 }
