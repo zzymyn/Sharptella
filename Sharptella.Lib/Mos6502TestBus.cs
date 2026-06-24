@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
-namespace Sharptari.Lib;
+namespace Sharptella.Lib;
 
 public sealed class Mos6502TestBus
     : IMos6502Bus

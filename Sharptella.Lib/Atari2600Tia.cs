@@ -1,6 +1,6 @@
 using System;
 
-namespace Sharptari.Lib;
+namespace Sharptella.Lib;
 
 public sealed class Atari2600Tia
 {

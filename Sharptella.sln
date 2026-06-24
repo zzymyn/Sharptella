@@ -1,13 +1,13 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.7.11911.148 stable
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharptari.Lib", "Sharptari.Lib\Sharptari.Lib.csproj", "{2331982D-593E-4C9B-93EB-23AF43E7D7A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharptella.Lib", "Sharptella.Lib\Sharptella.Lib.csproj", "{2331982D-593E-4C9B-93EB-23AF43E7D7A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharptari.CpuTest", "Sharptari.CpuTest\Sharptari.CpuTest.csproj", "{FD41B227-1C6E-4309-846F-7180A8450934}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharptella.CpuTest", "Sharptella.CpuTest\Sharptella.CpuTest.csproj", "{FD41B227-1C6E-4309-846F-7180A8450934}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharptari.Gui", "Sharptari.Gui\Sharptari.Gui.csproj", "{8CAC43BA-D692-4D17-99C8-F242F2CAE5FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharptella.Gui", "Sharptella.Gui\Sharptella.Gui.csproj", "{8CAC43BA-D692-4D17-99C8-F242F2CAE5FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

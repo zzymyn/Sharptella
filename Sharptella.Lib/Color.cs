@@ -1,6 +1,6 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
-namespace Sharptari.Lib;
+namespace Sharptella.Lib;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct ColorAbgr8888

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sharptari.Lib\Sharptari.Lib.csproj" />
+    <ProjectReference Include="..\Sharptella.Lib\Sharptella.Lib.csproj" />
   </ItemGroup>
 
 </Project>

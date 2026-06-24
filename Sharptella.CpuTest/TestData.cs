@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
-namespace Sharptari.CpuTest;
+namespace Sharptella.CpuTest;
 
 internal struct TestData
 {

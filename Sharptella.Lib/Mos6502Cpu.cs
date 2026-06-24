@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
-namespace Sharptari.Lib;
+namespace Sharptella.Lib;
 
 public sealed partial class Mos6502Cpu<BusT>
     where BusT : IMos6502Bus

@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace Sharptari.Lib;
+namespace Sharptella.Lib;
 
 public sealed class Atari2600Bus
     : IMos6502Bus

@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sharptari.Lib;
+using Sharptella.Lib;
 using Silk.NET.Input;
 
-namespace Sharptari.Gui;
+namespace Sharptella.Gui;
 
 internal sealed class SilkAtariInput
     : IAtariInput

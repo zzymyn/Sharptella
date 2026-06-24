@@ -1,10 +1,10 @@
-# Sharptari
+# Sharptella
 
 A small Atari 2600 emulator project written in pure C#.
 
 ## What This Is
 
-Sharptari is an emulator created to learn about the Atari 2600 and its components, including:
+Sharptella is an emulator created to learn about the Atari 2600 and its components, including:
 
 - 6502/6507 CPU behavior
 - Low-Level behaviour of Atari 2600 components (TIA, RIOT, bus, ROM mapping)
@@ -19,9 +19,9 @@ Sharptari is an emulator created to learn about the Atari 2600 and its component
 
 ## Project Structure
 
-- `Sharptari.Lib`: core emulator library (CPU, bus, RIOT, TIA, ROM, system glue)
-- `Sharptari.Gui`: desktop GUI frontend using Silk.NET + ImGui
-- `Sharptari.CpuTest`: CPU test runner for JSON-based opcode/state test cases
+- `Sharptella.Lib`: core emulator library (CPU, bus, RIOT, TIA, ROM, system glue)
+- `Sharptella.Gui`: desktop GUI frontend using Silk.NET + ImGui
+- `Sharptella.CpuTest`: CPU test runner for JSON-based opcode/state test cases
 
 ## Features
 
@@ -39,7 +39,7 @@ Sharptari is an emulator created to learn about the Atari 2600 and its component
 
 ## Accuracy Expectations
 
-Sharptari is not necessarily a high-accuracy emulator, although care has been taken to implement the CPU and TIA correctly. Homebrew or cutting edge ROMs using advanced tricks related to CPU and TIA timing may not work correctly. The emulator is intended to be a learning tool, not a preservation tool.
+Sharptella is not necessarily a high-accuracy emulator, although care has been taken to implement the CPU and TIA correctly. Homebrew or cutting edge ROMs using advanced tricks related to CPU and TIA timing may not work correctly. The emulator is intended to be a learning tool, not a preservation tool.
 
 If your goal is strict hardware fidelity or TAS-level determinism, this is currently the wrong target.
 
@@ -53,19 +53,19 @@ If your goal is to learn emulator internals in approachable C#, this is a good f
 ## Build
 
 ```bash
-dotnet build Sharptari.sln
+dotnet build Sharptella.sln
 ```
 
 ## Run GUI
 
 ```bash
-dotnet run --project Sharptari.Gui
+dotnet run --project Sharptella.Gui
 ```
 
 Run with a ROM path:
 
 ```bash
-dotnet run --project Sharptari.Gui -- path/to/rom.bin
+dotnet run --project Sharptella.Gui -- path/to/rom.bin
 ```
 
 Or launch the GUI and drag-and-drop a ROM file into the window.
@@ -78,7 +78,7 @@ The JSON CPU tests used by this project come from the SingleStepTests 65x02 repo
 https://github.com/SingleStepTests/65x02
 
 ```bash
-dotnet run --project Sharptari.CpuTest -- path/to/tests/*.json
+dotnet run --project Sharptella.CpuTest -- path/to/tests/*.json
 ```
 
 You can also pass:

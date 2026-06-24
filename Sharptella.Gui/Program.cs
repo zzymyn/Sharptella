@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Silk.NET.Input.Glfw;
 using Silk.NET.Windowing.Glfw;
 
-namespace Sharptari.Gui;
+namespace Sharptella.Gui;
 
 internal static class Program
 {

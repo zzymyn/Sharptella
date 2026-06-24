@@ -6,7 +6,7 @@ using System.IO;
 using System.Numerics;
 using System.Threading;
 using ImGuiNET;
-using Sharptari.Lib;
+using Sharptella.Lib;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenAL;
@@ -14,7 +14,7 @@ using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
 
-namespace Sharptari.Gui;
+namespace Sharptella.Gui;
 
 internal unsafe sealed class App
     : IDisposable
@@ -74,7 +74,7 @@ internal unsafe sealed class App
     {
         m_Window = Window.Create(WindowOptions.Default with
         {
-            Title = "Sharptari",
+            Title = "Sharptella",
             Size = new Vector2D<int>(1920, 1080),
             WindowState = WindowState.Normal,
             WindowBorder = WindowBorder.Resizable,

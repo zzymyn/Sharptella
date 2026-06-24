@@ -1,7 +1,7 @@
 using System;
 using System.Numerics;
 
-namespace Sharptari.Lib;
+namespace Sharptella.Lib;
 
 public sealed class Atari2600Rom
 {

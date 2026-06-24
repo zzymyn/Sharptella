@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
-namespace Sharptari.Lib;
+namespace Sharptella.Lib;
 
 public sealed class Mos6532Riot
 {

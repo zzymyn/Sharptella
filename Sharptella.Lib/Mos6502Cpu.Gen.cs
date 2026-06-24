@@ -1,4 +1,4 @@
-namespace Sharptari.Lib;
+namespace Sharptella.Lib;
 
 public sealed partial class Mos6502Cpu<BusT>
 {

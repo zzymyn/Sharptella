@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Sharptari.Lib;
+using Sharptella.Lib;
 
-namespace Sharptari.CpuTest;
+namespace Sharptella.CpuTest;
 
 internal class Program
 {

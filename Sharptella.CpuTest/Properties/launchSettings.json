@@ -1,80 +1,80 @@
 {
   "profiles": {
-    "Sharptari.CpuTest ALL": {
+    "Sharptella.CpuTest ALL": {
       "commandName": "Project",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest LDA LDX LDY STA STX STY TAX TAY TSX TXA TXS TYA": {
+    "Sharptella.CpuTest LDA LDX LDY STA STX STY TAX TAY TSX TXA TXS TYA": {
       "commandName": "Project",
       "commandLineArgs": "a9.json a5.json b5.json ad.json bd.json b9.json a1.json b1.json a2.json a6.json b6.json ae.json be.json a0.json a4.json b4.json ac.json bc.json 85.json 95.json 8d.json 9d.json 99.json 81.json 91.json 86.json 96.json 8e.json 84.json 94.json 8c.json aa.json a8.json ba.json 8a.json 9a.json 98.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest PHA PHP PLA PLP": {
+    "Sharptella.CpuTest PHA PHP PLA PLP": {
       "commandName": "Project",
       "commandLineArgs": "48.json 08.json 68.json 28.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest DEC DEX DEY INC INX INY": {
+    "Sharptella.CpuTest DEC DEX DEY INC INX INY": {
       "commandName": "Project",
       "commandLineArgs": "c6.json d6.json ce.json de.json ca.json 88.json e6.json f6.json ee.json fe.json e8.json c8.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest ADC SBC": {
+    "Sharptella.CpuTest ADC SBC": {
       "commandName": "Project",
       "commandLineArgs": "69.json 65.json 75.json 6d.json 7d.json 79.json 61.json 71.json e9.json e5.json f5.json ed.json fd.json f9.json e1.json f1.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest AND EOR ORA": {
+    "Sharptella.CpuTest AND EOR ORA": {
       "commandName": "Project",
       "commandLineArgs": "29.json 25.json 35.json 2D.json 3D.json 39.json 21.json 31.json 49.json 45.json 55.json 4d.json 5d.json 59.json 41.json 51.json 09.json 05.json 15.json 0d.json 1d.json 19.json 01.json 11.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest ASL LSR ROL ROR": {
+    "Sharptella.CpuTest ASL LSR ROL ROR": {
       "commandName": "Project",
       "commandLineArgs": "0a.json 06.json 16.json 0e.json 1e.json 4a.json 46.json 56.json 4e.json 5e.json 2a.json 26.json 36.json 2e.json 3e.json 6a.json 66.json 76.json 6e.json 7e.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest CLC CLD CLI CLV SEC SED SEI": {
+    "Sharptella.CpuTest CLC CLD CLI CLV SEC SED SEI": {
       "commandName": "Project",
       "commandLineArgs": "18.json d8.json 58.json b8.json 38.json f8.json 78.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest CMP CPX CPY": {
+    "Sharptella.CpuTest CMP CPX CPY": {
       "commandName": "Project",
       "commandLineArgs": "c9.json c5.json d5.json cd.json dd.json d9.json c1.json d1.json e0.json e4.json ec.json c0.json c4.json cc.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest BIT": {
+    "Sharptella.CpuTest BIT": {
       "commandName": "Project",
       "commandLineArgs": "18.json d8.json 58.json b8.json 38.json f8.json 78.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest BCC BCS BEQ BMI BNE BPL BVC BVS": {
+    "Sharptella.CpuTest BCC BCS BEQ BMI BNE BPL BVC BVS": {
       "commandName": "Project",
       "commandLineArgs": "90.json b0.json f0.json 30.json d0.json 10.json 50.json 70.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest JMP JSR RTS": {
+    "Sharptella.CpuTest JMP JSR RTS": {
       "commandName": "Project",
       "commandLineArgs": "4c.json 6c.json 20.json 60.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest BRK RTI": {
+    "Sharptella.CpuTest BRK RTI": {
       "commandName": "Project",
       "commandLineArgs": "00.json 40.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest NOP": {
+    "Sharptella.CpuTest NOP": {
       "commandName": "Project",
       "commandLineArgs": "ea.json 1a.json 3a.json 5a.json 7a.json da.json fa.json 80.json 82.json 89.json c2.json e2.json 04.json 44.json 64.json 14.json 34.json 54.json 74.json d4.json f4.json 0c.json 1c.json 3c.json 5c.json 7c.json dc.json fc.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest JAM": {
+    "Sharptella.CpuTest JAM": {
       "commandName": "Project",
       "commandLineArgs": "02.json 12.json 22.json 32.json 42.json 52.json 62.json 72.json 92.json b2.json d2.json f2.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"
     },
-    "Sharptari.CpuTest ILLEGALS": {
+    "Sharptella.CpuTest ILLEGALS": {
       "commandName": "Project",
       "commandLineArgs": "07.json 17.json 0f.json 1f.json 1b.json 03.json 13.json 4b.json 0b.json 2b.json 6b.json c7.json d7.json cf.json df.json db.json c3.json d3.json e7.json f7.json ef.json ff.json fb.json e3.json f3.json bb.json a7.json b7.json af.json bf.json a3.json b3.json 27.json 37.json 2f.json 3f.json 3b.json 23.json 33.json 67.json 77.json 6f.json 7f.json 63.json 73.json 87.json 97.json 8f.json 83.json cb.json 47.json 57.json 4f.json 5f.json 5b.json 43.json 53.json",
       "workingDirectory": "$(SolutionDir)..\\65x02\\6502\\v1"

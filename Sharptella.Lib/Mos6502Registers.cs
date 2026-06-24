@@ -1,4 +1,4 @@
-﻿namespace Sharptari.Lib;
+namespace Sharptella.Lib;
 
 public struct Mos6502Registers
 {
