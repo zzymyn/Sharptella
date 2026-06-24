@@ -842,6 +842,8 @@ public sealed class Atari2600Tia
 
     private struct AudioChannel
     {
+        private const double Alpha = 0.997;
+
         public int Control;
         public int Frequency;
         public int Volume;
@@ -855,12 +857,19 @@ public sealed class Atari2600Tia
         public int DivideBy3Counter;
         public bool Alternator = false;
 
-        public AudioChannel() { }
+        private double m_PrevInput;
+        private double m_PrevOutput;
+
+        public AudioChannel()
+        {
+        }
 
         public void Reboot()
         {
             Array.Clear(GeneratedAudio, 0, GeneratedAudio.Length);
             AudioIndex = 0;
+            m_PrevInput = 0.0;
+            m_PrevOutput = 0.0;
         }
 
         public int ReadAudioSamples(Span<byte> destination)
@@ -883,9 +892,14 @@ public sealed class Atari2600Tia
 
             if (AudioIndex < GeneratedAudio.Length)
             {
-                // remap 0-15 volume to 0-255 range for easier audio output:
-                var remappedVolume = (byte)(GetOutput() ? Volume * 17 : 0);
-                GeneratedAudio[AudioIndex] = remappedVolume;
+                double rawInput = GetOutput() ? Volume * 17 : 0;
+
+                double filteredOutput = Alpha * (m_PrevOutput + rawInput - m_PrevInput);
+
+                m_PrevInput = rawInput;
+                m_PrevOutput = filteredOutput;
+
+                GeneratedAudio[AudioIndex] = (byte)Math.Clamp(filteredOutput + 128, 0, 255);
                 ++AudioIndex;
             }
 
