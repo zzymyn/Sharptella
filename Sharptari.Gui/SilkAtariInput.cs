@@ -27,6 +27,8 @@ internal sealed class SilkAtariInput
     private bool m_TvTypeSwitch;
     private bool m_PlayerDifficultySwitchA = true;
     private bool m_PlayerDifficultySwitchB = true;
+    private int m_GameResetSwitchUiPressedFrames;
+    private int m_GameSelectSwitchUiPressedFrames;
 
     public bool Player0Up => m_Player0Up.IsActive;
     public bool Player0Left => m_Player0Left.IsActive;
@@ -40,11 +42,13 @@ internal sealed class SilkAtariInput
     public bool Player1Down => m_Player1Down.IsActive;
     public bool Player1Button => m_Player1Button.IsActive;
 
-    public bool GameResetSwitch => m_GameResetSwitch.IsActive;
-    public bool GameSelectSwitch => m_GameSelectSwitch.IsActive;
+    public bool GameResetSwitch => m_GameResetSwitch.IsActive || m_GameResetSwitchUiPressedFrames > 0;
+    public bool GameSelectSwitch => m_GameSelectSwitch.IsActive || m_GameSelectSwitchUiPressedFrames > 0;
     public bool TvTypeSwitch => m_TvTypeSwitch;
     public bool PlayerDifficultySwitchA => m_PlayerDifficultySwitchA;
     public bool PlayerDifficultySwitchB => m_PlayerDifficultySwitchB;
+
+    public event Action? RebootPressed;
 
     public SilkAtariInput(IInputContext inputContext)
     {
@@ -62,6 +66,7 @@ internal sealed class SilkAtariInput
 
     public void Dispose()
     {
+        RebootPressed = null;
         foreach (var kb in m_InputContext.Keyboards)
         {
             OnConnectionChanged(kb, false);
@@ -69,6 +74,20 @@ internal sealed class SilkAtariInput
         foreach (var gp in m_InputContext.Gamepads)
         {
             OnConnectionChanged(gp, false);
+        }
+        m_InputContext.ConnectionChanged -= OnConnectionChanged;
+    }
+
+    public void Step()
+    {
+        if (m_GameResetSwitchUiPressedFrames > 0)
+        {
+            m_GameResetSwitchUiPressedFrames--;
+        }
+
+        if (m_GameSelectSwitchUiPressedFrames > 0)
+        {
+            m_GameSelectSwitchUiPressedFrames--;
         }
     }
 
@@ -89,22 +108,12 @@ internal sealed class SilkAtariInput
 
     public void PressGameSelectSwitch()
     {
-        m_GameSelectSwitch.Set(null, 0, true);
-    }
-
-    public void ReleaseGameSelectSwitch()
-    {
-        m_GameSelectSwitch.Set(null, 0, false);
+        m_GameSelectSwitchUiPressedFrames = 4;
     }
 
     public void PressGameResetSwitch()
     {
-        m_GameResetSwitch.Set(null, 0, true);
-    }
-
-    public void ReleaseGameResetSwitch()
-    {
-        m_GameResetSwitch.Set(null, 0, false);
+        m_GameResetSwitchUiPressedFrames = 4;
     }
 
     private void KeyboardKeyDown(IKeyboard keyboard, Key key, int arg3)
@@ -135,6 +144,12 @@ internal sealed class SilkAtariInput
                 break;
             case Key.Space:
                 m_Player0Button.Set(keyboard, 0, down);
+                break;
+            case Key.F1:
+                if (down)
+                {
+                    RebootPressed?.Invoke();
+                }
                 break;
             case Key.F2:
                 if (down)

@@ -162,6 +162,7 @@ internal unsafe sealed class App
         m_Gl.BindTexture(TextureTarget.Texture2D, 0);
 
         m_AtariInput = new SilkAtariInput(m_InputContext);
+        m_AtariInput.RebootPressed += OnRebootPressed;
     }
 
     private void OnWindowUnload()
@@ -200,6 +201,11 @@ internal unsafe sealed class App
         {
             LoadRom(filePaths[0]);
         }
+    }
+
+    private void OnRebootPressed()
+    {
+        m_Atari2600?.Reboot();
     }
 
     private void OnWindowUpdate(double dt)
@@ -328,18 +334,10 @@ internal unsafe sealed class App
                 {
                     m_AtariInput?.PressGameSelectSwitch();
                 }
-                else
-                {
-                    m_AtariInput?.ReleaseGameSelectSwitch();
-                }
 
                 if (ImGui.Button("Game Reset (F6)"))
                 {
                     m_AtariInput?.PressGameResetSwitch();
-                }
-                else
-                {
-                    m_AtariInput?.ReleaseGameResetSwitch();
                 }
             }
             ImGui.End();
@@ -550,6 +548,11 @@ internal unsafe sealed class App
             else
             {
                 stepped = false;
+            }
+
+            if (stepped)
+            {
+                m_AtariInput?.Step();
             }
 
             m_Atari2600.ReadFrame(m_FrameBuffer);
