@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Numerics;
-using System.Text;
 using System.Threading;
 using ImGuiNET;
 using Sharptari.Lib;
@@ -53,6 +52,8 @@ internal unsafe sealed class App
 
     private AudioStream[] m_AudioStreams = [new(), new()];
 
+    private string m_LastError = "";
+
     // debugging:
     private bool m_ViewDebugTools;
     private bool m_PauseEmulation;
@@ -79,6 +80,7 @@ internal unsafe sealed class App
             WindowBorder = WindowBorder.Resizable,
             IsVisible = true,
             IsEventDriven = false,
+            API = new GraphicsAPI(ContextAPI.OpenGL, new APIVersion(4, 1)), // OpenGL 4.1 for macOS compatibility
         });
         m_Window.Load += OnWindowLoad;
         m_Window.Closing += OnWindowUnload;
@@ -99,17 +101,28 @@ internal unsafe sealed class App
         {
             m_RomBytes = File.ReadAllBytes(filePath);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             m_RomBytes = null;
+            m_LastError = ex.Message;
         }
 
         if (m_RomBytes != null)
         {
-            m_Atari2600 = new Atari2600(m_RomBytes, m_AtariInput);
-            m_Atari2600.Reboot();
-            m_CpuElapsedTime = TimeSpan.Zero;
-            m_RealElapsedTime = TimeSpan.Zero;
+            try
+            {
+                m_Atari2600 = new Atari2600(m_RomBytes, m_AtariInput);
+                m_Atari2600.Reboot();
+                m_CpuElapsedTime = TimeSpan.Zero;
+                m_RealElapsedTime = TimeSpan.Zero;
+                m_LastError = "";
+            }
+            catch (Exception ex)
+            {
+                m_Atari2600 = null;
+                m_RomBytes = null;
+                m_LastError = ex.Message;
+            }
         }
     }
 
@@ -132,8 +145,8 @@ internal unsafe sealed class App
 
         m_ImguiController = new ImGuiController(m_Gl, m_Window, m_InputContext);
 
-        m_Alc = ALContext.GetApi();
-        m_Al = AL.GetApi();
+        m_Alc = ALContext.GetApi(soft: true);
+        m_Al = AL.GetApi(soft: true);
         if (m_Alc != null)
         {
             m_AlDevice = m_Alc.OpenDevice("");
@@ -287,13 +300,23 @@ internal unsafe sealed class App
                 ImGuiWindowFlags.NoMove
                 | ImGuiWindowFlags.NoResize
                 | ImGuiWindowFlags.NoCollapse
-                | ImGuiWindowFlags.NoMouseInputs
-                | ImGuiWindowFlags.NoFocusOnAppearing
+                | ImGuiWindowFlags.AlwaysAutoResize
                 | ImGuiWindowFlags.NoTitleBar
                 | ImGuiWindowFlags.NoSavedSettings);
-            ImGui.TextColored(new Vector4(1.0f, 0.0f, 0.0f, 1.0f), "No ROM Loaded");
-            ImGui.Separator();
-            ImGui.Text("Drag and drop a ROM file to load it.");
+            if (string.IsNullOrEmpty(m_LastError))
+            {
+                ImGui.TextColored(new Vector4(1.0f, 0.0f, 0.0f, 1.0f), "No ROM Loaded");
+                ImGui.Separator();
+                ImGui.Text("Drag and drop a ROM file to load it.");
+            }
+            else
+            {
+                ImGui.TextColored(new Vector4(1.0f, 0.0f, 0.0f, 1.0f), "Error");
+                ImGui.Separator();
+                ImGui.Text(m_LastError);
+                ImGui.Separator();
+                ImGui.Text("Drag and drop another ROM file to load it.");
+            }
             ImGui.End();
         }
 
@@ -679,7 +702,6 @@ internal unsafe sealed class App
         {
             alBuffer = m_Al!.GenBuffer();
             m_AlBuffers.Add(alBuffer);
-            Console.WriteLine("Generated new OpenAL buffer. Total buffers: " + m_AlBuffers.Count);
         }
 
         return alBuffer;

@@ -1,11 +1,7 @@
-﻿using System.Drawing;
-using Silk.NET.Windowing;
-using Silk.NET.Input;
-using Silk.NET.OpenGL;
-using Silk.NET.OpenGL.Extensions.ImGui;
+﻿using System;
 using System.Threading.Tasks;
-using System.IO;
-using System;
+using Silk.NET.Input.Glfw;
+using Silk.NET.Windowing.Glfw;
 
 namespace Sharptari.Gui;
 
@@ -15,6 +11,9 @@ internal static class Program
     {
         try
         {
+            GlfwWindowing.RegisterPlatform();
+            GlfwInput.RegisterPlatform();
+            
             using var app = new App();
 
             if (args.Length == 1)

@@ -12,7 +12,7 @@ public sealed class Atari2600Rom
     {
         if (!BitOperations.IsPow2(data.Length))
         {
-            throw new ArgumentException("The ROM size must be a power of two.", nameof(data));
+            throw new ArgumentException("Invalid ROM: size must be a power of two.", nameof(data));
         }
 
         m_Data = data;

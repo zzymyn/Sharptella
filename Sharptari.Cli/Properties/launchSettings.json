@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Sharptari.Cli": {
-      "commandName": "Project",
-      "commandLineArgs": "test.bin",
-      "workingDirectory": "$(SolutionDir)"
-    }
-  }
-}
