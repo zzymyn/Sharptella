@@ -1,13 +1,23 @@
 {
   "profiles": {
+    "Sharptari.Gui Test": {
+      "commandName": "Project",
+      "commandLineArgs": "test.bin",
+      "workingDirectory": "$(SolutionDir)"
+    },
     "Sharptari.Gui Test2": {
       "commandName": "Project",
       "commandLineArgs": "test2.bin",
       "workingDirectory": "$(SolutionDir)"
     },
-    "Sharptari.Gui Test": {
+    "Sharptari.Gui Test3": {
       "commandName": "Project",
-      "commandLineArgs": "test.bin",
+      "commandLineArgs": "test3.bin",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Sharptari.Gui Test4": {
+      "commandName": "Project",
+      "commandLineArgs": "test4.bin",
       "workingDirectory": "$(SolutionDir)"
     },
     "Sharptari.Gui None": {
