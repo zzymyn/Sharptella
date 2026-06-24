@@ -853,9 +853,7 @@ public sealed class Atari2600Tia
         public int ShiftRegister4 = 0b1111;
         public int ShiftRegister5 = 0b11111;
         public int DivideBy3Counter;
-        public bool Toggle = false;
-
-        public int CurrentOutput;
+        public bool Alternator = false;
 
         public AudioChannel() { }
 
@@ -880,166 +878,200 @@ public sealed class Atari2600Tia
             {
                 // Reset counter: AUDF + 1
                 FrequencyCounter = 1 + Frequency;
-                CurrentOutput = StepOutput();
+                StepOutput();
             }
 
             if (AudioIndex < GeneratedAudio.Length)
             {
                 // remap 0-15 volume to 0-255 range for easier audio output:
-                var remappedVolume = (byte)(CurrentOutput * 17);
+                var remappedVolume = (byte)(GetOutput() ? Volume * 17 : 0);
                 GeneratedAudio[AudioIndex] = remappedVolume;
                 ++AudioIndex;
             }
 
-            // Prevent lock-up state
-            if (ShiftRegister4 == 0)
+            // Prevent lock-up states
+            if (Control == 8)
             {
-                ShiftRegister4 = 0b0001;
+                if (ShiftRegister4 == 0 && ShiftRegister5 == 0)
+                {
+                    ShiftRegister4 = 0b0001;
+                    ShiftRegister5 = 0b00001;
+                }
             }
-            if (ShiftRegister5 == 0)
+            else
             {
-                ShiftRegister5 = 0b00001;
+                if (ShiftRegister4 == 0)
+                {
+                    ShiftRegister4 = 0b0001;
+                }
+                if (ShiftRegister5 == 0)
+                {
+                    ShiftRegister5 = 0b00001;
+                }
             }
         }
 
-        private int StepOutput()
+        private void StepOutput()
         {
             // 16 different distortion modes selected by AUDC
-            switch (Control & 0b1111)
+            switch (Control)
             {
-                case 0:
-                case 11:
-                    return Volume;
-
                 case 1:
-                    // Mode 1: 4-bit Poly
+                    // 4 bit poly
                     ClockPoly4();
-                    bool bit3_m1 = (ShiftRegister4 & 0b1000) != 0;
-                    return bit3_m1 ? Volume : 0;
+                    break;
 
                 case 2:
-                    // Mode 2: P5 clocks P4 (Rumble)
+                    // div 15 -> 4 bit poly
+                    ClockPoly5();
+                    if (ShiftRegister5 == 0b01111 || ShiftRegister5 == 0b10100)
                     {
-                        //bool oldBit4 = (ShiftRegister5 & 0b10000) != 0;
-                        ClockPoly5();
-                        bool newBit4 = (ShiftRegister5 & 0b1000) != 0;
-
-                        // Clock P4 on the falling edge of P5 bit 4
-                        if (newBit4) ClockPoly4();
-
-                        bool out_m2 = (ShiftRegister4 & 0b1000) != 0;
-                        return out_m2 ? Volume : 0;
+                        ClockPoly4();
                     }
+                    break;
 
                 case 3:
-                    // Mode 3: P5 feedback modified by P4 (UFO)
+                    // 5 bit poly -> 4 bit poly
+                    ClockPoly5();
+                    if ((ShiftRegister5 & 0b00001) != 0)
                     {
-                        ClockPoly5(); // Special feedback mode
-                        bool newBit4 = (ShiftRegister5 & 0b10000) != 0;
-
-                        if (newBit4) ClockPoly4();
-
-                        bool out_m3 = (ShiftRegister5 & 0b10000) != 0;
-                        return out_m3 ? Volume : 0;
+                        ClockPoly4();
                     }
+                    break;
 
                 case 4:
                 case 5:
-                    // Mode 4 & 5: Pure Square Wave (Divide by 2)
-                    Toggle = !Toggle;
-                    return Toggle ? Volume : 0;
+                    // div 2 : pure tone
+                    Alternator = !Alternator;
+                    break;
 
                 case 6:
                 case 10:
-                    // Mode 6 & 10: Divide by 31 (Pure Lo)
+                    // div 31 : pure tone
                     ClockPoly5();
-                    bool bit4_m6 = (ShiftRegister5 & 0b10000) != 0;
-                    return bit4_m6 ? Volume : 0;
+                    if (ShiftRegister5 == 0b01111 || ShiftRegister5 == 0b10100)
+                    {
+                        Alternator = !Alternator;
+                    }
+                    break;
 
                 case 7:
-                case 9:
-                    // Mode 7 & 9: 5-bit Poly (Buzzy/Reedy)
+                    // 5 bit poly -> div 2
                     ClockPoly5();
-                    bool bit4_m7 = (ShiftRegister5 & 0b10000) != 0;
-                    return bit4_m7 ? Volume : 0;
+                    if ((ShiftRegister5 & 0b00001) != 0)
+                    {
+                        Alternator = !Alternator;
+                    }
+                    break;
 
                 case 8:
-                    // Mode 8: 9-bit Poly (White Noise)
+                    // 9 bit poly (white noise)
                     ClockPoly9();
-                    bool bit3_m8 = (ShiftRegister4 & 0b1000) != 0;
-                    return bit3_m8 ? Volume : 0;
+                    break;
+
+                case 9:
+                    // 5 bit poly
+                    ClockPoly5();
+                    break;
 
                 case 12:
                 case 13:
-                    // Mode 12 & 13: Pure Med (Divide by 6)
-                    DivideBy3Counter++;
+                    // div 6 : pure tone
+                    ++DivideBy3Counter;
                     if (DivideBy3Counter >= 3)
                     {
                         DivideBy3Counter = 0;
-                        Toggle = !Toggle;
+                        Alternator = !Alternator;
                     }
-                    return Toggle ? Volume : 0;
+                    break;
 
                 case 14:
-                case 15:
-                    // Mode 14 & 15: Buzzy Med (Divide by 93)
-                    DivideBy3Counter++;
+                    // div 93 : pure tone
+                    ++DivideBy3Counter;
                     if (DivideBy3Counter >= 3)
                     {
                         DivideBy3Counter = 0;
                         ClockPoly5();
+                        if (ShiftRegister5 == 0b01111 || ShiftRegister5 == 0b10100)
+                        {
+                            Alternator = !Alternator;
+                        }
                     }
-                    bool bit4_m14 = (ShiftRegister5 & 0b10000) != 0;
-                    return bit4_m14 ? Volume : 0;
+                    break;
+
+                case 15:
+                    // 5 bit poly div 6
+                    ++DivideBy3Counter;
+                    if (DivideBy3Counter >= 3)
+                    {
+                        DivideBy3Counter = 0;
+                        ClockPoly5();
+                        if ((ShiftRegister5 & 0b00001) != 0)
+                        {
+                            Alternator = !Alternator;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private readonly bool GetOutput()
+        {
+            // 16 different distortion modes selected by AUDC
+            switch (Control)
+            {
+                case 0:
+                case 11:
+                    return true;
+                case 1:
+                case 2:
+                case 3:
+                case 8:
+                    return (ShiftRegister4 & 0b0001) != 0;
+                case 9:
+                    return (ShiftRegister5 & 0b00001) != 0;
+                case 4:
+                case 5:
+                case 6:
+                case 10:
+                case 7:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                    return Alternator;
             }
 
-            return 0;
+            return false;
         }
+
 
         private void ClockPoly4()
         {
-            bool bit2 = (ShiftRegister4 & 0b0100) != 0;
-            bool bit3 = (ShiftRegister4 & 0b1000) != 0;
-            int carryIn = (bit2 ^ bit3) ? 0b0001 : 0b0000;
-
-            ShiftRegister4 = ((ShiftRegister4 << 1) | carryIn) & 0b1111;
+            bool bit0 = (ShiftRegister4 & 0b0001) != 0;
+            bool bit1 = (ShiftRegister4 & 0b0010) != 0;
+            int carryIn = (bit0 ^ bit1) ? 0b1000 : 0b0000;
+            ShiftRegister4 = carryIn | (ShiftRegister4 >> 1);
         }
 
         private void ClockPoly5()
         {
-            // Taps for 5-bit: Bit 2 XOR Bit 4
-            bool bit2 = (ShiftRegister5 & 0b0100) != 0;
-            bool bit4 = (ShiftRegister5 & 0b10000) != 0;
-            int carryIn = (bit2 ^ bit4) ? 0b0001 : 0b0000;
-
-            ShiftRegister5 = ((ShiftRegister5 << 1) | carryIn) & 0b11111;
-        }
-
-        private void ClockPoly5Mode3()
-        {
-            // Taps for 5-bit: Bit 2 XOR Bit 4
-            bool bit2 = (ShiftRegister5 & 0b0100) != 0;
-            bool bit4 = (ShiftRegister5 & 0b10000) != 0;
-            bool p4out = (ShiftRegister4 & 0b1000) != 0;
-            int carryIn = (bit2 ^ bit4 ^ p4out) ? 0b0000 : 0b0001;
-
-            ShiftRegister5 = ((ShiftRegister5 << 1) | carryIn) & 0b11111;
+            bool bit0 = (ShiftRegister5 & 0b00001) != 0;
+            bool bit2 = (ShiftRegister5 & 0b00100) != 0;
+            int carryIn = (bit0 ^ bit2) ? 0b10000 : 0b00000;
+            ShiftRegister5 = carryIn | (ShiftRegister5 >> 1);
         }
 
         private void ClockPoly9()
         {
-            // 9-bit mode: Taps are bit 4 of P5 and bit 3 of P4
-            bool p5bit4 = (ShiftRegister5 & 0b10000) != 0;
-            bool p4bit3 = (ShiftRegister4 & 0b1000) != 0;
+            bool bit40 = (ShiftRegister4 & 0b0001) != 0;
+            bool bit50 = (ShiftRegister5 & 0b00001) != 0;
 
-            int feedback = (p5bit4 ^ p4bit3) ? 0b0001 : 0b0000;
+            int carryIn5 = (bit40 ^ bit50) ? 0b10000 : 0b00000;
+            int carryIn4 = bit50 ? 0b1000 : 0b0000;
 
-            // Shift P5 and push feedback into bit 0
-            int oldP5Bit4 = (ShiftRegister5 & 0b10000) != 0 ? 0b0001 : 0b0000;
-            ShiftRegister5 = ((ShiftRegister5 << 1) | feedback) & 0b11111;
-
-            // Shift P4 and push the bit that "fell off" P5 into bit 0
-            ShiftRegister4 = ((ShiftRegister4 << 1) | oldP5Bit4) & 0b1111;
+            ShiftRegister5 = carryIn5 | (ShiftRegister5 >> 1);
+            ShiftRegister4 = carryIn4 | (ShiftRegister4 >> 1);
         }
     }
 }
