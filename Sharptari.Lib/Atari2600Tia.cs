@@ -821,7 +821,6 @@ public sealed class Atari2600Tia
             float gFloat = y - 0.272f * i - 0.647f * q;
             float bFloat = y - 1.106f * i + 1.703f * q;
 
-            // Clamp to byte range (0-255)
             byte r = (byte)Math.Clamp(rFloat * 255.0f, 0.0f, 255.0f);
             byte g = (byte)Math.Clamp(gFloat * 255.0f, 0.0f, 255.0f);
             byte b = (byte)Math.Clamp(bFloat * 255.0f, 0.0f, 255.0f);
@@ -880,7 +879,6 @@ public sealed class Atari2600Tia
             --FrequencyCounter;
             if (FrequencyCounter <= 0)
             {
-                // Reset counter: AUDF + 1
                 FrequencyCounter = 1 + Frequency;
                 StepOutput();
             }
@@ -898,7 +896,7 @@ public sealed class Atari2600Tia
                 ++AudioIndex;
             }
 
-            // Prevent lock-up states
+            // Prevent lock-up states even though the real hardware doesn't do this
             if (Control == 8)
             {
                 if (ShiftRegister4 == 0 && ShiftRegister5 == 0)
@@ -922,7 +920,6 @@ public sealed class Atari2600Tia
 
         private void StepOutput()
         {
-            // 16 different distortion modes selected by AUDC
             switch (Control)
             {
                 case 1:
@@ -1026,7 +1023,6 @@ public sealed class Atari2600Tia
 
         private readonly bool GetOutput()
         {
-            // 16 different distortion modes selected by AUDC
             switch (Control)
             {
                 case 0:

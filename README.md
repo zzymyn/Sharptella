@@ -35,6 +35,7 @@ Sharptari is an emulator created to learn about the Atari 2600 and its component
 
 - Current ROM support is limited to non-bank switching ROMs (ROMs up to 4KB). Bank switching support is planned but not yet implemented.
 - I haven't hooked up player 2 input yet, so only single player games are currently playable.
+- PAL ROMs will hard incorrect colors and timing.
 
 ## Accuracy Expectations
 
