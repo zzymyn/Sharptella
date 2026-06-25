@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -209,12 +210,12 @@ internal class Program
 
         var log = bus.Log;
 
-        if (log.Count != test.Cycles!.Count)
+        if (log.Count != test.Cycles!.Length)
         {
             return false; // Number of cycles does not match
         }
 
-        for (int i = 0; i < test.Cycles!.Count; i++)
+        for (int i = 0; i < test.Cycles!.Length; i++)
         {
             var expectedCycle = test.Cycles[i]!;
             var actualCycle = log[i];
@@ -299,9 +300,9 @@ internal class Program
         return resolvedFiles.Distinct().ToList();
     }
 
-    private static IAsyncEnumerable<(string, List<TestData>)> LoadAllTests(List<string> testFiles)
+    private static IAsyncEnumerable<(string, TestData[])> LoadAllTests(List<string> testFiles)
     {
-        var channel = Channel.CreateUnbounded<(string, List<TestData>)>(new UnboundedChannelOptions()
+        var channel = Channel.CreateUnbounded<(string, TestData[])>(new UnboundedChannelOptions()
         {
             SingleWriter = false,
             SingleReader = true,
@@ -323,14 +324,14 @@ internal class Program
         return channel.Reader.ReadAllAsync();
     }
 
-    private static async Task<List<TestData>> LoadTests(string filePath)
+    private static async Task<TestData[]> LoadTests(string filePath)
     {
         try
         {
             var fileData = await File.ReadAllBytesAsync(filePath);
 
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            var result = FastCpuTestParser.Parse(fileData);
+            var result = JsonSerializer.Deserialize<TestData[]>(fileData);
 
             if (result == null)
             {
