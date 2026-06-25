@@ -48,7 +48,7 @@ pipeline {
                 New-Item -ItemType Directory -Path "${env:WINDOWS_OUTPUT}" -Force | Out-Null
 
                 dotnet restore "${env:DOTNET_PROJECT}"
-                dotnet publish "${env:DOTNET_PROJECT}" -c Release -r win-x64 --self-contained true -o "${env:WINDOWS_OUTPUT}" /p:DebugType=None /p:DebugSymbols=false
+                dotnet publish "${env:DOTNET_PROJECT}" -c Release -r win-x64 --self-contained true -o "${env:WINDOWS_OUTPUT}" /p:DebugType=none /p:DebugSymbols=false /p:CopyOutputSymbolsToPublishDirectory=false
 
                 Compress-Archive -Path "${env:WINDOWS_OUTPUT}/*" -DestinationPath "${env:WINDOWS_ZIP}" -Force
             '''.stripIndent()
@@ -78,7 +78,7 @@ pipeline {
                 mkdir -p "${LINUX_OUTPUT}"
 
                 dotnet restore "${DOTNET_PROJECT}"
-                dotnet publish "${DOTNET_PROJECT}" -c Release -r linux-x64 --self-contained true -o "${LINUX_OUTPUT}" /p:DebugType=None /p:DebugSymbols=false
+                dotnet publish "${DOTNET_PROJECT}" -c Release -r linux-x64 --self-contained true -o "${LINUX_OUTPUT}" /p:DebugType=none /p:DebugSymbols=false /p:CopyOutputSymbolsToPublishDirectory=false
 
                 (
                   cd "${LINUX_OUTPUT}"
@@ -111,7 +111,7 @@ pipeline {
                 mkdir -p "${MACOS_OUTPUT}"
 
                 dotnet restore "${DOTNET_PROJECT}"
-                dotnet publish "${DOTNET_PROJECT}" -c Release -r osx-x64 --self-contained true -o "${MACOS_OUTPUT}" /p:DebugType=None /p:DebugSymbols=false
+                dotnet publish "${DOTNET_PROJECT}" -c Release -r osx-x64 --self-contained true -o "${MACOS_OUTPUT}" /p:DebugType=none /p:DebugSymbols=false /p:CopyOutputSymbolsToPublishDirectory=false
 
                 ditto -c -k --sequesterRsrc --keepParent "${MACOS_OUTPUT}" "${MACOS_ZIP}"
             '''.stripIndent()
