@@ -50,6 +50,9 @@ pipeline {
                 dotnet restore "${env:DOTNET_PROJECT}"
                 dotnet publish "${env:DOTNET_PROJECT}" -c Release -r win-x64 --self-contained true -o "${env:WINDOWS_OUTPUT}"
 
+                Get-ChildItem -Path "${env:WINDOWS_OUTPUT}" -File -Recurse -Include *.pdb,*.mdb,*.dbg,*.sym,*.debug | Remove-Item -Force -ErrorAction SilentlyContinue
+                Get-ChildItem -Path "${env:WINDOWS_OUTPUT}" -Directory -Recurse -Filter *.dSYM | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+
                 Compress-Archive -Path "${env:WINDOWS_OUTPUT}/*" -DestinationPath "${env:WINDOWS_ZIP}" -Force
             '''.stripIndent()
             archiveArtifacts artifacts: "${env.WINDOWS_ZIP}", fingerprint: true
@@ -79,6 +82,9 @@ pipeline {
 
                 dotnet restore "${DOTNET_PROJECT}"
                 dotnet publish "${DOTNET_PROJECT}" -c Release -r linux-x64 --self-contained true -o "${LINUX_OUTPUT}"
+
+                find "${LINUX_OUTPUT}" -type f \( -name '*.pdb' -o -name '*.mdb' -o -name '*.dbg' -o -name '*.sym' -o -name '*.debug' \) -delete
+                find "${LINUX_OUTPUT}" -type d -name '*.dSYM' -prune -exec rm -rf {} +
 
                 (
                   cd "${LINUX_OUTPUT}"
@@ -112,6 +118,9 @@ pipeline {
 
                 dotnet restore "${DOTNET_PROJECT}"
                 dotnet publish "${DOTNET_PROJECT}" -c Release -r osx-x64 --self-contained true -o "${MACOS_OUTPUT}"
+
+                find "${MACOS_OUTPUT}" -type f \( -name '*.pdb' -o -name '*.mdb' -o -name '*.dbg' -o -name '*.sym' -o -name '*.debug' \) -delete
+                find "${MACOS_OUTPUT}" -type d -name '*.dSYM' -prune -exec rm -rf {} +
 
                 ditto -c -k --sequesterRsrc --keepParent "${MACOS_OUTPUT}" "${MACOS_ZIP}"
             '''.stripIndent()
