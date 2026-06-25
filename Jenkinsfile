@@ -48,10 +48,7 @@ pipeline {
                 New-Item -ItemType Directory -Path "${env:WINDOWS_OUTPUT}" -Force | Out-Null
 
                 dotnet restore "${env:DOTNET_PROJECT}"
-                dotnet publish "${env:DOTNET_PROJECT}" -c Release -r win-x64 --self-contained true -o "${env:WINDOWS_OUTPUT}"
-
-                Get-ChildItem -Path "${env:WINDOWS_OUTPUT}" -File -Recurse -Include *.pdb,*.mdb,*.dbg,*.sym,*.debug | Remove-Item -Force -ErrorAction SilentlyContinue
-                Get-ChildItem -Path "${env:WINDOWS_OUTPUT}" -Directory -Recurse -Filter *.dSYM | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+                dotnet publish "${env:DOTNET_PROJECT}" -c Release -r win-x64 --self-contained true -o "${env:WINDOWS_OUTPUT}" /p:DebugType=None /p:DebugSymbols=false
 
                 Compress-Archive -Path "${env:WINDOWS_OUTPUT}/*" -DestinationPath "${env:WINDOWS_ZIP}" -Force
             '''.stripIndent()
@@ -81,10 +78,7 @@ pipeline {
                 mkdir -p "${LINUX_OUTPUT}"
 
                 dotnet restore "${DOTNET_PROJECT}"
-                dotnet publish "${DOTNET_PROJECT}" -c Release -r linux-x64 --self-contained true -o "${LINUX_OUTPUT}"
-
-                find "${LINUX_OUTPUT}" -type f \( -name '*.pdb' -o -name '*.mdb' -o -name '*.dbg' -o -name '*.sym' -o -name '*.debug' \) -delete
-                find "${LINUX_OUTPUT}" -type d -name '*.dSYM' -prune -exec rm -rf {} +
+                dotnet publish "${DOTNET_PROJECT}" -c Release -r linux-x64 --self-contained true -o "${LINUX_OUTPUT}" /p:DebugType=None /p:DebugSymbols=false
 
                 (
                   cd "${LINUX_OUTPUT}"
@@ -117,10 +111,7 @@ pipeline {
                 mkdir -p "${MACOS_OUTPUT}"
 
                 dotnet restore "${DOTNET_PROJECT}"
-                dotnet publish "${DOTNET_PROJECT}" -c Release -r osx-x64 --self-contained true -o "${MACOS_OUTPUT}"
-
-                find "${MACOS_OUTPUT}" -type f \( -name '*.pdb' -o -name '*.mdb' -o -name '*.dbg' -o -name '*.sym' -o -name '*.debug' \) -delete
-                find "${MACOS_OUTPUT}" -type d -name '*.dSYM' -prune -exec rm -rf {} +
+                dotnet publish "${DOTNET_PROJECT}" -c Release -r osx-x64 --self-contained true -o "${MACOS_OUTPUT}" /p:DebugType=None /p:DebugSymbols=false
 
                 ditto -c -k --sequesterRsrc --keepParent "${MACOS_OUTPUT}" "${MACOS_ZIP}"
             '''.stripIndent()
