@@ -310,7 +310,7 @@ public sealed class Atari2600Tia
                 return GetCx(m_CxM0P1, m_CxM0P0);
             case 0x01:
                 // CXM1P
-                return GetCx(m_CxM1P1, m_CxM1P0);
+                return GetCx(m_CxM1P0, m_CxM1P1);
             case 0x02:
                 // CXP0FB
                 return GetCx(m_CxP0PF, m_CxP0BL);
