@@ -312,7 +312,7 @@ internal sealed class SilkAtariInput
         }
     }
 
-    private readonly struct InputVector
+    private sealed class InputVector
     {
         private readonly HashSet<(IInputDevice? device, int id)> m_Inputs = [];
 
