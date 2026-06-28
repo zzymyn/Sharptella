@@ -603,10 +603,10 @@ internal unsafe sealed class App
             m_FrameBufferPos0.Y = Math.Max(m_FrameBufferPos0.Y - 8, 0);
             m_FrameBufferPos1.Y = Math.Min(m_FrameBufferPos1.Y + 8, MaxScanlineCount - 1);
 
-            m_FrameBufferUV0.X = (m_FrameBufferPos0.X + 0.5f) / ScanlineLength;
-            m_FrameBufferUV0.Y = (m_FrameBufferPos0.Y + 0.5f) / MaxScanlineCount;
-            m_FrameBufferUV1.X = (m_FrameBufferPos1.X - 0.5f) / ScanlineLength;
-            m_FrameBufferUV1.Y = (m_FrameBufferPos1.Y - 0.5f) / MaxScanlineCount;
+            m_FrameBufferUV0.X = m_FrameBufferPos0.X / (ScanlineLength - 1);
+            m_FrameBufferUV0.Y = m_FrameBufferPos0.Y / (MaxScanlineCount - 1);
+            m_FrameBufferUV1.X = m_FrameBufferPos1.X / (ScanlineLength - 1);
+            m_FrameBufferUV1.Y = m_FrameBufferPos1.Y / (MaxScanlineCount - 1);
 
             if (stepped && m_ViewMemory)
             {
