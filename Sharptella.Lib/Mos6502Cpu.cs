@@ -867,14 +867,14 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
-    [CpuInstruction(0x69, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0x65, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0x75, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x6d, ReadWriteMode.Read, AddressingMode.Absolute)]
-    [CpuInstruction(0x7d, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0x79, ReadWriteMode.Read, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0x61, ReadWriteMode.Read, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0x71, ReadWriteMode.Read, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0x69, InstructionType.ReadImmediate)]
+    [CpuInstruction(0x65, InstructionType.ReadZeropage)]
+    [CpuInstruction(0x75, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0x6d, InstructionType.ReadAbsolute)]
+    [CpuInstruction(0x7d, InstructionType.ReadAbsoluteXIndexed)]
+    [CpuInstruction(0x79, InstructionType.ReadAbsoluteYIndexed)]
+    [CpuInstruction(0x61, InstructionType.ReadIndirectXIndexed)]
+    [CpuInstruction(0x71, InstructionType.ReadIndirectYIndexed)]
     private void ADC(byte arg)
     {
         if (m_Registers.PDecimal)
@@ -928,29 +928,29 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
-    [CpuInstruction(0x4b, ReadWriteMode.Read, AddressingMode.Immediate)]
+    [CpuInstruction(0x4b, InstructionType.ReadImmediate)]
     private void ALR(byte arg)
     {
         AND(arg);
         LSR();
     }
 
-    [CpuInstruction(0x0b, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0x2b, ReadWriteMode.Read, AddressingMode.Immediate)]
+    [CpuInstruction(0x0b, InstructionType.ReadImmediate)]
+    [CpuInstruction(0x2b, InstructionType.ReadImmediate)]
     private void ANC(byte arg)
     {
         AND(arg);
         m_Registers.PCarry = m_Registers.PNegative;
     }
 
-    [CpuInstruction(0x29, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0x25, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0x35, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x2d, ReadWriteMode.Read, AddressingMode.Absolute)]
-    [CpuInstruction(0x3d, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0x39, ReadWriteMode.Read, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0x21, ReadWriteMode.Read, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0x31, ReadWriteMode.Read, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0x29, InstructionType.ReadImmediate)]
+    [CpuInstruction(0x25, InstructionType.ReadZeropage)]
+    [CpuInstruction(0x35, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0x2d, InstructionType.ReadAbsolute)]
+    [CpuInstruction(0x3d, InstructionType.ReadAbsoluteXIndexed)]
+    [CpuInstruction(0x39, InstructionType.ReadAbsoluteYIndexed)]
+    [CpuInstruction(0x21, InstructionType.ReadIndirectXIndexed)]
+    [CpuInstruction(0x31, InstructionType.ReadIndirectYIndexed)]
     private void AND(byte arg)
     {
         byte result = (byte)(m_Registers.A & arg);
@@ -960,7 +960,7 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0x6b, ReadWriteMode.Read, AddressingMode.Immediate)]
+    [CpuInstruction(0x6b, InstructionType.ReadImmediate)]
     private void ARR(byte arg)
     {
         int carryIn = m_Registers.PCarry ? 1 : 0;
@@ -1012,7 +1012,7 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
-    [CpuInstruction(0x0a, ReadWriteMode.ReadWrite, AddressingMode.Accumulator)]
+    [CpuInstruction(0x0a, InstructionType.Accumulator)]
     private void ASL()
     {
         byte arg = m_Registers.A;
@@ -1024,10 +1024,10 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0x06, ReadWriteMode.ReadWrite, AddressingMode.Zeropage)]
-    [CpuInstruction(0x16, ReadWriteMode.ReadWrite, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x0e, ReadWriteMode.ReadWrite, AddressingMode.Absolute)]
-    [CpuInstruction(0x1e, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteXIndexed)]
+    [CpuInstruction(0x06, InstructionType.ReadWriteZeropage)]
+    [CpuInstruction(0x16, InstructionType.ReadWriteZeropageXIndexed)]
+    [CpuInstruction(0x0e, InstructionType.ReadWriteAbsolute)]
+    [CpuInstruction(0x1e, InstructionType.ReadWriteAbsoluteXIndexed)]
     private byte ASL(byte arg)
     {
         byte result = (byte)(arg << 1);
@@ -1038,26 +1038,26 @@ public sealed partial class Mos6502Cpu<BusT>
         return result;
     }
 
-    [CpuInstruction(0x90, ReadWriteMode.Branch, AddressingMode.Relative)]
+    [CpuInstruction(0x90, InstructionType.BranchConditionalRelative)]
     private bool BCC()
     {
         return m_Registers.PCarry;
     }
 
-    [CpuInstruction(0xb0, ReadWriteMode.Branch, AddressingMode.Relative)]
+    [CpuInstruction(0xb0, InstructionType.BranchConditionalRelative)]
     private bool BCS()
     {
         return !m_Registers.PCarry;
     }
 
-    [CpuInstruction(0xf0, ReadWriteMode.Branch, AddressingMode.Relative)]
+    [CpuInstruction(0xf0, InstructionType.BranchConditionalRelative)]
     private bool BEQ()
     {
         return !m_Registers.PZero;
     }
 
-    [CpuInstruction(0x24, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0x2c, ReadWriteMode.Read, AddressingMode.Absolute)]
+    [CpuInstruction(0x24, InstructionType.ReadZeropage)]
+    [CpuInstruction(0x2c, InstructionType.ReadAbsolute)]
     private void BIT(byte arg)
     {
         byte result = (byte)(m_Registers.A & arg);
@@ -1066,19 +1066,19 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.POverflow = (arg & 0x40) != 0;
     }
 
-    [CpuInstruction(0x30, ReadWriteMode.Branch, AddressingMode.Relative)]
+    [CpuInstruction(0x30, InstructionType.BranchConditionalRelative)]
     private bool BMI()
     {
         return !m_Registers.PNegative;
     }
 
-    [CpuInstruction(0xd0, ReadWriteMode.Branch, AddressingMode.Relative)]
+    [CpuInstruction(0xd0, InstructionType.BranchConditionalRelative)]
     private bool BNE()
     {
         return m_Registers.PZero;
     }
 
-    [CpuInstruction(0x10, ReadWriteMode.Branch, AddressingMode.Relative)]
+    [CpuInstruction(0x10, InstructionType.BranchConditionalRelative)]
     private bool BPL()
     {
         return m_Registers.PNegative;
@@ -1122,50 +1122,50 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
-    [CpuInstruction(0x50, ReadWriteMode.Branch, AddressingMode.Relative)]
+    [CpuInstruction(0x50, InstructionType.BranchConditionalRelative)]
     private bool BVC()
     {
         return m_Registers.POverflow;
     }
 
-    [CpuInstruction(0x70, ReadWriteMode.Branch, AddressingMode.Relative)]
+    [CpuInstruction(0x70, InstructionType.BranchConditionalRelative)]
     private bool BVS()
     {
         return !m_Registers.POverflow;
     }
 
-    [CpuInstruction(0x18, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0x18, InstructionType.Implied)]
     private void CLC()
     {
         m_Registers.PCarry = false;
     }
 
-    [CpuInstruction(0xd8, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0xd8, InstructionType.Implied)]
     private void CLD()
     {
         m_Registers.PDecimal = false;
     }
 
-    [CpuInstruction(0x58, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0x58, InstructionType.Implied)]
     private void CLI()
     {
         m_Registers.PInterruptDisable = false;
     }
 
-    [CpuInstruction(0xb8, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0xb8, InstructionType.Implied)]
     private void CLV()
     {
         m_Registers.POverflow = false;
     }
 
-    [CpuInstruction(0xc9, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0xc5, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0xd5, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0xcd, ReadWriteMode.Read, AddressingMode.Absolute)]
-    [CpuInstruction(0xdd, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0xd9, ReadWriteMode.Read, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0xc1, ReadWriteMode.Read, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0xd1, ReadWriteMode.Read, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0xc9, InstructionType.ReadImmediate)]
+    [CpuInstruction(0xc5, InstructionType.ReadZeropage)]
+    [CpuInstruction(0xd5, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0xcd, InstructionType.ReadAbsolute)]
+    [CpuInstruction(0xdd, InstructionType.ReadAbsoluteXIndexed)]
+    [CpuInstruction(0xd9, InstructionType.ReadAbsoluteYIndexed)]
+    [CpuInstruction(0xc1, InstructionType.ReadIndirectXIndexed)]
+    [CpuInstruction(0xd1, InstructionType.ReadIndirectYIndexed)]
     private void CMP(byte arg)
     {
         byte invArg = (byte)~arg;
@@ -1179,9 +1179,9 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0xe0, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0xe4, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0xec, ReadWriteMode.Read, AddressingMode.Absolute)]
+    [CpuInstruction(0xe0, InstructionType.ReadImmediate)]
+    [CpuInstruction(0xe4, InstructionType.ReadZeropage)]
+    [CpuInstruction(0xec, InstructionType.ReadAbsolute)]
     private void CPX(byte arg)
     {
         byte invArg = (byte)~arg;
@@ -1195,9 +1195,9 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0xc0, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0xc4, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0xcc, ReadWriteMode.Read, AddressingMode.Absolute)]
+    [CpuInstruction(0xc0, InstructionType.ReadImmediate)]
+    [CpuInstruction(0xc4, InstructionType.ReadZeropage)]
+    [CpuInstruction(0xcc, InstructionType.ReadAbsolute)]
     private void CPY(byte arg)
     {
         byte invArg = (byte)~arg;
@@ -1211,13 +1211,13 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0xc7, ReadWriteMode.ReadWrite, AddressingMode.Zeropage)]
-    [CpuInstruction(0xd7, ReadWriteMode.ReadWrite, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0xcf, ReadWriteMode.ReadWrite, AddressingMode.Absolute)]
-    [CpuInstruction(0xdf, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0xdb, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0xc3, ReadWriteMode.ReadWrite, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0xd3, ReadWriteMode.ReadWrite, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0xc7, InstructionType.ReadWriteZeropage)]
+    [CpuInstruction(0xd7, InstructionType.ReadWriteZeropageXIndexed)]
+    [CpuInstruction(0xcf, InstructionType.ReadWriteAbsolute)]
+    [CpuInstruction(0xdf, InstructionType.ReadWriteAbsoluteXIndexed)]
+    [CpuInstruction(0xdb, InstructionType.ReadWriteAbsoluteYIndexed)]
+    [CpuInstruction(0xc3, InstructionType.ReadWriteIndirectXIndexed)]
+    [CpuInstruction(0xd3, InstructionType.ReadWriteIndirectYIndexed)]
     private byte DCP(byte arg)
     {
         byte decResult = DEC(arg);
@@ -1225,10 +1225,10 @@ public sealed partial class Mos6502Cpu<BusT>
         return decResult;
     }
 
-    [CpuInstruction(0xc6, ReadWriteMode.ReadWrite, AddressingMode.Zeropage)]
-    [CpuInstruction(0xd6, ReadWriteMode.ReadWrite, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0xce, ReadWriteMode.ReadWrite, AddressingMode.Absolute)]
-    [CpuInstruction(0xde, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteXIndexed)]
+    [CpuInstruction(0xc6, InstructionType.ReadWriteZeropage)]
+    [CpuInstruction(0xd6, InstructionType.ReadWriteZeropageXIndexed)]
+    [CpuInstruction(0xce, InstructionType.ReadWriteAbsolute)]
+    [CpuInstruction(0xde, InstructionType.ReadWriteAbsoluteXIndexed)]
     private byte DEC(byte arg)
     {
         byte result = (byte)(arg - 1);
@@ -1237,7 +1237,7 @@ public sealed partial class Mos6502Cpu<BusT>
         return result;
     }
 
-    [CpuInstruction(0xca, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0xca, InstructionType.Implied)]
     private void DEX()
     {
         byte result = (byte)(m_Registers.X - 1);
@@ -1246,7 +1246,7 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0x88, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0x88, InstructionType.Implied)]
     private void DEY()
     {
         byte result = (byte)(m_Registers.Y - 1);
@@ -1255,14 +1255,14 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0x49, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0x45, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0x55, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x4d, ReadWriteMode.Read, AddressingMode.Absolute)]
-    [CpuInstruction(0x5d, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0x59, ReadWriteMode.Read, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0x41, ReadWriteMode.Read, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0x51, ReadWriteMode.Read, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0x49, InstructionType.ReadImmediate)]
+    [CpuInstruction(0x45, InstructionType.ReadZeropage)]
+    [CpuInstruction(0x55, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0x4d, InstructionType.ReadAbsolute)]
+    [CpuInstruction(0x5d, InstructionType.ReadAbsoluteXIndexed)]
+    [CpuInstruction(0x59, InstructionType.ReadAbsoluteYIndexed)]
+    [CpuInstruction(0x41, InstructionType.ReadIndirectXIndexed)]
+    [CpuInstruction(0x51, InstructionType.ReadIndirectYIndexed)]
     private void EOR(byte arg)
     {
         byte result = (byte)(m_Registers.A ^ arg);
@@ -1271,10 +1271,10 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0xe6, ReadWriteMode.ReadWrite, AddressingMode.Zeropage)]
-    [CpuInstruction(0xf6, ReadWriteMode.ReadWrite, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0xee, ReadWriteMode.ReadWrite, AddressingMode.Absolute)]
-    [CpuInstruction(0xfe, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteXIndexed)]
+    [CpuInstruction(0xe6, InstructionType.ReadWriteZeropage)]
+    [CpuInstruction(0xf6, InstructionType.ReadWriteZeropageXIndexed)]
+    [CpuInstruction(0xee, InstructionType.ReadWriteAbsolute)]
+    [CpuInstruction(0xfe, InstructionType.ReadWriteAbsoluteXIndexed)]
     private byte INC(byte arg)
     {
         byte result = (byte)(arg + 1);
@@ -1283,7 +1283,7 @@ public sealed partial class Mos6502Cpu<BusT>
         return result;
     }
 
-    [CpuInstruction(0xe8, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0xe8, InstructionType.Implied)]
     private void INX()
     {
         m_Registers.X = (byte)(m_Registers.X + 1);
@@ -1291,7 +1291,7 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(m_Registers.X);
     }
 
-    [CpuInstruction(0xc8, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0xc8, InstructionType.Implied)]
     private void INY()
     {
         m_Registers.Y = (byte)(m_Registers.Y + 1);
@@ -1299,13 +1299,13 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(m_Registers.Y);
     }
 
-    [CpuInstruction(0xe7, ReadWriteMode.ReadWrite, AddressingMode.Zeropage)]
-    [CpuInstruction(0xf7, ReadWriteMode.ReadWrite, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0xef, ReadWriteMode.ReadWrite, AddressingMode.Absolute)]
-    [CpuInstruction(0xff, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0xfb, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0xe3, ReadWriteMode.ReadWrite, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0xf3, ReadWriteMode.ReadWrite, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0xe7, InstructionType.ReadWriteZeropage)]
+    [CpuInstruction(0xf7, InstructionType.ReadWriteZeropageXIndexed)]
+    [CpuInstruction(0xef, InstructionType.ReadWriteAbsolute)]
+    [CpuInstruction(0xff, InstructionType.ReadWriteAbsoluteXIndexed)]
+    [CpuInstruction(0xfb, InstructionType.ReadWriteAbsoluteYIndexed)]
+    [CpuInstruction(0xe3, InstructionType.ReadWriteIndirectXIndexed)]
+    [CpuInstruction(0xf3, InstructionType.ReadWriteIndirectYIndexed)]
     private byte ISC(byte arg)
     {
         byte incResult = INC(arg);
@@ -1413,7 +1413,7 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
-    [CpuInstruction(0xbb, ReadWriteMode.Read, AddressingMode.AbsoluteYIndexed)]
+    [CpuInstruction(0xbb, InstructionType.ReadAbsoluteYIndexed)]
     private void LAS(byte arg)
     {
         byte result = (byte)(m_Registers.S & arg);
@@ -1424,12 +1424,12 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0xa7, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0xb7, ReadWriteMode.Read, AddressingMode.ZeropageYIndexed)]
-    [CpuInstruction(0xaf, ReadWriteMode.Read, AddressingMode.Absolute)]
-    [CpuInstruction(0xbf, ReadWriteMode.Read, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0xa3, ReadWriteMode.Read, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0xb3, ReadWriteMode.Read, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0xa7, InstructionType.ReadZeropage)]
+    [CpuInstruction(0xb7, InstructionType.ReadZeropageYIndexed)]
+    [CpuInstruction(0xaf, InstructionType.ReadAbsolute)]
+    [CpuInstruction(0xbf, InstructionType.ReadAbsoluteYIndexed)]
+    [CpuInstruction(0xa3, InstructionType.ReadIndirectXIndexed)]
+    [CpuInstruction(0xb3, InstructionType.ReadIndirectYIndexed)]
     private void LAX(byte arg)
     {
         m_Registers.A = arg;
@@ -1438,14 +1438,14 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(arg);
     }
 
-    [CpuInstruction(0xa9, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0xa5, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0xb5, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0xad, ReadWriteMode.Read, AddressingMode.Absolute)]
-    [CpuInstruction(0xbd, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0xb9, ReadWriteMode.Read, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0xa1, ReadWriteMode.Read, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0xb1, ReadWriteMode.Read, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0xa9, InstructionType.ReadImmediate)]
+    [CpuInstruction(0xa5, InstructionType.ReadZeropage)]
+    [CpuInstruction(0xb5, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0xad, InstructionType.ReadAbsolute)]
+    [CpuInstruction(0xbd, InstructionType.ReadAbsoluteXIndexed)]
+    [CpuInstruction(0xb9, InstructionType.ReadAbsoluteYIndexed)]
+    [CpuInstruction(0xa1, InstructionType.ReadIndirectXIndexed)]
+    [CpuInstruction(0xb1, InstructionType.ReadIndirectYIndexed)]
     private void LDA(byte arg)
     {
         m_Registers.A = arg;
@@ -1453,11 +1453,11 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(arg);
     }
 
-    [CpuInstruction(0xa2, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0xa6, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0xb6, ReadWriteMode.Read, AddressingMode.ZeropageYIndexed)]
-    [CpuInstruction(0xae, ReadWriteMode.Read, AddressingMode.Absolute)]
-    [CpuInstruction(0xbe, ReadWriteMode.Read, AddressingMode.AbsoluteYIndexed)]
+    [CpuInstruction(0xa2, InstructionType.ReadImmediate)]
+    [CpuInstruction(0xa6, InstructionType.ReadZeropage)]
+    [CpuInstruction(0xb6, InstructionType.ReadZeropageYIndexed)]
+    [CpuInstruction(0xae, InstructionType.ReadAbsolute)]
+    [CpuInstruction(0xbe, InstructionType.ReadAbsoluteYIndexed)]
     private void LDX(byte arg)
     {
         m_Registers.X = arg;
@@ -1465,11 +1465,11 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(arg);
     }
 
-    [CpuInstruction(0xa0, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0xa4, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0xb4, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0xac, ReadWriteMode.Read, AddressingMode.Absolute)]
-    [CpuInstruction(0xbc, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
+    [CpuInstruction(0xa0, InstructionType.ReadImmediate)]
+    [CpuInstruction(0xa4, InstructionType.ReadZeropage)]
+    [CpuInstruction(0xb4, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0xac, InstructionType.ReadAbsolute)]
+    [CpuInstruction(0xbc, InstructionType.ReadAbsoluteXIndexed)]
     private void LDY(byte arg)
     {
         m_Registers.Y = arg;
@@ -1477,7 +1477,7 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(arg);
     }
 
-    [CpuInstruction(0x4a, ReadWriteMode.ReadWrite, AddressingMode.Accumulator)]
+    [CpuInstruction(0x4a, InstructionType.Accumulator)]
     private void LSR()
     {
         byte arg = m_Registers.A;
@@ -1489,10 +1489,10 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = false;
     }
 
-    [CpuInstruction(0x46, ReadWriteMode.ReadWrite, AddressingMode.Zeropage)]
-    [CpuInstruction(0x56, ReadWriteMode.ReadWrite, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x4e, ReadWriteMode.ReadWrite, AddressingMode.Absolute)]
-    [CpuInstruction(0x5e, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteXIndexed)]
+    [CpuInstruction(0x46, InstructionType.ReadWriteZeropage)]
+    [CpuInstruction(0x56, InstructionType.ReadWriteZeropageXIndexed)]
+    [CpuInstruction(0x4e, InstructionType.ReadWriteAbsolute)]
+    [CpuInstruction(0x5e, InstructionType.ReadWriteAbsoluteXIndexed)]
     private byte LSR(byte arg)
     {
         byte result = (byte)(arg >> 1);
@@ -1503,52 +1503,52 @@ public sealed partial class Mos6502Cpu<BusT>
         return result;
     }
 
-    [CpuInstruction(0xea, ReadWriteMode.None, AddressingMode.Implied)]
-    [CpuInstruction(0x1a, ReadWriteMode.None, AddressingMode.Implied)]
-    [CpuInstruction(0x3a, ReadWriteMode.None, AddressingMode.Implied)]
-    [CpuInstruction(0x5a, ReadWriteMode.None, AddressingMode.Implied)]
-    [CpuInstruction(0x7a, ReadWriteMode.None, AddressingMode.Implied)]
-    [CpuInstruction(0xda, ReadWriteMode.None, AddressingMode.Implied)]
-    [CpuInstruction(0xfa, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0xea, InstructionType.Implied)]
+    [CpuInstruction(0x1a, InstructionType.Implied)]
+    [CpuInstruction(0x3a, InstructionType.Implied)]
+    [CpuInstruction(0x5a, InstructionType.Implied)]
+    [CpuInstruction(0x7a, InstructionType.Implied)]
+    [CpuInstruction(0xda, InstructionType.Implied)]
+    [CpuInstruction(0xfa, InstructionType.Implied)]
     private static void NOP()
     {
         // nothing
     }
 
-    [CpuInstruction(0x80, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0x82, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0x89, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0xc2, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0xe2, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0x04, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0x44, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0x64, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0x14, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x34, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x54, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x74, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0xd4, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0xf4, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x0c, ReadWriteMode.Read, AddressingMode.Absolute)]
-    [CpuInstruction(0x1c, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0x3c, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0x5c, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0x7c, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0xdc, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0xfc, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
+    [CpuInstruction(0x80, InstructionType.ReadImmediate)]
+    [CpuInstruction(0x82, InstructionType.ReadImmediate)]
+    [CpuInstruction(0x89, InstructionType.ReadImmediate)]
+    [CpuInstruction(0xc2, InstructionType.ReadImmediate)]
+    [CpuInstruction(0xe2, InstructionType.ReadImmediate)]
+    [CpuInstruction(0x04, InstructionType.ReadZeropage)]
+    [CpuInstruction(0x44, InstructionType.ReadZeropage)]
+    [CpuInstruction(0x64, InstructionType.ReadZeropage)]
+    [CpuInstruction(0x14, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0x34, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0x54, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0x74, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0xd4, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0xf4, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0x0c, InstructionType.ReadAbsolute)]
+    [CpuInstruction(0x1c, InstructionType.ReadAbsoluteXIndexed)]
+    [CpuInstruction(0x3c, InstructionType.ReadAbsoluteXIndexed)]
+    [CpuInstruction(0x5c, InstructionType.ReadAbsoluteXIndexed)]
+    [CpuInstruction(0x7c, InstructionType.ReadAbsoluteXIndexed)]
+    [CpuInstruction(0xdc, InstructionType.ReadAbsoluteXIndexed)]
+    [CpuInstruction(0xfc, InstructionType.ReadAbsoluteXIndexed)]
     private static void NOP(byte _)
     {
         // nothing
     }
 
-    [CpuInstruction(0x09, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0x05, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0x15, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x0d, ReadWriteMode.Read, AddressingMode.Absolute)]
-    [CpuInstruction(0x1d, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0x19, ReadWriteMode.Read, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0x01, ReadWriteMode.Read, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0x11, ReadWriteMode.Read, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0x09, InstructionType.ReadImmediate)]
+    [CpuInstruction(0x05, InstructionType.ReadZeropage)]
+    [CpuInstruction(0x15, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0x0d, InstructionType.ReadAbsolute)]
+    [CpuInstruction(0x1d, InstructionType.ReadAbsoluteXIndexed)]
+    [CpuInstruction(0x19, InstructionType.ReadAbsoluteYIndexed)]
+    [CpuInstruction(0x01, InstructionType.ReadIndirectXIndexed)]
+    [CpuInstruction(0x11, InstructionType.ReadIndirectYIndexed)]
     private void ORA(byte arg)
     {
         byte result = (byte)(m_Registers.A | arg);
@@ -1637,13 +1637,13 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
-    [CpuInstruction(0x27, ReadWriteMode.ReadWrite, AddressingMode.Zeropage)]
-    [CpuInstruction(0x37, ReadWriteMode.ReadWrite, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x2f, ReadWriteMode.ReadWrite, AddressingMode.Absolute)]
-    [CpuInstruction(0x3f, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0x3b, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0x23, ReadWriteMode.ReadWrite, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0x33, ReadWriteMode.ReadWrite, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0x27, InstructionType.ReadWriteZeropage)]
+    [CpuInstruction(0x37, InstructionType.ReadWriteZeropageXIndexed)]
+    [CpuInstruction(0x2f, InstructionType.ReadWriteAbsolute)]
+    [CpuInstruction(0x3f, InstructionType.ReadWriteAbsoluteXIndexed)]
+    [CpuInstruction(0x3b, InstructionType.ReadWriteAbsoluteYIndexed)]
+    [CpuInstruction(0x23, InstructionType.ReadWriteIndirectXIndexed)]
+    [CpuInstruction(0x33, InstructionType.ReadWriteIndirectYIndexed)]
     private byte RLA(byte arg)
     {
         byte rol = ROL(arg);
@@ -1651,7 +1651,7 @@ public sealed partial class Mos6502Cpu<BusT>
         return rol;
     }
 
-    [CpuInstruction(0x2a, ReadWriteMode.ReadWrite, AddressingMode.Accumulator)]
+    [CpuInstruction(0x2a, InstructionType.Accumulator)]
     private void ROL()
     {
         byte arg = m_Registers.A;
@@ -1663,10 +1663,10 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0x26, ReadWriteMode.ReadWrite, AddressingMode.Zeropage)]
-    [CpuInstruction(0x36, ReadWriteMode.ReadWrite, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x2e, ReadWriteMode.ReadWrite, AddressingMode.Absolute)]
-    [CpuInstruction(0x3e, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteXIndexed)]
+    [CpuInstruction(0x26, InstructionType.ReadWriteZeropage)]
+    [CpuInstruction(0x36, InstructionType.ReadWriteZeropageXIndexed)]
+    [CpuInstruction(0x2e, InstructionType.ReadWriteAbsolute)]
+    [CpuInstruction(0x3e, InstructionType.ReadWriteAbsoluteXIndexed)]
     private byte ROL(byte arg)
     {
         byte result = (byte)((arg << 1) | (m_Registers.PCarry ? 1 : 0));
@@ -1677,7 +1677,7 @@ public sealed partial class Mos6502Cpu<BusT>
         return result;
     }
 
-    [CpuInstruction(0x6a, ReadWriteMode.ReadWrite, AddressingMode.Accumulator)]
+    [CpuInstruction(0x6a, InstructionType.Accumulator)]
     private void ROR()
     {
         byte arg = m_Registers.A;
@@ -1689,10 +1689,10 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0x66, ReadWriteMode.ReadWrite, AddressingMode.Zeropage)]
-    [CpuInstruction(0x76, ReadWriteMode.ReadWrite, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x6e, ReadWriteMode.ReadWrite, AddressingMode.Absolute)]
-    [CpuInstruction(0x7e, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteXIndexed)]
+    [CpuInstruction(0x66, InstructionType.ReadWriteZeropage)]
+    [CpuInstruction(0x76, InstructionType.ReadWriteZeropageXIndexed)]
+    [CpuInstruction(0x6e, InstructionType.ReadWriteAbsolute)]
+    [CpuInstruction(0x7e, InstructionType.ReadWriteAbsoluteXIndexed)]
     private byte ROR(byte arg)
     {
         byte result = (byte)((arg >> 1) | (m_Registers.PCarry ? 0x80 : 0));
@@ -1703,13 +1703,13 @@ public sealed partial class Mos6502Cpu<BusT>
         return result;
     }
 
-    [CpuInstruction(0x67, ReadWriteMode.ReadWrite, AddressingMode.Zeropage)]
-    [CpuInstruction(0x77, ReadWriteMode.ReadWrite, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x6f, ReadWriteMode.ReadWrite, AddressingMode.Absolute)]
-    [CpuInstruction(0x7f, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0x7b, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0x63, ReadWriteMode.ReadWrite, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0x73, ReadWriteMode.ReadWrite, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0x67, InstructionType.ReadWriteZeropage)]
+    [CpuInstruction(0x77, InstructionType.ReadWriteZeropageXIndexed)]
+    [CpuInstruction(0x6f, InstructionType.ReadWriteAbsolute)]
+    [CpuInstruction(0x7f, InstructionType.ReadWriteAbsoluteXIndexed)]
+    [CpuInstruction(0x7b, InstructionType.ReadWriteAbsoluteYIndexed)]
+    [CpuInstruction(0x63, InstructionType.ReadWriteIndirectXIndexed)]
+    [CpuInstruction(0x73, InstructionType.ReadWriteIndirectYIndexed)]
     private byte RRA(byte arg)
     {
         byte ror = ROR(arg);
@@ -1781,16 +1781,16 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
-    [CpuInstruction(0x87, ReadWriteMode.Write, AddressingMode.Zeropage)]
-    [CpuInstruction(0x97, ReadWriteMode.Write, AddressingMode.ZeropageYIndexed)]
-    [CpuInstruction(0x8f, ReadWriteMode.Write, AddressingMode.Absolute)]
-    [CpuInstruction(0x83, ReadWriteMode.Write, AddressingMode.IndirectXIndexed)]
+    [CpuInstruction(0x87, InstructionType.WriteZeropage)]
+    [CpuInstruction(0x97, InstructionType.WriteZeropageYIndexed)]
+    [CpuInstruction(0x8f, InstructionType.WriteAbsolute)]
+    [CpuInstruction(0x83, InstructionType.WriteIndirectXIndexed)]
     private byte SAX()
     {
         return (byte)(m_Registers.A & m_Registers.X);
     }
 
-    [CpuInstruction(0xcb, ReadWriteMode.Read, AddressingMode.Immediate)]
+    [CpuInstruction(0xcb, InstructionType.ReadImmediate)]
     private void SBX(byte arg)
     {
         int resultFull = (m_Registers.X & m_Registers.A) - arg;
@@ -1802,15 +1802,15 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PCarry = carryOut;
     }
 
-    [CpuInstruction(0xe9, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0xeb, ReadWriteMode.Read, AddressingMode.Immediate)]
-    [CpuInstruction(0xe5, ReadWriteMode.Read, AddressingMode.Zeropage)]
-    [CpuInstruction(0xf5, ReadWriteMode.Read, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0xed, ReadWriteMode.Read, AddressingMode.Absolute)]
-    [CpuInstruction(0xfd, ReadWriteMode.Read, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0xf9, ReadWriteMode.Read, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0xe1, ReadWriteMode.Read, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0xf1, ReadWriteMode.Read, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0xe9, InstructionType.ReadImmediate)]
+    [CpuInstruction(0xeb, InstructionType.ReadImmediate)]
+    [CpuInstruction(0xe5, InstructionType.ReadZeropage)]
+    [CpuInstruction(0xf5, InstructionType.ReadZeropageXIndexed)]
+    [CpuInstruction(0xed, InstructionType.ReadAbsolute)]
+    [CpuInstruction(0xfd, InstructionType.ReadAbsoluteXIndexed)]
+    [CpuInstruction(0xf9, InstructionType.ReadAbsoluteYIndexed)]
+    [CpuInstruction(0xe1, InstructionType.ReadIndirectXIndexed)]
+    [CpuInstruction(0xf1, InstructionType.ReadIndirectYIndexed)]
     private void SBC(byte arg)
     {
         byte inv0 = (byte)~arg;
@@ -1865,31 +1865,31 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
-    [CpuInstruction(0x38, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0x38, InstructionType.Implied)]
     private void SEC()
     {
         m_Registers.PCarry = true;
     }
 
-    [CpuInstruction(0xf8, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0xf8, InstructionType.Implied)]
     private void SED()
     {
         m_Registers.PDecimal = true;
     }
 
-    [CpuInstruction(0x78, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0x78, InstructionType.Implied)]
     private void SEI()
     {
         m_Registers.PInterruptDisable = true;
     }
 
-    [CpuInstruction(0x07, ReadWriteMode.ReadWrite, AddressingMode.Zeropage)]
-    [CpuInstruction(0x17, ReadWriteMode.ReadWrite, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x0f, ReadWriteMode.ReadWrite, AddressingMode.Absolute)]
-    [CpuInstruction(0x1f, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0x1b, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0x03, ReadWriteMode.ReadWrite, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0x13, ReadWriteMode.ReadWrite, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0x07, InstructionType.ReadWriteZeropage)]
+    [CpuInstruction(0x17, InstructionType.ReadWriteZeropageXIndexed)]
+    [CpuInstruction(0x0f, InstructionType.ReadWriteAbsolute)]
+    [CpuInstruction(0x1f, InstructionType.ReadWriteAbsoluteXIndexed)]
+    [CpuInstruction(0x1b, InstructionType.ReadWriteAbsoluteYIndexed)]
+    [CpuInstruction(0x03, InstructionType.ReadWriteIndirectXIndexed)]
+    [CpuInstruction(0x13, InstructionType.ReadWriteIndirectYIndexed)]
     private byte SLO(byte arg)
     {
         arg = ASL(arg);
@@ -1897,13 +1897,13 @@ public sealed partial class Mos6502Cpu<BusT>
         return arg;
     }
 
-    [CpuInstruction(0x47, ReadWriteMode.ReadWrite, AddressingMode.Zeropage)]
-    [CpuInstruction(0x57, ReadWriteMode.ReadWrite, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x4f, ReadWriteMode.ReadWrite, AddressingMode.Absolute)]
-    [CpuInstruction(0x5f, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0x5b, ReadWriteMode.ReadWrite, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0x43, ReadWriteMode.ReadWrite, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0x53, ReadWriteMode.ReadWrite, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0x47, InstructionType.ReadWriteZeropage)]
+    [CpuInstruction(0x57, InstructionType.ReadWriteZeropageXIndexed)]
+    [CpuInstruction(0x4f, InstructionType.ReadWriteAbsolute)]
+    [CpuInstruction(0x5f, InstructionType.ReadWriteAbsoluteXIndexed)]
+    [CpuInstruction(0x5b, InstructionType.ReadWriteAbsoluteYIndexed)]
+    [CpuInstruction(0x43, InstructionType.ReadWriteIndirectXIndexed)]
+    [CpuInstruction(0x53, InstructionType.ReadWriteIndirectYIndexed)]
     private byte SRE(byte arg)
     {
         arg = LSR(arg);
@@ -1911,35 +1911,35 @@ public sealed partial class Mos6502Cpu<BusT>
         return arg;
     }
 
-    [CpuInstruction(0x85, ReadWriteMode.Write, AddressingMode.Zeropage)]
-    [CpuInstruction(0x95, ReadWriteMode.Write, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x8d, ReadWriteMode.Write, AddressingMode.Absolute)]
-    [CpuInstruction(0x9d, ReadWriteMode.Write, AddressingMode.AbsoluteXIndexed)]
-    [CpuInstruction(0x99, ReadWriteMode.Write, AddressingMode.AbsoluteYIndexed)]
-    [CpuInstruction(0x81, ReadWriteMode.Write, AddressingMode.IndirectXIndexed)]
-    [CpuInstruction(0x91, ReadWriteMode.Write, AddressingMode.IndirectYIndexed)]
+    [CpuInstruction(0x85, InstructionType.WriteZeropage)]
+    [CpuInstruction(0x95, InstructionType.WriteZeropageXIndexed)]
+    [CpuInstruction(0x8d, InstructionType.WriteAbsolute)]
+    [CpuInstruction(0x9d, InstructionType.WriteAbsoluteXIndexed)]
+    [CpuInstruction(0x99, InstructionType.WriteAbsoluteYIndexed)]
+    [CpuInstruction(0x81, InstructionType.WriteIndirectXIndexed)]
+    [CpuInstruction(0x91, InstructionType.WriteIndirectYIndexed)]
     private byte STA()
     {
         return m_Registers.A;
     }
 
-    [CpuInstruction(0x86, ReadWriteMode.Write, AddressingMode.Zeropage)]
-    [CpuInstruction(0x96, ReadWriteMode.Write, AddressingMode.ZeropageYIndexed)]
-    [CpuInstruction(0x8e, ReadWriteMode.Write, AddressingMode.Absolute)]
+    [CpuInstruction(0x86, InstructionType.WriteZeropage)]
+    [CpuInstruction(0x96, InstructionType.WriteZeropageYIndexed)]
+    [CpuInstruction(0x8e, InstructionType.WriteAbsolute)]
     private byte STX()
     {
         return m_Registers.X;
     }
 
-    [CpuInstruction(0x84, ReadWriteMode.Write, AddressingMode.Zeropage)]
-    [CpuInstruction(0x94, ReadWriteMode.Write, AddressingMode.ZeropageXIndexed)]
-    [CpuInstruction(0x8c, ReadWriteMode.Write, AddressingMode.Absolute)]
+    [CpuInstruction(0x84, InstructionType.WriteZeropage)]
+    [CpuInstruction(0x94, InstructionType.WriteZeropageXIndexed)]
+    [CpuInstruction(0x8c, InstructionType.WriteAbsolute)]
     private byte STY()
     {
         return m_Registers.Y;
     }
 
-    [CpuInstruction(0xaa, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0xaa, InstructionType.Implied)]
     private void TAX()
     {
         byte result = m_Registers.A;
@@ -1948,7 +1948,7 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0xa8, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0xa8, InstructionType.Implied)]
     private void TAY()
     {
         byte result = m_Registers.A;
@@ -1957,7 +1957,7 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0xba, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0xba, InstructionType.Implied)]
     private void TSX()
     {
         byte result = m_Registers.S;
@@ -1966,7 +1966,7 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0x8a, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0x8a, InstructionType.Implied)]
     private void TXA()
     {
         byte result = m_Registers.X;
@@ -1975,13 +1975,13 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
-    [CpuInstruction(0x9a, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0x9a, InstructionType.Implied)]
     private void TXS()
     {
         m_Registers.S = m_Registers.X;
     }
 
-    [CpuInstruction(0x98, ReadWriteMode.None, AddressingMode.Implied)]
+    [CpuInstruction(0x98, InstructionType.Implied)]
     private void TYA()
     {
         byte result = m_Registers.Y;

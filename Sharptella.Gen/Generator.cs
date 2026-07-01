@@ -77,8 +77,7 @@ public sealed class Generator
                 continue;
 
             int opcode = 0;
-            ReadWriteMode readWriteMode = ReadWriteMode.Read;
-            AddressingMode addressingMode = AddressingMode.Implied;
+            InstructionType instructionType = InstructionType.Implied;
 
             for (int i = 0; i < attr.ConstructorArguments.Length; i++)
             {
@@ -90,12 +89,8 @@ public sealed class Generator
                             opcode = op;
                         break;
                     case 1:
-                        if (arg.Value is int rw)
-                            readWriteMode = (ReadWriteMode)rw;
-                        break;
-                    case 2:
-                        if (arg.Value is int am)
-                            addressingMode = (AddressingMode)am;
+                        if (arg.Value is int it)
+                            instructionType = (InstructionType)it;
                         break;
                 }
             }
@@ -108,20 +103,16 @@ public sealed class Generator
                         if (namedArg.Value.Value is int op)
                             opcode = op;
                         break;
-                    case "ReadWriteMode":
-                        if (namedArg.Value.Value is int rw)
-                            readWriteMode = (ReadWriteMode)rw;
-                        break;
-                    case "AddressingMode":
-                        if (namedArg.Value.Value is int am)
-                            addressingMode = (AddressingMode)am;
+                    case "InstructionType":
+                        if (namedArg.Value.Value is int it)
+                            instructionType = (InstructionType)it;
                         break;
                     default:
                         break;
                 }
             }
 
-            matchingAttributes.Add(new(nsName, className, methodName, opName, opcode, readWriteMode, addressingMode));
+            matchingAttributes.Add(new(nsName, className, methodName, opName, opcode, instructionType));
         }
 
         return matchingAttributes.ToImmutable();
@@ -147,67 +138,43 @@ public sealed class Generator
             sb.AppendLine($"public partial class {className}");
             sb.AppendLine("{");
 
-            var seen = new HashSet<(string, ReadWriteMode, AddressingMode)>();
+            var seen = new HashSet<(string, InstructionType)>();
 
             foreach (var op in group)
             {
-                if (!seen.Add((op.OpName, op.ReadWriteMode, op.AddressingMode)))
+                if (!seen.Add((op.OpName, op.InstructionType)))
                     continue;
 
-                var template = op.AddressingMode switch
+                var template = op.InstructionType switch
                 {
-                    AddressingMode.Implied => Resources.Implied,
-                    AddressingMode.Accumulator => Resources.Accumulator,
-
-                    AddressingMode.Relative => op.ReadWriteMode switch
-                    {
-                        ReadWriteMode.Branch => Resources.BranchConditionalRelative,
-                        _ => "",
-                    },
-
-                    _ => op.ReadWriteMode switch
-                    {
-                        ReadWriteMode.Read => op.AddressingMode switch
-                        {
-                            AddressingMode.Immediate => Resources.ReadImmediate,
-                            AddressingMode.Zeropage => Resources.ReadZeropage,
-                            AddressingMode.ZeropageXIndexed => Resources.ReadZeropageXIndexed,
-                            AddressingMode.ZeropageYIndexed => Resources.ReadZeropageYIndexed,
-                            AddressingMode.Absolute => Resources.ReadAbsolute,
-                            AddressingMode.AbsoluteXIndexed => Resources.ReadAbsoluteXIndexed,
-                            AddressingMode.AbsoluteYIndexed => Resources.ReadAbsoluteYIndexed,
-                            AddressingMode.IndirectXIndexed => Resources.ReadIndirectXIndexed,
-                            AddressingMode.IndirectYIndexed => Resources.ReadIndirectYIndexed,
-                            _ => "",
-                        },
-
-                        ReadWriteMode.Write => op.AddressingMode switch
-                        {
-                            AddressingMode.Zeropage => Resources.WriteZeropage,
-                            AddressingMode.ZeropageXIndexed => Resources.WriteZeropageXIndexed,
-                            AddressingMode.ZeropageYIndexed => Resources.WriteZeropageYIndexed,
-                            AddressingMode.Absolute => Resources.WriteAbsolute,
-                            AddressingMode.AbsoluteXIndexed => Resources.WriteAbsoluteXIndexed,
-                            AddressingMode.AbsoluteYIndexed => Resources.WriteAbsoluteYIndexed,
-                            AddressingMode.IndirectXIndexed => Resources.WriteIndirectXIndexed,
-                            AddressingMode.IndirectYIndexed => Resources.WriteIndirectYIndexed,
-                            _ => "",
-                        },
-
-                        ReadWriteMode.ReadWrite => op.AddressingMode switch
-                        {
-                            AddressingMode.Zeropage => Resources.ReadWriteZeropage,
-                            AddressingMode.ZeropageXIndexed => Resources.ReadWriteZeropageXIndexed,
-                            AddressingMode.Absolute => Resources.ReadWriteAbsolute,
-                            AddressingMode.AbsoluteXIndexed => Resources.ReadWriteAbsoluteXIndexed,
-                            AddressingMode.AbsoluteYIndexed => Resources.ReadWriteAbsoluteYIndexed,
-                            AddressingMode.IndirectXIndexed => Resources.ReadWriteIndirectXIndexed,
-                            AddressingMode.IndirectYIndexed => Resources.ReadWriteIndirectYIndexed,
-                            _ => "",
-                        },
-
-                        _ => "",
-                    },
+                    InstructionType.Implied => Resources.Implied,
+                    InstructionType.Accumulator => Resources.Accumulator,
+                    InstructionType.BranchConditionalRelative => Resources.BranchConditionalRelative,
+                    InstructionType.ReadImmediate => Resources.ReadImmediate,
+                    InstructionType.ReadZeropage => Resources.ReadZeropage,
+                    InstructionType.ReadZeropageXIndexed => Resources.ReadZeropageXIndexed,
+                    InstructionType.ReadZeropageYIndexed => Resources.ReadZeropageYIndexed,
+                    InstructionType.ReadAbsolute => Resources.ReadAbsolute,
+                    InstructionType.ReadAbsoluteXIndexed => Resources.ReadAbsoluteXIndexed,
+                    InstructionType.ReadAbsoluteYIndexed => Resources.ReadAbsoluteYIndexed,
+                    InstructionType.ReadIndirectXIndexed => Resources.ReadIndirectXIndexed,
+                    InstructionType.ReadIndirectYIndexed => Resources.ReadIndirectYIndexed,
+                    InstructionType.WriteZeropage => Resources.WriteZeropage,
+                    InstructionType.WriteZeropageXIndexed => Resources.WriteZeropageXIndexed,
+                    InstructionType.WriteZeropageYIndexed => Resources.WriteZeropageYIndexed,
+                    InstructionType.WriteAbsolute => Resources.WriteAbsolute,
+                    InstructionType.WriteAbsoluteXIndexed => Resources.WriteAbsoluteXIndexed,
+                    InstructionType.WriteAbsoluteYIndexed => Resources.WriteAbsoluteYIndexed,
+                    InstructionType.WriteIndirectXIndexed => Resources.WriteIndirectXIndexed,
+                    InstructionType.WriteIndirectYIndexed => Resources.WriteIndirectYIndexed,
+                    InstructionType.ReadWriteZeropage => Resources.ReadWriteZeropage,
+                    InstructionType.ReadWriteZeropageXIndexed => Resources.ReadWriteZeropageXIndexed,
+                    InstructionType.ReadWriteAbsolute => Resources.ReadWriteAbsolute,
+                    InstructionType.ReadWriteAbsoluteXIndexed => Resources.ReadWriteAbsoluteXIndexed,
+                    InstructionType.ReadWriteAbsoluteYIndexed => Resources.ReadWriteAbsoluteYIndexed,
+                    InstructionType.ReadWriteIndirectXIndexed => Resources.ReadWriteIndirectXIndexed,
+                    InstructionType.ReadWriteIndirectYIndexed => Resources.ReadWriteIndirectYIndexed,
+                    _ => "",
                 };
 
                 if (!string.IsNullOrEmpty(template))
@@ -270,30 +237,35 @@ public sealed class Generator
         return sb.ToString();
     }
 
-    internal enum ReadWriteMode
-    {
-        None,
-        Branch,
-        Read,
-        Write,
-        ReadWrite
-    }
-
-    internal enum AddressingMode
+    internal enum InstructionType
     {
         Implied,
         Accumulator,
-        Immediate,
-        Zeropage,
-        ZeropageXIndexed,
-        ZeropageYIndexed,
-        Absolute,
-        AbsoluteXIndexed,
-        AbsoluteYIndexed,
-        Indirect,
-        IndirectXIndexed,
-        IndirectYIndexed,
-        Relative
+        BranchConditionalRelative,
+        ReadImmediate,
+        ReadZeropage,
+        ReadZeropageXIndexed,
+        ReadZeropageYIndexed,
+        ReadAbsolute,
+        ReadAbsoluteXIndexed,
+        ReadAbsoluteYIndexed,
+        ReadIndirectXIndexed,
+        ReadIndirectYIndexed,
+        WriteZeropage,
+        WriteZeropageXIndexed,
+        WriteZeropageYIndexed,
+        WriteAbsolute,
+        WriteAbsoluteXIndexed,
+        WriteAbsoluteYIndexed,
+        WriteIndirectXIndexed,
+        WriteIndirectYIndexed,
+        ReadWriteZeropage,
+        ReadWriteZeropageXIndexed,
+        ReadWriteAbsolute,
+        ReadWriteAbsoluteXIndexed,
+        ReadWriteAbsoluteYIndexed,
+        ReadWriteIndirectXIndexed,
+        ReadWriteIndirectYIndexed
     }
 
     private readonly struct CpuInstructionData
@@ -303,18 +275,16 @@ public sealed class Generator
         public readonly string MethodName;
         public readonly string OpName;
         public readonly int Opcode;
-        public readonly ReadWriteMode ReadWriteMode;
-        public readonly AddressingMode AddressingMode;
+        public readonly InstructionType InstructionType;
 
-        public CpuInstructionData(string? nsName, string className, string methodName, string opName, int opcode, ReadWriteMode readWriteMode, AddressingMode addressingMode)
+        public CpuInstructionData(string? nsName, string className, string methodName, string opName, int opcode, InstructionType instructionType)
         {
             Namespace = nsName;
             ClassName = className;
             MethodName = methodName;
             OpName = opName;
             Opcode = opcode;
-            ReadWriteMode = readWriteMode;
-            AddressingMode = addressingMode;
+            InstructionType = instructionType;
         }
     }
 }

@@ -2,30 +2,35 @@
 
 namespace Sharptella.Gen;
 
-internal enum ReadWriteMode
-{
-    None,
-    Branch,
-    Read,
-    Write,
-    ReadWrite
-}
-
-internal enum AddressingMode
+internal enum InstructionType
 {
     Implied,
     Accumulator,
-    Immediate,
-    Zeropage,
-    ZeropageXIndexed,
-    ZeropageYIndexed,
-    Absolute,
-    AbsoluteXIndexed,
-    AbsoluteYIndexed,
-    Indirect,
-    IndirectXIndexed,
-    IndirectYIndexed,
-    Relative
+    BranchConditionalRelative,
+    ReadImmediate,
+    ReadZeropage,
+    ReadZeropageXIndexed,
+    ReadZeropageYIndexed,
+    ReadAbsolute,
+    ReadAbsoluteXIndexed,
+    ReadAbsoluteYIndexed,
+    ReadIndirectXIndexed,
+    ReadIndirectYIndexed,
+    WriteZeropage,
+    WriteZeropageXIndexed,
+    WriteZeropageYIndexed,
+    WriteAbsolute,
+    WriteAbsoluteXIndexed,
+    WriteAbsoluteYIndexed,
+    WriteIndirectXIndexed,
+    WriteIndirectYIndexed,
+    ReadWriteZeropage,
+    ReadWriteZeropageXIndexed,
+    ReadWriteAbsolute,
+    ReadWriteAbsoluteXIndexed,
+    ReadWriteAbsoluteYIndexed,
+    ReadWriteIndirectXIndexed,
+    ReadWriteIndirectYIndexed
 }
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
@@ -33,13 +38,11 @@ internal sealed class CpuInstructionAttribute
     : Attribute
 {
     public int OpCode;
-    public ReadWriteMode ReadWriteMode;
-    public AddressingMode AddressingMode;
+    public InstructionType InstructionType;
 
-    public CpuInstructionAttribute(int opCode, ReadWriteMode readWriteMode, AddressingMode addressingMode)
+    public CpuInstructionAttribute(int opCode, InstructionType instructionType)
     {
         OpCode = opCode;
-        ReadWriteMode = readWriteMode;
-        AddressingMode = addressingMode;
+        InstructionType = instructionType;
     }
 }
