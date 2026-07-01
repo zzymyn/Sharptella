@@ -4,33 +4,37 @@ namespace Sharptella.Gen;
 
 internal enum InstructionType
 {
+    Custom, 
     Implied,
     Accumulator,
     BranchConditionalRelative,
-    ReadImmediate,
-    ReadZeropage,
-    ReadZeropageXIndexed,
-    ReadZeropageYIndexed,
+
     ReadAbsolute,
     ReadAbsoluteXIndexed,
     ReadAbsoluteYIndexed,
+    ReadImmediate,
     ReadIndirectXIndexed,
     ReadIndirectYIndexed,
-    WriteZeropage,
-    WriteZeropageXIndexed,
-    WriteZeropageYIndexed,
+    ReadZeropage,
+    ReadZeropageXIndexed,
+    ReadZeropageYIndexed,
+
     WriteAbsolute,
     WriteAbsoluteXIndexed,
     WriteAbsoluteYIndexed,
     WriteIndirectXIndexed,
     WriteIndirectYIndexed,
-    ReadWriteZeropage,
-    ReadWriteZeropageXIndexed,
+    WriteZeropage,
+    WriteZeropageXIndexed,
+    WriteZeropageYIndexed,
+    
     ReadWriteAbsolute,
     ReadWriteAbsoluteXIndexed,
     ReadWriteAbsoluteYIndexed,
     ReadWriteIndirectXIndexed,
-    ReadWriteIndirectYIndexed
+    ReadWriteIndirectYIndexed,
+    ReadWriteZeropage,
+    ReadWriteZeropageXIndexed,
 }
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]

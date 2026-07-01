@@ -77,7 +77,7 @@ public sealed class Generator
                 continue;
 
             int opcode = 0;
-            InstructionType instructionType = InstructionType.Implied;
+            InstructionType instructionType = default;
 
             for (int i = 0; i < attr.ConstructorArguments.Length; i++)
             {
@@ -147,33 +147,34 @@ public sealed class Generator
 
                 var template = op.InstructionType switch
                 {
+                    InstructionType.Custom => "",
                     InstructionType.Implied => Resources.Implied,
                     InstructionType.Accumulator => Resources.Accumulator,
                     InstructionType.BranchConditionalRelative => Resources.BranchConditionalRelative,
-                    InstructionType.ReadImmediate => Resources.ReadImmediate,
-                    InstructionType.ReadZeropage => Resources.ReadZeropage,
-                    InstructionType.ReadZeropageXIndexed => Resources.ReadZeropageXIndexed,
-                    InstructionType.ReadZeropageYIndexed => Resources.ReadZeropageYIndexed,
                     InstructionType.ReadAbsolute => Resources.ReadAbsolute,
                     InstructionType.ReadAbsoluteXIndexed => Resources.ReadAbsoluteXIndexed,
                     InstructionType.ReadAbsoluteYIndexed => Resources.ReadAbsoluteYIndexed,
+                    InstructionType.ReadImmediate => Resources.ReadImmediate,
                     InstructionType.ReadIndirectXIndexed => Resources.ReadIndirectXIndexed,
                     InstructionType.ReadIndirectYIndexed => Resources.ReadIndirectYIndexed,
-                    InstructionType.WriteZeropage => Resources.WriteZeropage,
-                    InstructionType.WriteZeropageXIndexed => Resources.WriteZeropageXIndexed,
-                    InstructionType.WriteZeropageYIndexed => Resources.WriteZeropageYIndexed,
+                    InstructionType.ReadZeropage => Resources.ReadZeropage,
+                    InstructionType.ReadZeropageXIndexed => Resources.ReadZeropageXIndexed,
+                    InstructionType.ReadZeropageYIndexed => Resources.ReadZeropageYIndexed,
                     InstructionType.WriteAbsolute => Resources.WriteAbsolute,
                     InstructionType.WriteAbsoluteXIndexed => Resources.WriteAbsoluteXIndexed,
                     InstructionType.WriteAbsoluteYIndexed => Resources.WriteAbsoluteYIndexed,
                     InstructionType.WriteIndirectXIndexed => Resources.WriteIndirectXIndexed,
                     InstructionType.WriteIndirectYIndexed => Resources.WriteIndirectYIndexed,
-                    InstructionType.ReadWriteZeropage => Resources.ReadWriteZeropage,
-                    InstructionType.ReadWriteZeropageXIndexed => Resources.ReadWriteZeropageXIndexed,
+                    InstructionType.WriteZeropage => Resources.WriteZeropage,
+                    InstructionType.WriteZeropageXIndexed => Resources.WriteZeropageXIndexed,
+                    InstructionType.WriteZeropageYIndexed => Resources.WriteZeropageYIndexed,
                     InstructionType.ReadWriteAbsolute => Resources.ReadWriteAbsolute,
                     InstructionType.ReadWriteAbsoluteXIndexed => Resources.ReadWriteAbsoluteXIndexed,
                     InstructionType.ReadWriteAbsoluteYIndexed => Resources.ReadWriteAbsoluteYIndexed,
                     InstructionType.ReadWriteIndirectXIndexed => Resources.ReadWriteIndirectXIndexed,
                     InstructionType.ReadWriteIndirectYIndexed => Resources.ReadWriteIndirectYIndexed,
+                    InstructionType.ReadWriteZeropage => Resources.ReadWriteZeropage,
+                    InstructionType.ReadWriteZeropageXIndexed => Resources.ReadWriteZeropageXIndexed,
                     _ => "",
                 };
 
@@ -239,33 +240,37 @@ public sealed class Generator
 
     internal enum InstructionType
     {
+        Custom,
         Implied,
         Accumulator,
         BranchConditionalRelative,
-        ReadImmediate,
-        ReadZeropage,
-        ReadZeropageXIndexed,
-        ReadZeropageYIndexed,
+
         ReadAbsolute,
         ReadAbsoluteXIndexed,
         ReadAbsoluteYIndexed,
+        ReadImmediate,
         ReadIndirectXIndexed,
         ReadIndirectYIndexed,
-        WriteZeropage,
-        WriteZeropageXIndexed,
-        WriteZeropageYIndexed,
+        ReadZeropage,
+        ReadZeropageXIndexed,
+        ReadZeropageYIndexed,
+
         WriteAbsolute,
         WriteAbsoluteXIndexed,
         WriteAbsoluteYIndexed,
         WriteIndirectXIndexed,
         WriteIndirectYIndexed,
-        ReadWriteZeropage,
-        ReadWriteZeropageXIndexed,
+        WriteZeropage,
+        WriteZeropageXIndexed,
+        WriteZeropageYIndexed,
+
         ReadWriteAbsolute,
         ReadWriteAbsoluteXIndexed,
         ReadWriteAbsoluteYIndexed,
         ReadWriteIndirectXIndexed,
-        ReadWriteIndirectYIndexed
+        ReadWriteIndirectYIndexed,
+        ReadWriteZeropage,
+        ReadWriteZeropageXIndexed,
     }
 
     private readonly struct CpuInstructionData

@@ -822,6 +822,7 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
+    [CpuInstruction(OpCodeBOOT, InstructionType.Custom)]
     private void BOOT()
     {
         // TODO: This isn't exactly correct yet, need to verify the exact sequence of reads and writes that the CPU does on boot
@@ -1084,6 +1085,7 @@ public sealed partial class Mos6502Cpu<BusT>
         return m_Registers.PNegative;
     }
 
+    [CpuInstruction(0x00, InstructionType.Custom)]
     private void BRK_impl()
     {
         switch (m_CurrentOpCodeCycle)
@@ -1313,6 +1315,18 @@ public sealed partial class Mos6502Cpu<BusT>
         return incResult;
     }
 
+    [CpuInstruction(0x02, InstructionType.Custom)]
+    [CpuInstruction(0x12, InstructionType.Custom)]
+    [CpuInstruction(0x22, InstructionType.Custom)]
+    [CpuInstruction(0x32, InstructionType.Custom)]
+    [CpuInstruction(0x42, InstructionType.Custom)]
+    [CpuInstruction(0x52, InstructionType.Custom)]
+    [CpuInstruction(0x62, InstructionType.Custom)]
+    [CpuInstruction(0x72, InstructionType.Custom)]
+    [CpuInstruction(0x92, InstructionType.Custom)]
+    [CpuInstruction(0xb2, InstructionType.Custom)]
+    [CpuInstruction(0xd2, InstructionType.Custom)]
+    [CpuInstruction(0xf2, InstructionType.Custom)]
     private void JAM_impl()
     {
         switch (m_CurrentOpCodeCycle)
@@ -1335,6 +1349,7 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
+    [CpuInstruction(0x4c, InstructionType.Custom)]
     private void JMP_absolute()
     {
         switch (m_CurrentOpCodeCycle)
@@ -1353,6 +1368,7 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
+    [CpuInstruction(0x6c, InstructionType.Custom)]
     private void JMP_indirect()
     {
         switch (m_CurrentOpCodeCycle)
@@ -1381,6 +1397,7 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
+    [CpuInstruction(0x20, InstructionType.Custom)]
     private void JSR_absolute()
     {
         switch (m_CurrentOpCodeCycle)
@@ -1557,6 +1574,7 @@ public sealed partial class Mos6502Cpu<BusT>
         m_Registers.PNegative = CheckNegative(result);
     }
 
+    [CpuInstruction(0x48, InstructionType.Custom)]
     private void PHA_impl()
     {
         switch (m_CurrentOpCodeCycle)
@@ -1574,6 +1592,7 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
+    [CpuInstruction(0x08, InstructionType.Custom)]
     private void PHP_impl()
     {
         switch (m_CurrentOpCodeCycle)
@@ -1591,6 +1610,7 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
+    [CpuInstruction(0x68, InstructionType.Custom)]
     private void PLA_impl()
     {
         switch (m_CurrentOpCodeCycle)
@@ -1615,6 +1635,7 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
+    [CpuInstruction(0x28, InstructionType.Custom)]
     private void PLP_impl()
     {
         switch (m_CurrentOpCodeCycle)
