@@ -148,14 +148,60 @@ public sealed class Generator
 
             foreach (var op in group)
             {
-                var template = op.ReadWriteMode switch
+                var template = op.AddressingMode switch
                 {
-                    ReadWriteMode.Read => op.AddressingMode switch
+                    AddressingMode.Implied => Resources.Implied,
+                    AddressingMode.Accumulator => Resources.Accumulator,
+
+                    AddressingMode.Relative => op.ReadWriteMode switch
                     {
-                        AddressingMode.Immediate => Resources.ReadImmediate,
+                        ReadWriteMode.Branch => Resources.BranchConditionalRelative,
                         _ => "",
                     },
-                    _ => "",
+
+                    _ => op.ReadWriteMode switch
+                    {
+                        ReadWriteMode.Read => op.AddressingMode switch
+                        {
+                            AddressingMode.Immediate => Resources.ReadImmediate,
+                            AddressingMode.Zeropage => Resources.ReadZeropage,
+                            AddressingMode.ZeropageXIndexed => Resources.ReadZeropageXIndexed,
+                            AddressingMode.ZeropageYIndexed => Resources.ReadZeropageYIndexed,
+                            AddressingMode.Absolute => Resources.ReadAbsolute,
+                            AddressingMode.AbsoluteXIndexed => Resources.ReadAbsoluteXIndexed,
+                            AddressingMode.AbsoluteYIndexed => Resources.ReadAbsoluteYIndexed,
+                            AddressingMode.IndirectXIndexed => Resources.ReadIndirectXIndexed,
+                            AddressingMode.IndirectYIndexed => Resources.ReadIndirectYIndexed,
+                            _ => "",
+                        },
+
+                        ReadWriteMode.Write => op.AddressingMode switch
+                        {
+                            AddressingMode.Zeropage => Resources.WriteZeropage,
+                            AddressingMode.ZeropageXIndexed => Resources.WriteZeropageXIndexed,
+                            AddressingMode.ZeropageYIndexed => Resources.WriteZeropageYIndexed,
+                            AddressingMode.Absolute => Resources.WriteAbsolute,
+                            AddressingMode.AbsoluteXIndexed => Resources.WriteAbsoluteXIndexed,
+                            AddressingMode.AbsoluteYIndexed => Resources.WriteAbsoluteYIndexed,
+                            AddressingMode.IndirectXIndexed => Resources.WriteIndirectXIndexed,
+                            AddressingMode.IndirectYIndexed => Resources.WriteIndirectYIndexed,
+                            _ => "",
+                        },
+
+                        ReadWriteMode.ReadWrite => op.AddressingMode switch
+                        {
+                            AddressingMode.Zeropage => Resources.ReadWriteZeropage,
+                            AddressingMode.ZeropageXIndexed => Resources.ReadWriteZeropageXIndexed,
+                            AddressingMode.Absolute => Resources.ReadWriteAbsolute,
+                            AddressingMode.AbsoluteXIndexed => Resources.ReadWriteAbsoluteXIndexed,
+                            AddressingMode.AbsoluteYIndexed => Resources.ReadWriteAbsoluteYIndexed,
+                            AddressingMode.IndirectXIndexed => Resources.ReadWriteIndirectXIndexed,
+                            AddressingMode.IndirectYIndexed => Resources.ReadWriteIndirectYIndexed,
+                            _ => "",
+                        },
+
+                        _ => "",
+                    },
                 };
 
                 if (!string.IsNullOrEmpty(template))
@@ -220,7 +266,8 @@ public sealed class Generator
 
     internal enum ReadWriteMode
     {
-        Implied,
+        None,
+        Branch,
         Read,
         Write,
         ReadWrite

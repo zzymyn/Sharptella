@@ -61,12 +61,28 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_impl()
+        ///    {
+        ///        _ = m_Bus.Read(m_Registers.PC);
+        ///        Trace($&quot;$OP$ A&quot;);
+        ///        $OP$();
+        ///        m_CurrentOpCodeCycle = 0;
+        ///    }.
+        /// </summary>
+        internal static string Accumulator {
+            get {
+                return ResourceManager.GetString("Accumulator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to using System;
         ///
         ///namespace Sharptella.Gen;
         ///
         ///internal enum ReadWriteMode
         ///{
+        ///    Implied,
         ///    Read,
         ///    Write,
         ///    ReadWrite
@@ -90,11 +106,120 @@ namespace Sharptella.Gen {
         ///}
         ///
         ///[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-        ///internal sealed class CpuInstructionAttribu [rest of string was truncated]&quot;;.
+        ///internal sealed class CpuInst [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Attributes {
             get {
                 return ResourceManager.GetString("Attributes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_relative()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}&quot;);
+        ///
+        ///                if ($OP$())
+        ///                {
+        ///                    m_CurrentOpCodeCycle = 0;
+        ///                }
+        ///                else
+        ///                {
+        ///                    m_CurrentOpCodeCycle = 2;
+        ///                }
+        ///                break;
+        ///     [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string BranchConditionalRelative {
+            get {
+                return ResourceManager.GetString("BranchConditionalRelative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_impl()
+        ///    {
+        ///        _ = m_Bus.Read(m_Registers.PC);
+        ///        Trace($&quot;$OP$&quot;);
+        ///        $OP$();
+        ///        m_CurrentOpCodeCycle = 0;
+        ///    }.
+        /// </summary>
+        internal static string Implied {
+            get {
+                return ResourceManager.GetString("Implied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_absolute()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2}&quot;);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///       [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadAbsolute {
+            get {
+                return ResourceManager.GetString("ReadAbsolute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_absolute_xindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2},X&quot;);
+        ///                m_CurrentOpCodeCycle = [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadAbsoluteXIndexed {
+            get {
+                return ResourceManager.GetString("ReadAbsoluteXIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_absolute_yindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2},Y&quot;);
+        ///                m_CurrentOpCodeCycle = [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadAbsoluteYIndexed {
+            get {
+                return ResourceManager.GetString("ReadAbsoluteYIndexed", resourceCulture);
             }
         }
         
@@ -106,12 +231,480 @@ namespace Sharptella.Gen {
         ///        Trace($&quot;$OP$ #${m_SavedValue2:X2}&quot;);
         ///        $OP$(m_SavedValue2);
         ///        m_CurrentOpCodeCycle = 0;
-        ///    }
-        ///.
+        ///    }.
         /// </summary>
         internal static string ReadImmediate {
             get {
                 return ResourceManager.GetString("ReadImmediate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_indirect_xindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ (${m_SavedValue1:X2},X)&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                _ = m_Bus.Read(m_SavedValue1);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///                break;
+        ///            case 3:
+        ///               [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadIndirectXIndexed {
+            get {
+                return ResourceManager.GetString("ReadIndirectXIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_indirect_yindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ (${m_SavedValue1:X2}),Y&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                m_SavedValue0 = m_Bus.Read(m_SavedValue1);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///                break;
+        ///            case 3:
+        ///   [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadIndirectYIndexed {
+            get {
+                return ResourceManager.GetString("ReadIndirectYIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_absolute()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2}&quot;);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///       [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadWriteAbsolute {
+            get {
+                return ResourceManager.GetString("ReadWriteAbsolute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_absolute_xindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2},X&quot;);
+        ///                m_CurrentOpCodeCycle = [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadWriteAbsoluteXIndexed {
+            get {
+                return ResourceManager.GetString("ReadWriteAbsoluteXIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_absolute_yindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2},Y&quot;);
+        ///                m_CurrentOpCodeCycle = [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadWriteAbsoluteYIndexed {
+            get {
+                return ResourceManager.GetString("ReadWriteAbsoluteYIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_indirect_xindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ (${m_SavedValue1:X2},X)&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                _ = m_Bus.Read(m_SavedValue1);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///                break;
+        ///            case 3:
+        ///               [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadWriteIndirectXIndexed {
+            get {
+                return ResourceManager.GetString("ReadWriteIndirectXIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_indirect_yindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ (${m_SavedValue1:X2}),Y&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                m_SavedValue0 = m_Bus.Read(m_SavedValue1);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///                break;
+        ///            case 3:
+        ///   [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadWriteIndirectYIndexed {
+            get {
+                return ResourceManager.GetString("ReadWriteIndirectYIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_zeropage()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///                break;
+        ///            case 3:
+        ///                [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadWriteZeropage {
+            get {
+                return ResourceManager.GetString("ReadWriteZeropage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_zeropage_xindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},X&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                _ = m_Bus.Read(m_SavedValue0);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///                break;
+        ///            case 3:
+        ///                 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadWriteZeropageXIndexed {
+            get {
+                return ResourceManager.GetString("ReadWriteZeropageXIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_zeropage()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            default:
+        ///                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
+        ///                $OP$(m_SavedValue2);
+        ///                m_CurrentOpCodeCycle = 0;
+        ///                break [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadZeropage {
+            get {
+                return ResourceManager.GetString("ReadZeropage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_zeropage_xindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},X&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                _ = m_Bus.Read(m_SavedValue0);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///                break;
+        ///            default:
+        ///                [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadZeropageXIndexed {
+            get {
+                return ResourceManager.GetString("ReadZeropageXIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_zeropage_yindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},Y&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                _ = m_Bus.Read(m_SavedValue0);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///                break;
+        ///            default:
+        ///                [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ReadZeropageYIndexed {
+            get {
+                return ResourceManager.GetString("ReadZeropageYIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_absolute()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2}&quot;);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///       [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string WriteAbsolute {
+            get {
+                return ResourceManager.GetString("WriteAbsolute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_absolute_xindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2},X&quot;);
+        ///                m_CurrentOpCodeCycle = [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string WriteAbsoluteXIndexed {
+            get {
+                return ResourceManager.GetString("WriteAbsoluteXIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_absolute_yindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2},Y&quot;);
+        ///                m_CurrentOpCodeCycle = [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string WriteAbsoluteYIndexed {
+            get {
+                return ResourceManager.GetString("WriteAbsoluteYIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_indirect_xindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ (${m_SavedValue1:X2},X)&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                _ = m_Bus.Read(m_SavedValue1);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///                break;
+        ///            case 3:
+        ///               [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string WriteIndirectXIndexed {
+            get {
+                return ResourceManager.GetString("WriteIndirectXIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_indirect_yindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ (${m_SavedValue1:X2}),Y&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                m_SavedValue0 = m_Bus.Read(m_SavedValue1);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///                break;
+        ///            case 3:
+        ///   [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string WriteIndirectYIndexed {
+            get {
+                return ResourceManager.GetString("WriteIndirectYIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_zeropage()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            default:
+        ///                m_Bus.Write(m_SavedValue0, $OP$());
+        ///                m_CurrentOpCodeCycle = 0;
+        ///                break;
+        ///        }
+        ///    }.
+        /// </summary>
+        internal static string WriteZeropage {
+            get {
+                return ResourceManager.GetString("WriteZeropage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_zeropage_xindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},X&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                _ = m_Bus.Read(m_SavedValue0);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///                break;
+        ///            default:
+        ///                [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string WriteZeropageXIndexed {
+            get {
+                return ResourceManager.GetString("WriteZeropageXIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     private void $OP$_zeropage_yindexed()
+        ///    {
+        ///        switch (m_CurrentOpCodeCycle)
+        ///        {
+        ///            case 1:
+        ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+        ///                ++m_Registers.PC;
+        ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},Y&quot;);
+        ///                m_CurrentOpCodeCycle = 2;
+        ///                break;
+        ///            case 2:
+        ///                _ = m_Bus.Read(m_SavedValue0);
+        ///                m_CurrentOpCodeCycle = 3;
+        ///                break;
+        ///            default:
+        ///                [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string WriteZeropageYIndexed {
+            get {
+                return ResourceManager.GetString("WriteZeropageYIndexed", resourceCulture);
             }
         }
     }
