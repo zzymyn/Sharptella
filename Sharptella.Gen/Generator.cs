@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
@@ -146,8 +147,13 @@ public sealed class Generator
             sb.AppendLine($"public partial class {className}");
             sb.AppendLine("{");
 
+            var seen = new HashSet<(string, ReadWriteMode, AddressingMode)>();
+
             foreach (var op in group)
             {
+                if (!seen.Add((op.OpName, op.ReadWriteMode, op.AddressingMode)))
+                    continue;
+
                 var template = op.AddressingMode switch
                 {
                     AddressingMode.Implied => Resources.Implied,

@@ -7,14 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Mos6502Cpu.Gen.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Mos6502Cpu.Gen.tt</DependentUpon>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Sharptella.Gen\Sharptella.Gen.csproj">
       <OutputItemType>Analyzer</OutputItemType>
       <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
@@ -22,22 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Mos6502Cpu.Gen.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Mos6502Cpu.Gen.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Mos6502Cpu.Gen.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Mos6502Cpu.Gen.tt</DependentUpon>
-    </Compile>
   </ItemGroup>
 
 </Project>
