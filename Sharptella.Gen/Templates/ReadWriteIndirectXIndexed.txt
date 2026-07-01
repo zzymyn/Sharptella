@@ -1,0 +1,36 @@
+    private void $OP$_indirect_xindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                Trace($"$OP$ (${m_SavedValue1:X2},X)");
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(m_SavedValue1);
+                m_CurrentOpCodeCycle = 3;
+                break;
+            case 3:
+                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue1, m_Registers.X));
+                m_CurrentOpCodeCycle = 4;
+                break;
+            case 4:
+                m_SavedValue1 = m_Bus.Read(GetZeropageIndexedAdd1NoCarry(m_SavedValue1, m_Registers.X));
+                m_CurrentOpCodeCycle = 5;
+                break;
+            case 5:
+                m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
+                m_CurrentOpCodeCycle = 6;
+                break;
+            case 6:
+                m_Bus.Write(GetAbsolute(m_SavedValue0, m_SavedValue1), m_SavedValue2);
+                m_CurrentOpCodeCycle = 7;
+                break;
+            default:
+                m_Bus.Write(GetAbsolute(m_SavedValue0, m_SavedValue1), $OP$(m_SavedValue2));
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }

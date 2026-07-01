@@ -220,6 +220,7 @@ public sealed class Generator
 
     internal enum ReadWriteMode
     {
+        Implied,
         Read,
         Write,
         ReadWrite

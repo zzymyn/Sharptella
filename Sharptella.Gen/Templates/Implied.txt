@@ -1,0 +1,7 @@
+    private void $OP$_impl()
+    {
+        _ = m_Bus.Read(m_Registers.PC);
+        Trace($"$OP$");
+        $OP$();
+        m_CurrentOpCodeCycle = 0;
+    }

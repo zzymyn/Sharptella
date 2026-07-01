@@ -118,10 +118,88 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Accumulator" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\Accumulator.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="Attributes" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Templates\Attributes.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="BranchConditionalRelative" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\BranchConditionalRelative.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Implied" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\Implied.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadAbsolute" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadAbsolute.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadAbsoluteXIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadAbsoluteXIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadAbsoluteYIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadAbsoluteYIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="ReadImmediate" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Templates\ReadImmediate.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadIndirectXIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadIndirectXIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadIndirectYIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadIndirectYIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadWriteAbsolute" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadWriteAbsolute.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadWriteAbsoluteXIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadWriteAbsoluteXIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadWriteAbsoluteYIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadWriteAbsoluteYIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadWriteIndirectXIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadWriteIndirectXIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadWriteIndirectYIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadWriteIndirectYIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadWriteZeropage" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadWriteZeropage.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadWriteZeropageXIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadWriteZeropageXIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadZeropage" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadZeropage.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadZeropageXIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadZeropageXIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReadZeropageYIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\ReadZeropageYIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WriteAbsolute" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\WriteAbsolute.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WriteAbsoluteXIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\WriteAbsoluteXIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WriteAbsoluteYIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\WriteAbsoluteYIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WriteIndirectXIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\WriteIndirectXIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WriteIndirectYIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\WriteIndirectYIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WriteZeropage" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\WriteZeropage.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WriteZeropageXIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\WriteZeropageXIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WriteZeropageYIndexed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Templates\WriteZeropageYIndexed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

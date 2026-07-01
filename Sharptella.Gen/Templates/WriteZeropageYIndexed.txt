@@ -1,0 +1,20 @@
+    private void $OP$_zeropage_yindexed()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                Trace($"$OP$ ${m_SavedValue0:X2},Y");
+                m_CurrentOpCodeCycle = 2;
+                break;
+            case 2:
+                _ = m_Bus.Read(m_SavedValue0);
+                m_CurrentOpCodeCycle = 3;
+                break;
+            default:
+                m_Bus.Write(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.Y), $OP$());
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }

@@ -1,0 +1,16 @@
+    private void $OP$_zeropage()
+    {
+        switch (m_CurrentOpCodeCycle)
+        {
+            case 1:
+                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
+                ++m_Registers.PC;
+                Trace($"$OP$ ${m_SavedValue0:X2}");
+                m_CurrentOpCodeCycle = 2;
+                break;
+            default:
+                m_Bus.Write(m_SavedValue0, $OP$());
+                m_CurrentOpCodeCycle = 0;
+                break;
+        }
+    }

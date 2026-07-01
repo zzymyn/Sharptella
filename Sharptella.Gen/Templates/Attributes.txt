@@ -4,6 +4,7 @@ namespace Sharptella.Gen;
 
 internal enum ReadWriteMode
 {
+    Implied,
     Read,
     Write,
     ReadWrite
