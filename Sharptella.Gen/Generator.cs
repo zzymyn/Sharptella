@@ -142,7 +142,7 @@ public sealed class Generator
             sb.AppendLine("    {");
             sb.AppendLine("        switch (opcode)");
             sb.AppendLine("        {");
-            foreach (var op in group)
+            foreach (var op in group.OrderBy(a => a.Opcode))
             {
                 sb.AppendLine($"        case 0x{op.Opcode:X2}:");
                 if (op.InstructionType == InstructionType.Custom)
