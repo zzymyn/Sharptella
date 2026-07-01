@@ -1,4 +1,4 @@
-    private void $OP$_absolute()
+    private void $OP$_WriteAbsolute()
     {
         switch (m_CurrentOpCodeCycle)
         {

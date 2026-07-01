@@ -1,4 +1,4 @@
-    private void $OP$_relative()
+    private void $OP$_BranchConditionalRelative()
     {
         switch (m_CurrentOpCodeCycle)
         {

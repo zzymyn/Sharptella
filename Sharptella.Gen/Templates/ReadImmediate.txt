@@ -1,4 +1,4 @@
-    private void $OP$_immediate()
+    private void $OP$_ReadImmediate()
     {
         m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ++m_Registers.PC;

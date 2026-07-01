@@ -1,4 +1,4 @@
-    private void $OP$_impl()
+    private void $OP$_Implied()
     {
         _ = m_Bus.Read(m_Registers.PC);
         Trace($"$OP$");

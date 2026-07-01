@@ -1,4 +1,4 @@
-    private void $OP$_zeropage()
+    private void $OP$_WriteZeropage()
     {
         switch (m_CurrentOpCodeCycle)
         {

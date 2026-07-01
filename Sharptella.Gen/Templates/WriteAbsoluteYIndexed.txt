@@ -1,4 +1,4 @@
-    private void $OP$_absolute_yindexed()
+    private void $OP$_WriteAbsoluteYIndexed()
     {
         switch (m_CurrentOpCodeCycle)
         {

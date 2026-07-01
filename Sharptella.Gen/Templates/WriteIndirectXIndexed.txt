@@ -1,4 +1,4 @@
-    private void $OP$_indirect_xindexed()
+    private void $OP$_WriteIndirectXIndexed()
     {
         switch (m_CurrentOpCodeCycle)
         {

@@ -138,6 +138,29 @@ public sealed class Generator
             sb.AppendLine($"public partial class {className}");
             sb.AppendLine("{");
 
+            sb.AppendLine("    private void Dispatch(int opcode)");
+            sb.AppendLine("    {");
+            sb.AppendLine("        switch (opcode)");
+            sb.AppendLine("        {");
+            foreach (var op in group)
+            {
+                sb.AppendLine($"        case 0x{op.Opcode:X2}:");
+                if (op.InstructionType == InstructionType.Custom)
+                {
+                    sb.AppendLine($"            {op.MethodName}();");
+                }
+                else
+                {
+                    sb.AppendLine($"            {op.MethodName}_{op.InstructionType}();");
+                }
+                sb.AppendLine("            break;");
+            }
+            sb.AppendLine("        default:");
+            sb.AppendLine("            UNKNOWN();");
+            sb.AppendLine("            break;");
+            sb.AppendLine("        }");
+            sb.AppendLine("    }");
+
             var seen = new HashSet<(string, InstructionType)>();
 
             foreach (var op in group)

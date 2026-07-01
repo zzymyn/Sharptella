@@ -1,4 +1,4 @@
-    private void $OP$_zeropage_xindexed()
+    private void $OP$_ReadZeropageXIndexed()
     {
         switch (m_CurrentOpCodeCycle)
         {

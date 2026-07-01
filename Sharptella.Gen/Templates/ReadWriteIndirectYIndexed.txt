@@ -1,4 +1,4 @@
-    private void $OP$_indirect_yindexed()
+    private void $OP$_ReadWriteIndirectYIndexed()
     {
         switch (m_CurrentOpCodeCycle)
         {
