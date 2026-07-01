@@ -1,0 +1,43 @@
+﻿using System;
+
+namespace Sharptella.Gen;
+
+internal enum ReadWriteMode
+{
+    Read,
+    Write,
+    ReadWrite
+}
+
+internal enum AddressingMode
+{
+    Implied,
+    Accumulator,
+    Immediate,
+    Zeropage,
+    ZeropageXIndexed,
+    ZeropageYIndexed,
+    Absolute,
+    AbsoluteXIndexed,
+    AbsoluteYIndexed,
+    Indirect,
+    IndirectXIndexed,
+    IndirectYIndexed,
+    Relative
+}
+
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+internal sealed class CpuInstructionAttribute
+    : Attribute
+{
+    public int OpCode;
+    public ReadWriteMode ReadWriteMode;
+    public AddressingMode AddressingMode;
+
+    public CpuInstructionAttribute(int opCode, ReadWriteMode readWriteMode, AddressingMode addressingMode)
+    {
+        OpCode = opCode;
+        ReadWriteMode = readWriteMode;
+        AddressingMode = addressingMode;
+    }
+}

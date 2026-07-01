@@ -15,6 +15,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sharptella.Gen\Sharptella.Gen.csproj">
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Mos6502Cpu.Gen.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Mos6502Cpu.Gen.cs</LastGenOutput>

@@ -4,3 +4,4 @@ bin/
 *.user
 test*.bin
 imgui.ini
+*.tmp

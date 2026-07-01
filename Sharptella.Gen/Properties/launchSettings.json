@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DebugGenerator": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\Sharptella.Lib\\Sharptella.Lib.csproj"
+    }
+  }
+}

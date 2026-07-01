@@ -23,8 +23,6 @@ public sealed partial class Mos6502Cpu<BusT>
 <# ReadIndirectXIndexed("ADC"); #>
 <# ReadIndirectYIndexed("ADC"); #>
 
-<# ReadImmediate("ALR"); #>
-
 <# ReadImmediate("ANC"); #>
 
 <# ReadImmediate("AND"); #>

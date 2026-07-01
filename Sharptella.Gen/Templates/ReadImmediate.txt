@@ -1,0 +1,8 @@
+﻿    private void $OP$_immediate()
+    {
+        m_SavedValue2 = m_Bus.Read(m_Registers.PC);
+        ++m_Registers.PC;
+        Trace($"$OP$ #${m_SavedValue2:X2}");
+        $OP$(m_SavedValue2);
+        m_CurrentOpCodeCycle = 0;
+    }

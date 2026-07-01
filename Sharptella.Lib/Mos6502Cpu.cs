@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Sharptella.Gen;
 
 namespace Sharptella.Lib;
 
@@ -919,6 +920,7 @@ public sealed partial class Mos6502Cpu<BusT>
         }
     }
 
+    [CpuInstruction(0x4b, ReadWriteMode.Read, AddressingMode.Immediate)]
     private void ALR(byte arg)
     {
         AND(arg);

@@ -1,3 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace Sharptella.Lib;
 
 public sealed partial class Mos6502Cpu<BusT>
@@ -206,15 +212,6 @@ public sealed partial class Mos6502Cpu<BusT>
                 m_CurrentOpCodeCycle = 0;
                 break;
         }
-    }
-
-    private void ALR_immediate()
-    {
-        m_SavedValue2 = m_Bus.Read(m_Registers.PC);
-        ++m_Registers.PC;
-        Trace($"ALR #${m_SavedValue2:X2}");
-        ALR(m_SavedValue2);
-        m_CurrentOpCodeCycle = 0;
     }
 
     private void ANC_immediate()
