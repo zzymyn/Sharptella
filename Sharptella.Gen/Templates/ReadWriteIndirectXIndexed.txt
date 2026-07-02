@@ -1,4 +1,4 @@
-    private void $OP$_ReadWriteIndirectXIndexed()
+﻿    private bool $OP$_ReadWriteIndirectXIndexed()
     {
         switch (m_CurrentOpCodeCycle)
         {
@@ -6,31 +6,24 @@
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
                 Trace($"$OP$ (${m_SavedValue1:X2},X)");
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 2:
                 _ = m_Bus.Read(m_SavedValue1);
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 3:
                 m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue1, m_Registers.X));
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 4:
                 m_SavedValue1 = m_Bus.Read(GetZeropageIndexedAdd1NoCarry(m_SavedValue1, m_Registers.X));
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 5:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 6:
                 m_Bus.Write(GetAbsolute(m_SavedValue0, m_SavedValue1), m_SavedValue2);
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             default:
                 m_Bus.Write(GetAbsolute(m_SavedValue0, m_SavedValue1), $OP$(m_SavedValue2));
-                m_CurrentOpCodeCycle = 0;
-                break;
+                return true;
         }
     }

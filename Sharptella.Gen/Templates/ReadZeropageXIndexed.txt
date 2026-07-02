@@ -1,4 +1,4 @@
-    private void $OP$_ReadZeropageXIndexed()
+﻿    private bool $OP$_ReadZeropageXIndexed()
     {
         switch (m_CurrentOpCodeCycle)
         {
@@ -6,16 +6,13 @@
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
                 Trace($"$OP$ ${m_SavedValue0:X2},X");
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 2:
                 _ = m_Bus.Read(m_SavedValue0);
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             default:
                 m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X));
-                m_CurrentOpCodeCycle = 0;
                 $OP$(m_SavedValue2);
-                break;
+                return true;
         }
     }

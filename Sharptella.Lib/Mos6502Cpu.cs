@@ -56,27 +56,35 @@ public sealed partial class Mos6502Cpu<BusT>
             m_CurrentOpCodeAddress = m_Registers.PC;
             m_CurrentOpCode = m_Bus.Read(m_Registers.PC);
             ++m_Registers.PC;
-
-            m_CurrentOpCodeCycle = 1;
+            ++m_CurrentOpCodeCycle;
         }
         else
         {
-            Dispatch(m_CurrentOpCode);
+            bool isComplete = Dispatch(m_CurrentOpCode);
+
+            if (isComplete)
+            {
+                m_CurrentOpCodeCycle = 0;
+            }
+            else
+            {
+                ++m_CurrentOpCodeCycle;
+            }
         }
     }
 
-    private void UNKNOWN()
+    private bool UNKNOWN()
     {
         // We're explicitly not handling the unstable opcodes, just NOPing instead.
         // Possible accuracy improvement: at least run for the same number of cycles
         // as the unstable opcode would have, to improve timing accuracy?
         _ = m_Bus.Read(m_Registers.PC);
         Trace($"UNKNOWN ${m_CurrentOpCode:X2}");
-        m_CurrentOpCodeCycle = 0;
+        return true;
     }
 
     [CpuInstruction(OpCodeBOOT, InstructionType.Custom)]
-    private void BOOT()
+    private bool BOOT()
     {
         // TODO: This isn't exactly correct yet, need to verify the exact sequence of reads and writes that the CPU does on boot
         // and make sure this matches that.
@@ -96,29 +104,26 @@ public sealed partial class Mos6502Cpu<BusT>
                 m_Registers.PInterruptDisable = true;
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("BOOT");
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 2:
                 _ = m_Bus.Read(m_Registers.PC);
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 3:
             case 4:
             case 5:
                 _ = m_Bus.Read(GetStackAddress(m_Registers.S));
                 --m_Registers.S;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 6:
                 m_SavedValue0 = m_Bus.Read(0xFFFC);
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 7:
                 m_SavedValue1 = m_Bus.Read(0xFFFD);
                 m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
-                m_CurrentOpCodeCycle = 0;
-                break;
+                return true;
         }
+
+        return false;
     }
 
     [CpuInstruction(0x69, InstructionType.ReadImmediate)]
@@ -339,7 +344,7 @@ public sealed partial class Mos6502Cpu<BusT>
     }
 
     [CpuInstruction(0x00, InstructionType.Custom)]
-    private void BRK_impl()
+    private bool BRK_impl()
     {
         switch (m_CurrentOpCodeCycle)
         {
@@ -347,34 +352,30 @@ public sealed partial class Mos6502Cpu<BusT>
                 _ = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
                 Trace("BRK");
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 2:
                 m_Bus.Write(GetStackAddress(m_Registers.S), GetHi(m_Registers.PC));
                 --m_Registers.S;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 3:
                 m_Bus.Write(GetStackAddress(m_Registers.S), GetLo(m_Registers.PC));
                 --m_Registers.S;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 4:
                 m_Bus.Write(GetStackAddress(m_Registers.S), m_Registers.ReadP(true));
                 --m_Registers.S;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 5:
                 m_SavedValue0 = m_Bus.Read(0xFFFE);
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 6:
                 m_SavedValue1 = m_Bus.Read(0xFFFF);
                 m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
                 m_Registers.PInterruptDisable = true;
-                m_CurrentOpCodeCycle = 0;
-                break;
+                return true;
         }
+
+        return false;
     }
 
     [CpuInstruction(0x50, InstructionType.BranchConditionalRelative)]
@@ -580,106 +581,94 @@ public sealed partial class Mos6502Cpu<BusT>
     [CpuInstruction(0xb2, InstructionType.Custom)]
     [CpuInstruction(0xd2, InstructionType.Custom)]
     [CpuInstruction(0xf2, InstructionType.Custom)]
-    private void JAM_impl()
+    private bool JAM_impl()
     {
         switch (m_CurrentOpCodeCycle)
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("JAM");
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 2:
             default:
                 _ = m_Bus.Read(0xFFFF);
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 3:
             case 4:
                 _ = m_Bus.Read(0xFFFE);
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
         }
     }
 
     [CpuInstruction(0x4c, InstructionType.Custom)]
-    private void JMP_absolute()
+    private bool JMP_absolute()
     {
         switch (m_CurrentOpCodeCycle)
         {
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             default:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 Trace($"JMP ${m_SavedValue0:X2}{m_SavedValue1:X2}");
                 m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
-                m_CurrentOpCodeCycle = 0;
-                break;
+                return true;
         }
     }
 
     [CpuInstruction(0x6c, InstructionType.Custom)]
-    private void JMP_indirect()
+    private bool JMP_indirect()
     {
         switch (m_CurrentOpCodeCycle)
         {
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
                 Trace($"JMP (${m_SavedValue0:X2}{m_SavedValue1:X2})");
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 3:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 ++m_SavedValue0;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 4:
                 m_SavedValue1 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 m_Registers.PC = GetAbsolute(m_SavedValue2, m_SavedValue1);
-                m_CurrentOpCodeCycle = 0;
-                break;
+                return true;
         }
+
+        return false;
     }
 
     [CpuInstruction(0x20, InstructionType.Custom)]
-    private void JSR_absolute()
+    private bool JSR_absolute()
     {
         switch (m_CurrentOpCodeCycle)
         {
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 2:
                 _ = m_Bus.Read(GetStackAddress(m_Registers.S));
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 3:
                 m_Bus.Write(GetStackAddress(m_Registers.S), GetHi(m_Registers.PC));
                 --m_Registers.S;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 4:
                 m_Bus.Write(GetStackAddress(m_Registers.S), GetLo(m_Registers.PC));
                 --m_Registers.S;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             default:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
                 Trace($"JSR ${m_SavedValue0:X2}{m_SavedValue1:X2}");
-                m_CurrentOpCodeCycle = 0;
-                break;
+                return true;
         }
     }
 
@@ -828,86 +817,76 @@ public sealed partial class Mos6502Cpu<BusT>
     }
 
     [CpuInstruction(0x48, InstructionType.Custom)]
-    private void PHA_impl()
+    private bool PHA_impl()
     {
         switch (m_CurrentOpCodeCycle)
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("PHA");
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             default:
                 m_Bus.Write(GetStackAddress(m_Registers.S), m_Registers.A);
                 --m_Registers.S;
-                m_CurrentOpCodeCycle = 0;
-                break;
+                return true;
         }
     }
 
     [CpuInstruction(0x08, InstructionType.Custom)]
-    private void PHP_impl()
+    private bool PHP_impl()
     {
         switch (m_CurrentOpCodeCycle)
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("PHP");
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             default:
                 m_Bus.Write(GetStackAddress(m_Registers.S), m_Registers.ReadP(true));
                 --m_Registers.S;
-                m_CurrentOpCodeCycle = 0;
-                break;
+                return true;
         }
     }
 
     [CpuInstruction(0x68, InstructionType.Custom)]
-    private void PLA_impl()
+    private bool PLA_impl()
     {
         switch (m_CurrentOpCodeCycle)
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("PLA");
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 2:
                 _ = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.S++;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             default:
                 m_SavedValue2 = m_Bus.Read(GetStackAddress(m_Registers.S));
-                m_CurrentOpCodeCycle = 0;
                 m_Registers.A = m_SavedValue2;
                 m_Registers.PZero = CheckZero(m_SavedValue2);
                 m_Registers.PNegative = CheckNegative(m_SavedValue2);
-                break;
+                return true;
         }
     }
 
     [CpuInstruction(0x28, InstructionType.Custom)]
-    private void PLP_impl()
+    private bool PLP_impl()
     {
         switch (m_CurrentOpCodeCycle)
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("PLP");
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 2:
                 _ = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.S++;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             default:
                 m_SavedValue2 = m_Bus.Read(GetStackAddress(m_Registers.S));
-                m_CurrentOpCodeCycle = 0;
                 m_Registers.WriteP(m_SavedValue2);
-                break;
+                return true;
         }
     }
 
@@ -992,69 +971,63 @@ public sealed partial class Mos6502Cpu<BusT>
     }
 
     [CpuInstruction(0x40, InstructionType.Custom)]
-    private void RTI_impl()
+    private bool RTI_impl()
     {
         switch (m_CurrentOpCodeCycle)
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("RTI");
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 2:
                 _ = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.S++;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 3:
                 m_Registers.WriteP(m_Bus.Read(GetStackAddress(m_Registers.S)));
                 m_Registers.S++;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 4:
                 m_SavedValue0 = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.S++;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 5:
                 m_SavedValue1 = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
-                m_CurrentOpCodeCycle = 0;
-                break;
+                return true;
         }
+
+        return false;
     }
 
     [CpuInstruction(0x60, InstructionType.Custom)]
-    private void RTS_impl()
+    private bool RTS_impl()
     {
         switch (m_CurrentOpCodeCycle)
         {
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("RTS");
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 2:
                 _ = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.S++;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 3:
                 m_SavedValue0 = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.S++;
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 4:
                 m_SavedValue1 = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
-                ++m_CurrentOpCodeCycle;
-                break;
+                return false;
             case 5:
                 _ = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
-                m_CurrentOpCodeCycle = 0;
-                break;
+                return true;
         }
+
+        return false;
     }
 
     [CpuInstruction(0x87, InstructionType.WriteZeropage)]

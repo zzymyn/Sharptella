@@ -1,4 +1,4 @@
-    private void $OP$_BranchConditionalRelative()
+﻿    private bool $OP$_BranchConditionalRelative()
     {
         switch (m_CurrentOpCodeCycle)
         {
@@ -9,13 +9,12 @@
 
                 if ($OP$())
                 {
-                    m_CurrentOpCodeCycle = 0;
+                    return true;
                 }
                 else
                 {
-                    ++m_CurrentOpCodeCycle;
+                    return false;
                 }
-                break;
             case 2:
                 _ = m_Bus.Read(m_Registers.PC);
 
@@ -25,18 +24,15 @@
                 if (newPc == pcNoCarry)
                 {
                     m_Registers.PC = newPc;
-                    m_CurrentOpCodeCycle = 0;
+                    return true;
                 }
                 else
                 {
-                    ++m_CurrentOpCodeCycle;
+                    return false;
                 }
-                break;
             default:
                 _ = m_Bus.Read(GetRelativeSignedNoCarry(m_Registers.PC, m_SavedValue0));
                 m_Registers.PC = GetRelativeSigned(m_Registers.PC, m_SavedValue0);
-                m_CurrentOpCodeCycle = 0;
-                break;
+                return true;
         }
-
     }

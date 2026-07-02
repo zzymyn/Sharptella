@@ -138,7 +138,7 @@ public sealed class Generator
             sb.AppendLine($"public partial class {className}");
             sb.AppendLine("{");
 
-            sb.AppendLine("    private void Dispatch(int opcode)");
+            sb.AppendLine("    private bool Dispatch(int opcode)");
             sb.AppendLine("    {");
             sb.AppendLine("        switch (opcode)");
             sb.AppendLine("        {");
@@ -147,17 +147,15 @@ public sealed class Generator
                 sb.AppendLine($"        case 0x{op.Opcode:X2}:");
                 if (op.InstructionType == InstructionType.Custom)
                 {
-                    sb.AppendLine($"            {op.MethodName}();");
+                    sb.AppendLine($"            return {op.MethodName}();");
                 }
                 else
                 {
-                    sb.AppendLine($"            {op.MethodName}_{op.InstructionType}();");
+                    sb.AppendLine($"            return {op.MethodName}_{op.InstructionType}();");
                 }
-                sb.AppendLine("            break;");
             }
             sb.AppendLine("        default:");
-            sb.AppendLine("            UNKNOWN();");
-            sb.AppendLine("            break;");
+            sb.AppendLine("            return UNKNOWN();");
             sb.AppendLine("        }");
             sb.AppendLine("    }");
 

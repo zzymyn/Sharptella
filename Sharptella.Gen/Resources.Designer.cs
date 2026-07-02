@@ -61,13 +61,14 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_impl()
+        ///   Looks up a localized string similar to     private bool $OP$_Accumulator()
         ///    {
         ///        _ = m_Bus.Read(m_Registers.PC);
         ///        Trace($&quot;$OP$ A&quot;);
         ///        $OP$();
-        ///        m_CurrentOpCodeCycle = 0;
-        ///    }.
+        ///        return true;
+        ///    }
+        ///.
         /// </summary>
         internal static string Accumulator {
             get {
@@ -80,33 +81,28 @@ namespace Sharptella.Gen {
         ///
         ///namespace Sharptella.Gen;
         ///
-        ///internal enum ReadWriteMode
+        ///internal enum InstructionType
         ///{
-        ///    Implied,
-        ///    Read,
-        ///    Write,
-        ///    ReadWrite
-        ///}
-        ///
-        ///internal enum AddressingMode
-        ///{
+        ///    Custom, 
         ///    Implied,
         ///    Accumulator,
-        ///    Immediate,
-        ///    Zeropage,
-        ///    ZeropageXIndexed,
-        ///    ZeropageYIndexed,
-        ///    Absolute,
-        ///    AbsoluteXIndexed,
-        ///    AbsoluteYIndexed,
-        ///    Indirect,
-        ///    IndirectXIndexed,
-        ///    IndirectYIndexed,
-        ///    Relative
-        ///}
+        ///    BranchConditionalRelative,
         ///
-        ///[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-        ///internal sealed class CpuInst [rest of string was truncated]&quot;;.
+        ///    ReadAbsolute,
+        ///    ReadAbsoluteXIndexed,
+        ///    ReadAbsoluteYIndexed,
+        ///    ReadImmediate,
+        ///    ReadIndirectXIndexed,
+        ///    ReadIndirectYIndexed,
+        ///    ReadZeropage,
+        ///    ReadZeropageXIndexed,
+        ///    ReadZeropageYIndexed,
+        ///
+        ///    WriteAbsolute,
+        ///    WriteAbsoluteXIndexed,
+        ///    WriteAbsoluteYIndexed,
+        ///    WriteIndirectXIndexed,
+        ///    WriteIndirectYIndexed, [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Attributes {
             get {
@@ -115,7 +111,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_relative()
+        ///   Looks up a localized string similar to     private bool $OP$_BranchConditionalRelative()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -126,14 +122,14 @@ namespace Sharptella.Gen {
         ///
         ///                if ($OP$())
         ///                {
-        ///                    m_CurrentOpCodeCycle = 0;
+        ///                    return true;
         ///                }
         ///                else
         ///                {
-        ///                    ++m_CurrentOpCodeCycle;
+        ///                    return false;
         ///                }
-        ///                break;
-        ///     [rest of string was truncated]&quot;;.
+        ///            case 2:
+        ///                [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string BranchConditionalRelative {
             get {
@@ -142,13 +138,14 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_impl()
+        ///   Looks up a localized string similar to     private bool $OP$_Implied()
         ///    {
         ///        _ = m_Bus.Read(m_Registers.PC);
         ///        Trace($&quot;$OP$&quot;);
         ///        $OP$();
-        ///        m_CurrentOpCodeCycle = 0;
-        ///    }.
+        ///        return true;
+        ///    }
+        ///.
         /// </summary>
         internal static string Implied {
             get {
@@ -157,21 +154,21 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_absolute()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadAbsolute()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2}&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///       [rest of string was truncated]&quot;;.
+        ///                return false;
+        ///            default:
+        ///                m_SavedValue [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadAbsolute {
             get {
@@ -180,20 +177,21 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_absolute_xindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadAbsoluteXIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2},X&quot;);
-        ///                m_CurrentOpCodeCycle = [rest of string was truncated]&quot;;.
+        ///                return false;
+        ///            case 3:
+        ///                if  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadAbsoluteXIndexed {
             get {
@@ -202,20 +200,21 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_absolute_yindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadAbsoluteYIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2},Y&quot;);
-        ///                m_CurrentOpCodeCycle = [rest of string was truncated]&quot;;.
+        ///                return false;
+        ///            case 3:
+        ///                if  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadAbsoluteYIndexed {
             get {
@@ -224,14 +223,15 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_immediate()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadImmediate()
         ///    {
         ///        m_SavedValue2 = m_Bus.Read(m_Registers.PC);
         ///        ++m_Registers.PC;
         ///        Trace($&quot;$OP$ #${m_SavedValue2:X2}&quot;);
         ///        $OP$(m_SavedValue2);
-        ///        m_CurrentOpCodeCycle = 0;
-        ///    }.
+        ///        return true;
+        ///    }
+        ///.
         /// </summary>
         internal static string ReadImmediate {
             get {
@@ -240,7 +240,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_indirect_xindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadIndirectXIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -248,14 +248,12 @@ namespace Sharptella.Gen {
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ (${m_SavedValue1:X2},X)&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue1);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 3:
-        ///               [rest of string was truncated]&quot;;.
+        ///                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue1, [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadIndirectXIndexed {
             get {
@@ -264,7 +262,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_indirect_yindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadIndirectYIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -272,14 +270,12 @@ namespace Sharptella.Gen {
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ (${m_SavedValue1:X2}),Y&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                m_SavedValue0 = m_Bus.Read(m_SavedValue1);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 3:
-        ///   [rest of string was truncated]&quot;;.
+        ///                m_SavedValue1 = m_Bus.Read(GetAdd1NoCarry(m_SavedValue1 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadIndirectYIndexed {
             get {
@@ -288,21 +284,21 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_absolute()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadWriteAbsolute()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2}&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///       [rest of string was truncated]&quot;;.
+        ///                return false;
+        ///            case 3:
+        ///                m_SavedV [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadWriteAbsolute {
             get {
@@ -311,20 +307,21 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_absolute_xindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadWriteAbsoluteXIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2},X&quot;);
-        ///                m_CurrentOpCodeCycle = [rest of string was truncated]&quot;;.
+        ///                return false;
+        ///            case 3:
+        ///               [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadWriteAbsoluteXIndexed {
             get {
@@ -333,20 +330,21 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_absolute_yindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadWriteAbsoluteYIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2},Y&quot;);
-        ///                m_CurrentOpCodeCycle = [rest of string was truncated]&quot;;.
+        ///                return false;
+        ///            case 3:
+        ///               [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadWriteAbsoluteYIndexed {
             get {
@@ -355,7 +353,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_indirect_xindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadWriteIndirectXIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -363,14 +361,12 @@ namespace Sharptella.Gen {
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ (${m_SavedValue1:X2},X)&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue1);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 3:
-        ///               [rest of string was truncated]&quot;;.
+        ///                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedVa [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadWriteIndirectXIndexed {
             get {
@@ -379,7 +375,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_indirect_yindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadWriteIndirectYIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -387,14 +383,12 @@ namespace Sharptella.Gen {
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ (${m_SavedValue1:X2}),Y&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                m_SavedValue0 = m_Bus.Read(m_SavedValue1);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 3:
-        ///   [rest of string was truncated]&quot;;.
+        ///                m_SavedValue1 = m_Bus.Read(GetAdd1NoCarry(m_SavedV [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadWriteIndirectYIndexed {
             get {
@@ -403,7 +397,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_zeropage()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadWriteZeropage()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -411,14 +405,13 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 3:
-        ///                [rest of string was truncated]&quot;;.
+        ///                m_Bus.Write(m_SavedValue0, m_SavedValue2);
+        ///                re [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadWriteZeropage {
             get {
@@ -427,7 +420,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_zeropage_xindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadWriteZeropageXIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -435,14 +428,12 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},X&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue0);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 3:
-        ///                 [rest of string was truncated]&quot;;.
+        ///                m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValu [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadWriteZeropageXIndexed {
             get {
@@ -451,7 +442,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_zeropage()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadZeropage()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -459,13 +450,14 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            default:
         ///                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
         ///                $OP$(m_SavedValue2);
-        ///                m_CurrentOpCodeCycle = 0;
-        ///                break [rest of string was truncated]&quot;;.
+        ///                return true;
+        ///        }
+        ///    }
+        ///.
         /// </summary>
         internal static string ReadZeropage {
             get {
@@ -474,7 +466,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_zeropage_xindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadZeropageXIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -482,14 +474,12 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},X&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue0);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            default:
-        ///                [rest of string was truncated]&quot;;.
+        ///                m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0,  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadZeropageXIndexed {
             get {
@@ -498,7 +488,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_zeropage_yindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_ReadZeropageYIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -506,14 +496,12 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},Y&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue0);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            default:
-        ///                [rest of string was truncated]&quot;;.
+        ///                m_SavedValue2 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue0,  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadZeropageYIndexed {
             get {
@@ -522,21 +510,21 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_absolute()
+        ///   Looks up a localized string similar to     private bool $OP$_WriteAbsolute()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2}&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///       [rest of string was truncated]&quot;;.
+        ///                return false;
+        ///            default:
+        ///                m_Bus.Write [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string WriteAbsolute {
             get {
@@ -545,20 +533,21 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_absolute_xindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_WriteAbsoluteXIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2},X&quot;);
-        ///                m_CurrentOpCodeCycle = [rest of string was truncated]&quot;;.
+        ///                return false;
+        ///            case 3:
+        ///                _  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string WriteAbsoluteXIndexed {
             get {
@@ -567,20 +556,21 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_absolute_yindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_WriteAbsoluteYIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2},Y&quot;);
-        ///                m_CurrentOpCodeCycle = [rest of string was truncated]&quot;;.
+        ///                return false;
+        ///            case 3:
+        ///                _  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string WriteAbsoluteYIndexed {
             get {
@@ -589,7 +579,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_indirect_xindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_WriteIndirectXIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -597,14 +587,12 @@ namespace Sharptella.Gen {
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ (${m_SavedValue1:X2},X)&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue1);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 3:
-        ///               [rest of string was truncated]&quot;;.
+        ///                m_SavedValue0 = m_Bus.Read(GetZeropageIndexedNoCarry(m_SavedValue1 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string WriteIndirectXIndexed {
             get {
@@ -613,7 +601,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_indirect_yindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_WriteIndirectYIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -621,14 +609,12 @@ namespace Sharptella.Gen {
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ (${m_SavedValue1:X2}),Y&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                m_SavedValue0 = m_Bus.Read(m_SavedValue1);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 3:
-        ///   [rest of string was truncated]&quot;;.
+        ///                m_SavedValue1 = m_Bus.Read(GetAdd1NoCarry(m_SavedValue [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string WriteIndirectYIndexed {
             get {
@@ -637,7 +623,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_zeropage()
+        ///   Looks up a localized string similar to     private bool $OP$_WriteZeropage()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -645,14 +631,13 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            default:
         ///                m_Bus.Write(m_SavedValue0, $OP$());
-        ///                m_CurrentOpCodeCycle = 0;
-        ///                break;
+        ///                return true;
         ///        }
-        ///    }.
+        ///    }
+        ///.
         /// </summary>
         internal static string WriteZeropage {
             get {
@@ -661,7 +646,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_zeropage_xindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_WriteZeropageXIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -669,14 +654,12 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},X&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue0);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            default:
-        ///                [rest of string was truncated]&quot;;.
+        ///                m_Bus.Write(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.X) [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string WriteZeropageXIndexed {
             get {
@@ -685,7 +668,7 @@ namespace Sharptella.Gen {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     private void $OP$_zeropage_yindexed()
+        ///   Looks up a localized string similar to     private bool $OP$_WriteZeropageYIndexed()
         ///    {
         ///        switch (m_CurrentOpCodeCycle)
         ///        {
@@ -693,14 +676,12 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},Y&quot;);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue0);
-        ///                ++m_CurrentOpCodeCycle;
-        ///                break;
+        ///                return false;
         ///            default:
-        ///                [rest of string was truncated]&quot;;.
+        ///                m_Bus.Write(GetZeropageIndexedNoCarry(m_SavedValue0, m_Registers.Y) [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string WriteZeropageYIndexed {
             get {

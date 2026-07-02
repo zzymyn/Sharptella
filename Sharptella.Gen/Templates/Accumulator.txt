@@ -1,7 +1,7 @@
-    private void $OP$_Accumulator()
+﻿    private bool $OP$_Accumulator()
     {
         _ = m_Bus.Read(m_Registers.PC);
         Trace($"$OP$ A");
         $OP$();
-        m_CurrentOpCodeCycle = 0;
+        return true;
     }
