@@ -12,6 +12,10 @@ public sealed class Atari2600Tia
     private const int HBlankLengthHMoved = 76;
     private const int MaxScanlineCount = 512; // sensible upper bound to prevent unbounded memory usage in case of a bug
 
+    private const double CapacitorDischargeRate = 125.0;
+    private const double CapacitorChargeRateMin = 58000.0;
+    private const double CapacitorChargeRateMax = 3.0;
+
     private static readonly ColorAbgr8888[] YiqToColorLut = new ColorAbgr8888[256];
 
     private readonly IAtariInput m_Input;
@@ -61,6 +65,12 @@ public sealed class Atari2600Tia
     private bool m_LatchesEnabled;
     private bool m_P0Latch;
     private bool m_P1Latch;
+
+    private bool m_DumpPaddlesToGround;
+    private double m_CapacitorCharge0;
+    private double m_CapacitorCharge1;
+    private double m_CapacitorCharge2;
+    private double m_CapacitorCharge3;
 
     private AudioChannel m_AudioChannel0 = new();
     private AudioChannel m_AudioChannel1 = new();
@@ -200,6 +210,26 @@ public sealed class Atari2600Tia
             m_P0Latch |= m_Input.Player0Button;
             m_P1Latch |= m_Input.Player1Button;
         }
+        else
+        {
+            m_P0Latch = false;
+            m_P1Latch = false;
+        }
+
+        if (m_DumpPaddlesToGround)
+        {
+            m_CapacitorCharge0 = Math.Max(0.0f, m_CapacitorCharge0 - 1.0 / CapacitorDischargeRate);
+            m_CapacitorCharge1 = Math.Max(0.0f, m_CapacitorCharge1 - 1.0 / CapacitorDischargeRate);
+            m_CapacitorCharge2 = Math.Max(0.0f, m_CapacitorCharge2 - 1.0 / CapacitorDischargeRate);
+            m_CapacitorCharge3 = Math.Max(0.0f, m_CapacitorCharge3 - 1.0 / CapacitorDischargeRate);
+        }
+        else
+        {
+            m_CapacitorCharge0 = Math.Min(1.0f, m_CapacitorCharge0 + 1.0 / MathEx.Lerp(CapacitorChargeRateMin, CapacitorChargeRateMax, m_Input.Player0Paddle0));
+            m_CapacitorCharge1 = Math.Min(1.0f, m_CapacitorCharge1 + 1.0 / MathEx.Lerp(CapacitorChargeRateMin, CapacitorChargeRateMax, m_Input.Player0Paddle1));
+            m_CapacitorCharge2 = Math.Min(1.0f, m_CapacitorCharge2 + 1.0 / MathEx.Lerp(CapacitorChargeRateMin, CapacitorChargeRateMax, m_Input.Player1Paddle0));
+            m_CapacitorCharge3 = Math.Min(1.0f, m_CapacitorCharge3 + 1.0 / MathEx.Lerp(CapacitorChargeRateMin, CapacitorChargeRateMax, m_Input.Player1Paddle1));
+        }
     }
 
     private bool DrawPlayfield(Span<ColorAbgr8888> currentScanline, int i)
@@ -331,20 +361,16 @@ public sealed class Atari2600Tia
                 return GetCx(m_CxP0P1, m_CxM0M1);
             case 0x08:
                 // INPT0
-                // TODO
-                return 0x80;
+                return (m_CapacitorCharge0 >= 1.0) ? 0x80 : 0x00;
             case 0x09:
                 // INPT1
-                // TODO
-                return 0x80;
+                return (m_CapacitorCharge1 >= 1.0) ? 0x80 : 0x00;
             case 0x0a:
                 // INPT2
-                // TODO
-                return 0x80;
+                return (m_CapacitorCharge2 >= 1.0) ? 0x80 : 0x00;
             case 0x0b:
                 // INPT3
-                // TODO
-                return 0x80;
+                return (m_CapacitorCharge3 >= 1.0) ? 0x80 : 0x00;
             case 0x0c:
                 // INPT4
                 if (m_LatchesEnabled)
@@ -383,8 +409,8 @@ public sealed class Atari2600Tia
             case 0x01:
                 // VBLANK
                 SetVBlank((value & 0b0000_0010) != 0);
-                SetTriggerButtonLatches((value & 0b0100_0000) != 0);
-                SetPaddleCapacitorDumpToGround((value & 0b1000_0000) != 0);
+                m_LatchesEnabled = (value & 0b0100_0000) != 0;
+                m_DumpPaddlesToGround = (value & 0b1000_0000) != 0;
                 break;
             case 0x02:
                 // WSYNC
@@ -641,21 +667,6 @@ public sealed class Atari2600Tia
         }
     }
 
-    private void SetTriggerButtonLatches(bool value)
-    {
-        m_LatchesEnabled = value;
-        if (!m_LatchesEnabled)
-        {
-            m_P0Latch = false;
-            m_P1Latch = false;
-        }
-    }
-
-    private void SetPaddleCapacitorDumpToGround(bool value)
-    {
-        // TODO
-    }
-
     private static byte GetCx(bool b7, bool b6)
     {
         byte result = 0;
@@ -811,7 +822,7 @@ public sealed class Atari2600Tia
         }
         else
         {
-            float y = Lerp(0.2f, 0.85f, lum / 7.0f);
+            float y = MathEx.Lerp(0.2f, 0.85f, lum / 7.0f);
 
             float hueDegs = 156.0f - 24.0f * hue;
             float hueRads = hueDegs * (MathF.PI / 180.0f);
@@ -831,11 +842,6 @@ public sealed class Atari2600Tia
 
             return new(r, g, b, 255);
         }
-    }
-
-    private static float Lerp(float a, float b, float t)
-    {
-        return a + (b - a) * Math.Clamp(t, 0.0f, 1.0f);
     }
 
     private struct AudioChannel

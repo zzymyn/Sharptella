@@ -7,12 +7,16 @@ public interface IAtariInput
     bool Player0Right { get; }
     bool Player0Down { get; }
     bool Player0Button { get; }
+    double Player0Paddle0 { get; }
+    double Player0Paddle1 { get; }
 
     bool Player1Up { get; }
     bool Player1Left { get; }
     bool Player1Right { get; }
     bool Player1Down { get; }
     bool Player1Button { get; }
+    double Player1Paddle0 { get; }
+    double Player1Paddle1 { get; }
 
     bool GameResetSwitch { get; }
     bool GameSelectSwitch { get; }

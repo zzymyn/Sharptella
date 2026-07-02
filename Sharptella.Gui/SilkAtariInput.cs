@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Sharptella.Lib;
 using Silk.NET.Input;
 
@@ -26,6 +27,10 @@ internal sealed class SilkAtariInput
     private bool m_TvTypeSwitch;
     private bool m_PlayerDifficultySwitchA = true;
     private bool m_PlayerDifficultySwitchB = true;
+    private double m_Player0Paddle0 = 0.5;
+    private double m_Player0Paddle1 = 0.5;
+    private double m_Player1Paddle0 = 0.5;
+    private double m_Player1Paddle1 = 0.5;
     private int m_GameResetSwitchUiPressedFrames;
     private int m_GameSelectSwitchUiPressedFrames;
 
@@ -34,12 +39,16 @@ internal sealed class SilkAtariInput
     public bool Player0Right => m_Player0Right.IsActive;
     public bool Player0Down => m_Player0Down.IsActive;
     public bool Player0Button => m_Player0Button.IsActive;
+    public double Player0Paddle0 => m_Player0Paddle0;
+    public double Player0Paddle1 => m_Player0Paddle1;
 
     public bool Player1Up => m_Player1Up.IsActive;
     public bool Player1Left => m_Player1Left.IsActive;
     public bool Player1Right => m_Player1Right.IsActive;
     public bool Player1Down => m_Player1Down.IsActive;
     public bool Player1Button => m_Player1Button.IsActive;
+    public double Player1Paddle0 => m_Player1Paddle0;
+    public double Player1Paddle1 => m_Player1Paddle1;
 
     public bool GameResetSwitch => m_GameResetSwitch.IsActive || m_GameResetSwitchUiPressedFrames > 0;
     public bool GameSelectSwitch => m_GameSelectSwitch.IsActive || m_GameSelectSwitchUiPressedFrames > 0;
@@ -77,8 +86,13 @@ internal sealed class SilkAtariInput
         m_InputContext.ConnectionChanged -= OnConnectionChanged;
     }
 
-    public void Step()
+    public void Step(Vector2 gameMin, Vector2 gameMax)
     {
+        foreach (var mouse in m_InputContext.Mice)
+        {
+            m_Player0Paddle0 = MathEx.InverseLerp(gameMin.X, gameMax.X, mouse.Position.X);
+        }
+
         if (m_GameResetSwitchUiPressedFrames > 0)
         {
             m_GameResetSwitchUiPressedFrames--;
@@ -276,6 +290,9 @@ internal sealed class SilkAtariInput
                 keyboard.KeyDown += KeyboardKeyDown;
                 keyboard.KeyUp += KeyboardKeyUp;
             }
+            else if (device is IMouse mouse)
+            {
+            }
             else if (device is IGamepad gamepad)
             {
                 gamepad.ButtonDown += OnGamepadButtonDown;
@@ -289,6 +306,9 @@ internal sealed class SilkAtariInput
             {
                 keyboard.KeyDown -= KeyboardKeyDown;
                 keyboard.KeyUp -= KeyboardKeyUp;
+            }
+            else if (device is IMouse mouse)
+            {
             }
             else if (device is IGamepad gamepad)
             {

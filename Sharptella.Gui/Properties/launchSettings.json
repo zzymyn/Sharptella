@@ -20,6 +20,11 @@
       "commandLineArgs": "test4.bin",
       "workingDirectory": "$(SolutionDir)"
     },
+    "Sharptella.Gui Test5": {
+      "commandName": "Project",
+      "commandLineArgs": "test5.bin",
+      "workingDirectory": "$(SolutionDir)"
+    },
     "Sharptella.Gui None": {
       "commandName": "Project",
       "workingDirectory": "$(SolutionDir)"

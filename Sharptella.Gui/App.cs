@@ -237,7 +237,7 @@ internal unsafe sealed class App
         m_ImguiController.Update((float)dt);
 
         DoGui();
-        DoEmu();
+        DoEmu(out var stepped);
         DoAudio();
 
         var bg = ImGui.GetBackgroundDrawList();
@@ -250,6 +250,8 @@ internal unsafe sealed class App
         var gameSize = new Vector2(PixelAspectRatio * (m_FrameBufferPos1.X - m_FrameBufferPos0.X + 1), m_FrameBufferPos1.Y - m_FrameBufferPos0.Y + 1);
 
         var (gameMin, gameMax) = Fit(gameSize, windowMin, windowMax);
+
+        DoInput(stepped, gameMin, gameMax);
 
         bg.AddImage((IntPtr)m_MainTex, gameMin, gameMax, m_FrameBufferUV0, m_FrameBufferUV1);
 
@@ -534,14 +536,14 @@ internal unsafe sealed class App
         }
     }
 
-    private void DoEmu()
+    private void DoEmu(out bool stepped)
     {
         if (m_Gl == null)
             throw new NullReferenceException(nameof(m_Gl));
 
         if (m_Atari2600 != null)
         {
-            bool stepped = true;
+            stepped = true;
 
             // Process the emulation:
             if (!m_ViewDebugTools)
@@ -571,11 +573,6 @@ internal unsafe sealed class App
             else
             {
                 stepped = false;
-            }
-
-            if (stepped)
-            {
-                m_AtariInput?.Step();
             }
 
             m_Atari2600.ReadFrame(m_FrameBuffer);
@@ -623,6 +620,7 @@ internal unsafe sealed class App
         }
         else
         {
+            stepped = false;
             m_CpuElapsedTime = m_RealElapsedTime;
             Array.Clear(m_FrameBuffer, 0, m_FrameBuffer.Length);
             m_FrameBufferPos0 = default;
@@ -689,6 +687,14 @@ internal unsafe sealed class App
         }
     }
 
+    private void DoInput(bool stepped, Vector2 gameMin, Vector2 gameMax)
+    {
+        if (stepped)
+        {
+            m_AtariInput?.Step(gameMin, gameMax);
+        }
+    }
+
     private uint GetFreeAlBuffer()
     {
         uint alBuffer;
@@ -707,7 +713,7 @@ internal unsafe sealed class App
         return alBuffer;
     }
 
-    private (Vector2 min, Vector2 max) Fit(Vector2 a, Vector2 rMin, Vector2 rMax)
+    private static (Vector2 min, Vector2 max) Fit(Vector2 a, Vector2 rMin, Vector2 rMax)
     {
         var rCenter = 0.5f * (rMin + rMax);
         var rWidth = rMax.X - rMin.X;
