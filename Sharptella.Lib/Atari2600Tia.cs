@@ -218,17 +218,17 @@ public sealed class Atari2600Tia
 
         if (m_DumpPaddlesToGround)
         {
-            m_CapacitorCharge0 = Math.Max(0.0f, m_CapacitorCharge0 - 1.0 / CapacitorDischargeRate);
-            m_CapacitorCharge1 = Math.Max(0.0f, m_CapacitorCharge1 - 1.0 / CapacitorDischargeRate);
-            m_CapacitorCharge2 = Math.Max(0.0f, m_CapacitorCharge2 - 1.0 / CapacitorDischargeRate);
-            m_CapacitorCharge3 = Math.Max(0.0f, m_CapacitorCharge3 - 1.0 / CapacitorDischargeRate);
+            m_CapacitorCharge0 = Math.Max(0.0, m_CapacitorCharge0 - 1.0 / CapacitorDischargeRate);
+            m_CapacitorCharge1 = Math.Max(0.0, m_CapacitorCharge1 - 1.0 / CapacitorDischargeRate);
+            m_CapacitorCharge2 = Math.Max(0.0, m_CapacitorCharge2 - 1.0 / CapacitorDischargeRate);
+            m_CapacitorCharge3 = Math.Max(0.0, m_CapacitorCharge3 - 1.0 / CapacitorDischargeRate);
         }
         else
         {
-            m_CapacitorCharge0 = Math.Min(1.0f, m_CapacitorCharge0 + 1.0 / MathEx.Lerp(CapacitorChargeRateMin, CapacitorChargeRateMax, m_Input.Player0Paddle0));
-            m_CapacitorCharge1 = Math.Min(1.0f, m_CapacitorCharge1 + 1.0 / MathEx.Lerp(CapacitorChargeRateMin, CapacitorChargeRateMax, m_Input.Player0Paddle1));
-            m_CapacitorCharge2 = Math.Min(1.0f, m_CapacitorCharge2 + 1.0 / MathEx.Lerp(CapacitorChargeRateMin, CapacitorChargeRateMax, m_Input.Player1Paddle0));
-            m_CapacitorCharge3 = Math.Min(1.0f, m_CapacitorCharge3 + 1.0 / MathEx.Lerp(CapacitorChargeRateMin, CapacitorChargeRateMax, m_Input.Player1Paddle1));
+            m_CapacitorCharge0 = Math.Min(1.0, m_CapacitorCharge0 + 1.0 / MathEx.Lerp(CapacitorChargeRateMin, CapacitorChargeRateMax, m_Input.Player0Paddle0));
+            m_CapacitorCharge1 = Math.Min(1.0, m_CapacitorCharge1 + 1.0 / MathEx.Lerp(CapacitorChargeRateMin, CapacitorChargeRateMax, m_Input.Player0Paddle1));
+            m_CapacitorCharge2 = Math.Min(1.0, m_CapacitorCharge2 + 1.0 / MathEx.Lerp(CapacitorChargeRateMin, CapacitorChargeRateMax, m_Input.Player1Paddle0));
+            m_CapacitorCharge3 = Math.Min(1.0, m_CapacitorCharge3 + 1.0 / MathEx.Lerp(CapacitorChargeRateMin, CapacitorChargeRateMax, m_Input.Player1Paddle1));
         }
     }
 
