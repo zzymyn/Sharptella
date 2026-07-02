@@ -5,13 +5,13 @@
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
                 Trace($"$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2}");
-                m_CurrentOpCodeCycle = 3;
+                ++m_CurrentOpCodeCycle;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));

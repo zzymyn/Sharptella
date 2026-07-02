@@ -130,7 +130,7 @@ namespace Sharptella.Gen {
         ///                }
         ///                else
         ///                {
-        ///                    m_CurrentOpCodeCycle = 2;
+        ///                    ++m_CurrentOpCodeCycle;
         ///                }
         ///                break;
         ///     [rest of string was truncated]&quot;;.
@@ -164,13 +164,13 @@ namespace Sharptella.Gen {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2}&quot;);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///       [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadAbsolute {
@@ -187,7 +187,7 @@ namespace Sharptella.Gen {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
@@ -209,7 +209,7 @@ namespace Sharptella.Gen {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
@@ -248,11 +248,11 @@ namespace Sharptella.Gen {
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ (${m_SavedValue1:X2},X)&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue1);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 3:
         ///               [rest of string was truncated]&quot;;.
@@ -272,11 +272,11 @@ namespace Sharptella.Gen {
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ (${m_SavedValue1:X2}),Y&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                m_SavedValue0 = m_Bus.Read(m_SavedValue1);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 3:
         ///   [rest of string was truncated]&quot;;.
@@ -295,13 +295,13 @@ namespace Sharptella.Gen {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2}&quot;);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///       [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ReadWriteAbsolute {
@@ -318,7 +318,7 @@ namespace Sharptella.Gen {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
@@ -340,7 +340,7 @@ namespace Sharptella.Gen {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
@@ -363,11 +363,11 @@ namespace Sharptella.Gen {
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ (${m_SavedValue1:X2},X)&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue1);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 3:
         ///               [rest of string was truncated]&quot;;.
@@ -387,11 +387,11 @@ namespace Sharptella.Gen {
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ (${m_SavedValue1:X2}),Y&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                m_SavedValue0 = m_Bus.Read(m_SavedValue1);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 3:
         ///   [rest of string was truncated]&quot;;.
@@ -411,11 +411,11 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 3:
         ///                [rest of string was truncated]&quot;;.
@@ -435,11 +435,11 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},X&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue0);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 3:
         ///                 [rest of string was truncated]&quot;;.
@@ -459,7 +459,7 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            default:
         ///                m_SavedValue2 = m_Bus.Read(m_SavedValue0);
@@ -482,11 +482,11 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},X&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue0);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            default:
         ///                [rest of string was truncated]&quot;;.
@@ -506,11 +506,11 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},Y&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue0);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            default:
         ///                [rest of string was truncated]&quot;;.
@@ -529,13 +529,13 @@ namespace Sharptella.Gen {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}{m_SavedValue1:X2}&quot;);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///       [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string WriteAbsolute {
@@ -552,7 +552,7 @@ namespace Sharptella.Gen {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
@@ -574,7 +574,7 @@ namespace Sharptella.Gen {
         ///            case 1:
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
@@ -597,11 +597,11 @@ namespace Sharptella.Gen {
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ (${m_SavedValue1:X2},X)&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue1);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 3:
         ///               [rest of string was truncated]&quot;;.
@@ -621,11 +621,11 @@ namespace Sharptella.Gen {
         ///                m_SavedValue1 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ (${m_SavedValue1:X2}),Y&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                m_SavedValue0 = m_Bus.Read(m_SavedValue1);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 3:
         ///   [rest of string was truncated]&quot;;.
@@ -645,7 +645,7 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2}&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            default:
         ///                m_Bus.Write(m_SavedValue0, $OP$());
@@ -669,11 +669,11 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},X&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue0);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            default:
         ///                [rest of string was truncated]&quot;;.
@@ -693,11 +693,11 @@ namespace Sharptella.Gen {
         ///                m_SavedValue0 = m_Bus.Read(m_Registers.PC);
         ///                ++m_Registers.PC;
         ///                Trace($&quot;$OP$ ${m_SavedValue0:X2},Y&quot;);
-        ///                m_CurrentOpCodeCycle = 2;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            case 2:
         ///                _ = m_Bus.Read(m_SavedValue0);
-        ///                m_CurrentOpCodeCycle = 3;
+        ///                ++m_CurrentOpCodeCycle;
         ///                break;
         ///            default:
         ///                [rest of string was truncated]&quot;;.

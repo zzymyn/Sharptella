@@ -96,11 +96,11 @@ public sealed partial class Mos6502Cpu<BusT>
                 m_Registers.PInterruptDisable = true;
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("BOOT");
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 2:
                 _ = m_Bus.Read(m_Registers.PC);
-                m_CurrentOpCodeCycle = 3;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 3:
             case 4:
@@ -111,7 +111,7 @@ public sealed partial class Mos6502Cpu<BusT>
                 break;
             case 6:
                 m_SavedValue0 = m_Bus.Read(0xFFFC);
-                m_CurrentOpCodeCycle = 7;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 7:
                 m_SavedValue1 = m_Bus.Read(0xFFFD);
@@ -347,26 +347,26 @@ public sealed partial class Mos6502Cpu<BusT>
                 _ = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
                 Trace("BRK");
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 2:
                 m_Bus.Write(GetStackAddress(m_Registers.S), GetHi(m_Registers.PC));
                 --m_Registers.S;
-                m_CurrentOpCodeCycle = 3;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 3:
                 m_Bus.Write(GetStackAddress(m_Registers.S), GetLo(m_Registers.PC));
                 --m_Registers.S;
-                m_CurrentOpCodeCycle = 4;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 4:
                 m_Bus.Write(GetStackAddress(m_Registers.S), m_Registers.ReadP(true));
                 --m_Registers.S;
-                m_CurrentOpCodeCycle = 5;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 5:
                 m_SavedValue0 = m_Bus.Read(0xFFFE);
-                m_CurrentOpCodeCycle = 6;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 6:
                 m_SavedValue1 = m_Bus.Read(0xFFFF);
@@ -587,7 +587,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("JAM");
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 2:
             default:
@@ -610,7 +610,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             default:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
@@ -629,18 +629,18 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 2:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
                 Trace($"JMP (${m_SavedValue0:X2}{m_SavedValue1:X2})");
-                m_CurrentOpCodeCycle = 3;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 3:
                 m_SavedValue2 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
                 ++m_SavedValue0;
-                m_CurrentOpCodeCycle = 4;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 4:
                 m_SavedValue1 = m_Bus.Read(GetAbsolute(m_SavedValue0, m_SavedValue1));
@@ -658,21 +658,21 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 2:
                 _ = m_Bus.Read(GetStackAddress(m_Registers.S));
-                m_CurrentOpCodeCycle = 3;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 3:
                 m_Bus.Write(GetStackAddress(m_Registers.S), GetHi(m_Registers.PC));
                 --m_Registers.S;
-                m_CurrentOpCodeCycle = 4;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 4:
                 m_Bus.Write(GetStackAddress(m_Registers.S), GetLo(m_Registers.PC));
                 --m_Registers.S;
-                m_CurrentOpCodeCycle = 5;
+                ++m_CurrentOpCodeCycle;
                 break;
             default:
                 m_SavedValue1 = m_Bus.Read(m_Registers.PC);
@@ -835,7 +835,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("PHA");
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             default:
                 m_Bus.Write(GetStackAddress(m_Registers.S), m_Registers.A);
@@ -853,7 +853,7 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("PHP");
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             default:
                 m_Bus.Write(GetStackAddress(m_Registers.S), m_Registers.ReadP(true));
@@ -871,12 +871,12 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("PLA");
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 2:
                 _ = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.S++;
-                m_CurrentOpCodeCycle = 3;
+                ++m_CurrentOpCodeCycle;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetStackAddress(m_Registers.S));
@@ -896,12 +896,12 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("PLP");
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 2:
                 _ = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.S++;
-                m_CurrentOpCodeCycle = 3;
+                ++m_CurrentOpCodeCycle;
                 break;
             default:
                 m_SavedValue2 = m_Bus.Read(GetStackAddress(m_Registers.S));
@@ -999,22 +999,22 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("RTI");
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 2:
                 _ = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.S++;
-                m_CurrentOpCodeCycle = 3;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 3:
                 m_Registers.WriteP(m_Bus.Read(GetStackAddress(m_Registers.S)));
                 m_Registers.S++;
-                m_CurrentOpCodeCycle = 4;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 4:
                 m_SavedValue0 = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.S++;
-                m_CurrentOpCodeCycle = 5;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 5:
                 m_SavedValue1 = m_Bus.Read(GetStackAddress(m_Registers.S));
@@ -1032,22 +1032,22 @@ public sealed partial class Mos6502Cpu<BusT>
             case 1:
                 _ = m_Bus.Read(m_Registers.PC);
                 Trace("RTS");
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 2:
                 _ = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.S++;
-                m_CurrentOpCodeCycle = 3;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 3:
                 m_SavedValue0 = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.S++;
-                m_CurrentOpCodeCycle = 4;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 4:
                 m_SavedValue1 = m_Bus.Read(GetStackAddress(m_Registers.S));
                 m_Registers.PC = GetAbsolute(m_SavedValue0, m_SavedValue1);
-                m_CurrentOpCodeCycle = 5;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 5:
                 _ = m_Bus.Read(m_Registers.PC);

@@ -6,15 +6,15 @@
                 m_SavedValue0 = m_Bus.Read(m_Registers.PC);
                 ++m_Registers.PC;
                 Trace($"$OP$ ${m_SavedValue0:X2}");
-                m_CurrentOpCodeCycle = 2;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 2:
                 m_SavedValue2 = m_Bus.Read(m_SavedValue0);
-                m_CurrentOpCodeCycle = 3;
+                ++m_CurrentOpCodeCycle;
                 break;
             case 3:
                 m_Bus.Write(m_SavedValue0, m_SavedValue2);
-                m_CurrentOpCodeCycle = 4;
+                ++m_CurrentOpCodeCycle;
                 break;
             default:
                 m_Bus.Write(m_SavedValue0, $OP$(m_SavedValue2));
