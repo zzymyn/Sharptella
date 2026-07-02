@@ -331,15 +331,19 @@ public sealed class Atari2600Tia
                 return GetCx(m_CxP0P1, m_CxM0M1);
             case 0x08:
                 // INPT0
+                // TODO
                 return 0x80;
             case 0x09:
                 // INPT1
+                // TODO
                 return 0x80;
             case 0x0a:
                 // INPT2
+                // TODO
                 return 0x80;
             case 0x0b:
                 // INPT3
+                // TODO
                 return 0x80;
             case 0x0c:
                 // INPT4

@@ -19,12 +19,10 @@ public sealed class Mos6532Riot
 
     private readonly IAtariInput m_Input;
 
-    // TODO: read controller inputs for SWCHA:
     private byte m_SWCHA = 0b1111_1111;
     private byte m_ORA;
     private byte m_SWACNT;
 
-    // TODO: read switch inputs for SWCHB:
     private byte m_SWCHB = 0b0011_1111;
     private byte m_ORB;
     private byte m_SWBCNT;
