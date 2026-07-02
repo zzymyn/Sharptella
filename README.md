@@ -97,6 +97,7 @@ You can also pass:
 - F4: Toggle player difficulty B
 - F5: Game select
 - F6: Game reset
+- Mouse X (relative to window): Player 0 paddle
 
 ## Notes
 
