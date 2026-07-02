@@ -13,7 +13,7 @@ internal static class Program
         {
             GlfwWindowing.RegisterPlatform();
             GlfwInput.RegisterPlatform();
-            
+
             using var app = new App();
 
             if (args.Length == 1)
